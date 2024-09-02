@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block title%}
+    Register a New User
+{% endblock %}
+
+{% block content %}
+    <h1>Register a New User</h1>
+
+    {% comment %}
+        for user registration using the built in function of django
+        
+        action = the link see the url.py
+        
+    {% endcomment %}
+
+    <form class="form-with-validation" action="{% url 'users:register' %}" method="post">
+        {% comment %}
+            django provides security using cross-site request forger (CSRF) token ensuring that this form is submitted in our site and not scam site
+            this is the line to use the form in the function register_user
+        {% endcomment %}
+        {% csrf_token %} {% comment %} without this django will throw in error when you use the built-in user registration of django {% endcomment %}
+        {{ form }}
+        <button class=form-submit>Submit</button>
+    </form>
+{% endblock %}

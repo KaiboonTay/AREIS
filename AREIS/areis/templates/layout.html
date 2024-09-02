@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--similar to the layout of asp.net here we have the navigation bar-->
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--similar to the render body or section of asp.net-->
+    <title>
+        {% block title %}
+            Django App
+        {% endblock %}
+    </title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!--defer will wait till all of the pages are loaded then loads the script-->
+    <script src="{% static 'js/main.js' %}" defer> </script>
+</head>
+<body>
+    <nav>
+        <a href="/">
+            <span role="img" aria-label="Home" title="Home">🏠</span>
+        </a> |
+        <a href="/about">About</a>
+        {% comment %}
+        url is using the "name" parameter in the url path inside the posts app
+        posts:list - first part is the name of the app inside urls.py it is the app_name, second part is the name of the url
+        {% endcomment %}
+         
+        |
+
+        {% comment %}
+        to hide some items in the nav bar depending if the user is logged in or not
+        {% endcomment %}
+        {% if user.is_authenticated %}
+        
+        <form class="logout" action="{% url 'users:logout' %}"
+        method="post">
+        {% csrf_token %}
+        <button class="logout-button" aria-label="User Logout">Logout</button>
+        </form>
+        {% else %}
+
+        <a href="{% url 'users:register' %}">Sign Up</a> 
+        |
+        <a href="{% url 'users:login' %}">Login</a> 
+        
+        {% endif %}
+
+    </nav>
+    
+        <!--similar to the render body or section of asp.net-->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>
