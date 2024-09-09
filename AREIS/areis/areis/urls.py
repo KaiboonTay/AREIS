@@ -30,7 +30,11 @@ urlpatterns = [
     #telling django to look inside posts app and look at the URLs file inside of that 
     #posts application created inside of project
     #users application created inside of project
-    path('users/', include('users.urls')) 
+    path('users/', include('users.urls')),
+    #for data management
+    #path('managedata/', include('managedata.urls')),
+    #for student management
+    path('managestudents/', include('managestudents.urls')),
 ]
 
 #used for upload image feature

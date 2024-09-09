@@ -1,0 +1,43 @@
+{% extends 'layout.html' %} 
+
+{% comment %}
+{%%} similar to the asp.net code block
+{% endcomment %}
+
+{% block title%}
+    Trigger At-Risk Student
+{% endblock %}
+
+{% block content %}
+    <section>
+        <h1>Students</h1>
+
+        {% comment %}
+        the the value of posts here is from the posts in the post_list method in the views.py 
+        {% endcomment %}
+        <table>
+            <thead>
+                <tr class="tableHeader">
+                    <th>Student ID</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
+                    <th>Academic Program</th>
+                    <th>Phone Number</th>
+                    <th>Email Address</th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for student in students %}
+            <tr>
+                <td>{{ student.studentid }}</td>
+                <td>{{ student.lastname }}</td>
+                <td>{{ student.firstname }}</td>
+                <td>{{ student.acadprogdesc }}</td>
+                <td>{{ student.phoneno }}</td>
+                <td>{{ student.email }}</td> 
+            </tr>   
+        {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endblock %}

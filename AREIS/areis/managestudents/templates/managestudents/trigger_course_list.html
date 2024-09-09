@@ -1,0 +1,31 @@
+{% extends 'layout.html' %} 
+
+{% comment %}
+{%%} similar to the asp.net code block
+{% endcomment %}
+
+{% block title%}
+    Trigger At-Risk Student
+{% endblock %}
+
+{% block content %}
+    <section>
+    <h1>Courses</h1>
+
+    {% comment %}
+    the the value of posts here is from the posts in the post_list method in the views.py 
+    {% endcomment %}
+    {% for course in courses %}
+            <h2>
+                {% comment %}
+                url is using the "name" parameter in the url path inside the posts app
+                managestudent:course-list - first part is the name of the app inside urls.py it is the app_name, second part is the name of the url
+                {% endcomment %}
+                <a href="{% url 'managestudents:trigger-students-list' %}">
+                {{ course.subject }} : {{ course.classdescription }}
+                </a>
+            </h2>
+            
+    {% endfor %}
+    </section>
+{% endblock %}
