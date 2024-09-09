@@ -28,17 +28,15 @@
          
         |
 
-        |
-        <a href="{% url 'managestudents:course-list' %}">Trigger At-Risk Students</a>
-        |
+        
 
         {% comment %}
         to hide some items in the nav bar depending if the user is logged in or not
         {% endcomment %}
         {% if user.is_authenticated %}
        
-        
-        
+        <a href="{% url 'managestudents:course-list' %}">Trigger At-Risk Students</a>
+        |
         <form class="logout" action="{% url 'users:logout' %}"
         method="post">
         {% csrf_token %}
