@@ -16,17 +16,24 @@
     <script src="{% static 'js/main.js' %}" defer> </script>
 </head>
 <body>
+    <div class="container">
     <nav>
-        <a href="/">
-            <span role="img" aria-label="Home" title="Home">🏠</span>
-        </a> |
-        <a href="/about">About</a>
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>AREIS</h2>
+            </div>
+        <ul>
+            <li><a href="/"><span role="img" aria-label="Home" title="Home">🏠 Home</span></li></a>
+            <li><a href="/about">🔎 Search</a></li>
+            <li><a href="/about">🚩 At Risk Students</a></li>
+            <li><a href="/about">📌 Trigger At-Risk</a></li>
+        </ul>
         {% comment %}
         url is using the "name" parameter in the url path inside the posts app
         posts:list - first part is the name of the app inside urls.py it is the app_name, second part is the name of the url
         {% endcomment %}
          
-        |
+
 
         
 
@@ -34,24 +41,23 @@
         to hide some items in the nav bar depending if the user is logged in or not
         {% endcomment %}
         {% if user.is_authenticated %}
-       
-        <a href="{% url 'managestudents:course-list' %}">Trigger At-Risk Students</a>
-        |
-        <a href="{% url 'managedata:upload-csv' %}">Upload CSV</a>
-        |
-        <form class="logout" action="{% url 'users:logout' %}"
-        method="post">
-        {% csrf_token %}
-        <button class="logout-button" aria-label="User Logout">Logout</button>
-        </form>
+        <ul>
+            <li><a href="{% url 'managestudents:course-list' %}">Trigger At-Risk Students</a></li>
+            <li><a href="{% url 'managedata:upload-csv' %}">Upload CSV</a></li>
+            <li>
+                <form class="logout" action="{% url 'users:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button class="logout-button" aria-label="User Logout">Logout</button>
+                </form>
+            </li>
+        </ul>
         {% else %}
-
-        <a href="{% url 'users:register' %}">Sign Up</a> 
-        |
-        <a href="{% url 'users:login' %}">Login</a> 
-        
+        <ul>
+            <li><a href="{% url 'users:register' %}">Sign Up</a></li>
+            <li><a href="{% url 'users:login' %}">Login</a></li>
+        </ul>
         {% endif %}
-
+        </aside>
     </nav>
     
         <!--similar to the render body or section of asp.net-->
@@ -59,6 +65,6 @@
         {% block content %}
         {% endblock %}
     </main>
-
+    </div>
 </body>
 </html>
