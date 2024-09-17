@@ -1,0 +1,25 @@
+{% extends 'layout.html' %} 
+
+{% comment %}
+{%%} similar to the asp.net code block
+{% endcomment %}
+
+{% block title%}
+    Upload CSV File
+{% endblock %}
+
+{% block content %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+    Select File: <input type="file" name="csv_file">
+    <button type="submit">Upload File</button>
+    </form>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div>
+        <p{% if message.tags %} {% endif %}> {{ message }}</p>
+    </div>
+    {% endfor %}
+    {% endif %}
+{% endblock %}

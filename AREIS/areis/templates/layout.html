@@ -37,6 +37,8 @@
        
         <a href="{% url 'managestudents:course-list' %}">Trigger At-Risk Students</a>
         |
+        <a href="{% url 'managedata:upload-csv' %}">Upload CSV</a>
+        |
         <form class="logout" action="{% url 'users:logout' %}"
         method="post">
         {% csrf_token %}

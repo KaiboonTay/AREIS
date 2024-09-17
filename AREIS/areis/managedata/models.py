@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 class Students(models.Model):
-    studentid = models.AutoField(db_column='StudentID', primary_key=True, blank=True, null=False)  # Field name made lowercase.
+    studentid = models.TextField(db_column='StudentID', primary_key=True, blank=True, null=False)  # Field name made lowercase.
     lastname = models.TextField(db_column='LastName', blank=True, null=True)  # Field name made lowercase.
     firstname = models.TextField(db_column='FirstName', blank=True, null=True)  # Field name made lowercase.
     acadprogdesc = models.TextField(db_column='AcadProgDesc', blank=True, null=True)  # Field name made lowercase.

@@ -32,7 +32,7 @@ urlpatterns = [
     #users application created inside of project
     path('users/', include('users.urls')),
     #for data management
-    #path('managedata/', include('managedata.urls')),
+    path('managedata/', include('managedata.urls')),
     #for student management
     path('managestudents/', include('managestudents.urls')),
 ]
