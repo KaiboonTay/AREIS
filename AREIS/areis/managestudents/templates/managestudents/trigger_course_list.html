@@ -21,7 +21,7 @@
                 url is using the "name" parameter in the url path inside the posts app
                 managestudent:course-list - first part is the name of the app inside urls.py it is the app_name, second part is the name of the url
                 {% endcomment %}
-                <a href="{% url 'managestudents:trigger-students-list' %}">
+                <a href="{% url 'managestudents:trigger-students-list' CatalogueNo=course.catalogueno %}">
                 {{ course.subject }} : {{ course.classdescription }}
                 </a>
             </h2>
