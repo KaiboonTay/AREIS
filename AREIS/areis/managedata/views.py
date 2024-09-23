@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Students
+from .models import Students, Courses, Studentgrades
 from django.contrib import messages
 from tablib import Dataset
 import csv, io
@@ -31,31 +31,73 @@ def upload_csv(request):
 
 
         for row in csv_reader:
-            studentid = row.get('Empl ID', '').strip()
-            lastname = row.get('Surname', '').strip()
-            firstname = row.get('First Name', '').strip()
-            acadprogdesc = row.get('Academic Program Descr', '').strip()
-            phoneno = row.get('Phone No.', '').strip()
-            email = row.get('Email Address', '').strip()
+            StudentId = row.get('Empl ID', '').strip()
+            Lastname = row.get('Surname', '').strip()
+            FirstName = row.get('First Name', '').strip()
+            AcadProgDesc = row.get('Academic Program Descr', '').strip()
+            PhoneNo = row.get('Phone No.', '').strip()
+            Email = row.get('Email Address', '').strip()
+            CatalogueNo = row.get('Catalogue Number', '').strip()
+            Subject = row.get('Subject', '').strip()
+            ClassDescription = row.get('Class Descr', '').strip()
+            GradeInput = row.get('Grade Input', '').strip()
+            OfficialGrade = row.get('Official Grade', '').strip()
+            Trimester = row.get('Term', '').strip()
+            
 
             # Check if the student already exists before inserting
-            if not Students.objects.filter(studentid=studentid).exists():
+            if not Students.objects.filter(studentid=StudentId).exists():
                 try:
                     # Insert the student record
                     Students.objects.create(
-                        studentid=studentid,
-                        lastname=lastname,
-                        firstname=firstname,
-                        acadprogdesc=acadprogdesc,
-                        phoneno=phoneno,
-                        email=email
+                        studentid=StudentId,
+                        lastname=Lastname,
+                        firstname=FirstName,
+                        acadprogdesc=AcadProgDesc,
+                        phoneno=PhoneNo,
+                        email=Email
                     )
                 except IntegrityError:
                     # Handle any integrity error (like UNIQUE constraint)
-                    messages.error(request, f"Error inserting record for {studentid}. Duplicate entry.")
+                    messages.error(request, f"Error inserting record for {StudentId}. Duplicate entry.")
             else:
                 # If the student already exists, show a message
-                messages.warning(request, f"StudentID {studentid} already exists. Skipping.")
-    
+                messages.warning(request, f"StudentID {StudentId} already exists. Skipping.")
+
+
+            # check if the course already exists before inserting
+            if not Courses.objects.filter(catalogueno=CatalogueNo).exists():
+                try:
+                    # add the course
+                    Courses.objects.create(
+                        catalogueno=CatalogueNo,
+                        subject=Subject,
+                        classdescription=ClassDescription,
+                    )
+                except IntegrityError:
+                    # Handle any integrity error (like UNIQUE constraint)
+                    messages.error(request, f"Error inserting record for {CatalogueNo}. Duplicate entry.")
+            else:
+                # If the course already exists, show a message
+                messages.warning(request, f"{ClassDescription} already exists. Skipping.")
+
+
+            # check if the studentgrades already exists before inserting
+            if not Studentgrades.objects.filter(catalogueno=CatalogueNo, studentid=StudentId, trimester=Trimester).exists():
+                try:
+                    # add the course
+                    Studentgrades.objects.create(
+                        studentid=Students.objects.get(studentid=StudentId),
+                        catalogueno=Courses.objects.get(catalogueno=CatalogueNo),
+                        gradeinput=GradeInput,
+                        officialgrade=OfficialGrade,
+                        trimester=Trimester
+                    )
+                except IntegrityError:
+                    # Handle any integrity error (like UNIQUE constraint)
+                    messages.error(request, f"Error inserting record for {StudentId}. Duplicate entry.")
+            else:
+                # If the course already exists, show a message
+                messages.warning(request, f"Grade for {StudentId} already exists. Skipping.")
     
     return render(request, 'managedata/upload_csv.html')

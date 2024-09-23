@@ -22,12 +22,12 @@ class Students(models.Model):
 
 
 class Courses(models.Model):
-    catalogueno = models.AutoField(db_column='CatalogueNo', primary_key=True, blank=True, null=False)  # Field name made lowercase.
+    catalogueno = models.TextField(db_column='CatalogueNo', primary_key=True, blank=True, null=False)  # Field name made lowercase.
     subject = models.TextField(db_column='Subject', blank=True, null=True)  # Field name made lowercase.
-    classdescription = models.IntegerField(db_column='ClassDescription', blank=True, null=True)  # Field name made lowercase.
+    classdescription = models.TextField(db_column='ClassDescription', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False # This tells Django not to create or alter this table
+        managed = False
         db_table = 'courses'
 
 
@@ -37,7 +37,8 @@ class Studentgrades(models.Model):
     catalogueno = models.ForeignKey(Courses, models.DO_NOTHING, db_column='CatalogueNo', blank=True, null=True)  # Field name made lowercase.
     gradeinput = models.IntegerField(db_column='GradeInput', blank=True, null=True)  # Field name made lowercase.
     officialgrade = models.TextField(db_column='OfficialGrade', blank=True, null=True)  # Field name made lowercase.
+    trimester = models.TextField(db_column='Trimester', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False # This tells Django not to create or alter this table
+        managed = False
         db_table = 'studentGrades'
