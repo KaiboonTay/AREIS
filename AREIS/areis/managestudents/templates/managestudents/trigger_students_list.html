@@ -10,20 +10,23 @@
 
 {% block content %}
     <section>
-        <h1>Students</h1>
+        <h1>{{ course.subject }}{{ course.catalogueno }}: {{ course.classdescription }}</h1>
 
         {% comment %}
         the the value of posts here is from the posts in the post_list method in the views.py 
         {% endcomment %}
+
         <table>
             <thead>
                 <tr class="tableHeader">
                     <th>Student ID</th>
                     <th>Last Name</th>
                     <th>First Name</th>
-                    <th>Academic Program</th>
+                    <th>Grade</th>
+                    <th>Official Grade</th>
                     <th>Phone Number</th>
                     <th>Email Address</th>
+                    <th>Flag Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,9 +35,19 @@
                 <td>{{ student.studentid }}</td>
                 <td>{{ student.lastname }}</td>
                 <td>{{ student.firstname }}</td>
-                <td>{{ student.acadprogdesc }}</td>
+                {% for grade in studentsgrades%}
+                {%comment%}
+                grade.studentid.studentid (object instance) need to do this because in django when you access a foreign key it returns an object
+                grade.studentid is a model instance
+                {%endcomment%}
+                    {% if student.studentid == grade.studentid.studentid %}
+                        <td>{{ grade.gradeinput }}</td>
+                        <td>{{ grade.officialgrade }}</td>
+                    {% endif %}
+                {% endfor %}
                 <td>{{ student.phoneno }}</td>
                 <td>{{ student.email }}</td> 
+                <td>Temporary Flag Status</td> 
             </tr>   
         {% endfor %}
             </tbody>
