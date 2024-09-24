@@ -43,6 +43,7 @@ def upload_csv(request):
             GradeInput = row.get('Grade Input', '').strip()
             OfficialGrade = row.get('Official Grade', '').strip()
             Trimester = row.get('Term', '').strip()
+            CourseId = Subject+CatalogueNo
             
 
             # Check if the student already exists before inserting
@@ -66,29 +67,30 @@ def upload_csv(request):
 
 
             # check if the course already exists before inserting
-            if not Courses.objects.filter(catalogueno=CatalogueNo).exists():
+            if not Courses.objects.filter(courseid=CourseId).exists():
                 try:
                     # add the course
                     Courses.objects.create(
+                        courseid=CourseId,
                         catalogueno=CatalogueNo,
                         subject=Subject,
                         classdescription=ClassDescription,
                     )
                 except IntegrityError:
                     # Handle any integrity error (like UNIQUE constraint)
-                    messages.error(request, f"Error inserting record for {CatalogueNo}. Duplicate entry.")
+                    messages.error(request, f"Error inserting record for {CourseId}. Duplicate entry.")
             else:
                 # If the course already exists, show a message
                 messages.warning(request, f"{ClassDescription} already exists. Skipping.")
 
 
             # check if the studentgrades already exists before inserting
-            if not Studentgrades.objects.filter(catalogueno=CatalogueNo, studentid=StudentId, trimester=Trimester).exists():
+            if not Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId, trimester=Trimester).exists():
                 try:
                     # add the course
                     Studentgrades.objects.create(
                         studentid=Students.objects.get(studentid=StudentId),
-                        catalogueno=Courses.objects.get(catalogueno=CatalogueNo),
+                        courseid=Courses.objects.get(courseid=CourseId),
                         gradeinput=GradeInput,
                         officialgrade=OfficialGrade,
                         trimester=Trimester

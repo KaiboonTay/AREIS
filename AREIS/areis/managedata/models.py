@@ -22,7 +22,8 @@ class Students(models.Model):
 
 
 class Courses(models.Model):
-    catalogueno = models.TextField(db_column='CatalogueNo', primary_key=True, blank=True, null=False)  # Field name made lowercase.
+    courseid = models.TextField(db_column='CourseID', primary_key=True, blank=True, null=False)  # Field name made lowercase.
+    catalogueno = models.TextField(db_column='CatalogueNo', blank=True, null=True)  # Field name made lowercase.
     subject = models.TextField(db_column='Subject', blank=True, null=True)  # Field name made lowercase.
     classdescription = models.TextField(db_column='ClassDescription', blank=True, null=True)  # Field name made lowercase.
 
@@ -34,7 +35,7 @@ class Courses(models.Model):
 
 class Studentgrades(models.Model):
     studentid = models.ForeignKey('Students', models.DO_NOTHING, db_column='StudentID', blank=True, null=True)  # Field name made lowercase.
-    catalogueno = models.ForeignKey(Courses, models.DO_NOTHING, db_column='CatalogueNo', blank=True, null=True)  # Field name made lowercase.
+    courseid = models.ForeignKey(Courses, models.DO_NOTHING, db_column='CourseID', blank=True, null=True)  # Field name made lowercase.
     gradeinput = models.IntegerField(db_column='GradeInput', blank=True, null=True)  # Field name made lowercase.
     officialgrade = models.TextField(db_column='OfficialGrade', blank=True, null=True)  # Field name made lowercase.
     trimester = models.TextField(db_column='Trimester', blank=True, null=True)  # Field name made lowercase.

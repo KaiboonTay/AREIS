@@ -13,15 +13,15 @@ def course_list(request):
     return render(request, 'managestudents/trigger_course_list.html', { 'courses' : courses }) #'courses' : courses this is a dictionary datatype
 
 
-def trigger_students_list(request, CatalogueNo):
+def trigger_students_list(request, CourseId):
     #students = Students.objects.all()
-    studentsgrades = Studentgrades.objects.filter(catalogueno = CatalogueNo)
+    studentsgrades = Studentgrades.objects.filter(courseid = CourseId)
     # Extract student IDs from the studentsfilter queryset
     student_ids = studentsgrades.values_list('studentid', flat = True)
     # Filter Students based on the extracted student IDs
     students = Students.objects.filter(studentid__in = student_ids)
     #first - request (the link I think ie about, home, posts), second - html file location, third - setting the value of 'courses' as the courses object this will be used in the html file
-    course = Courses.objects.get(catalogueno = CatalogueNo)
+    course = Courses.objects.get(courseid = CourseId)
     
     #print(studentsgrades)
 
