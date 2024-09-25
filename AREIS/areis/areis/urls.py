@@ -24,8 +24,8 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.homepage, name='home'), #first part is the link, second part is the method from the views.py
-    path('about/', views.about),
+    path('', views.index, name='home'), #first part is the link, second part is the method from the views.py
+    path('about/', views.index, name='about'),
     #register the urls inside the posts app
     #telling django to look inside posts app and look at the URLs file inside of that 
     #posts application created inside of project

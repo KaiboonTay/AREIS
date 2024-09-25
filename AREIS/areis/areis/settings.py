@@ -58,7 +58,7 @@ ROOT_URLCONF = 'areis.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'areis-react/build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,7 +132,7 @@ STATIC_URL = 'static/'
 
 #for the static files like css were telling django the location of the static files
 STATICFILES_DIRS =[
-    os.path.join(BASE_DIR, 'static') 
+    os.path.join(BASE_DIR, 'areis-react/build/static') 
 ]
 
 # Default primary key field type
