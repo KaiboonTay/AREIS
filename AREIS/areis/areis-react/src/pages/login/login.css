@@ -1,0 +1,6 @@
+.bg{
+    /* background-image: url("/bg.png"); */
+    min-height: 100vh;
+    object-fit: contain;
+    background-repeat: round;
+}
