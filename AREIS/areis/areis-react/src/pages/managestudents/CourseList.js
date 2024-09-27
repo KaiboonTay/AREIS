@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Layout from '../../components/Layout';
 
 function CourseList() {
     const [courses, setCourses] = useState([]);
@@ -11,6 +12,7 @@ function CourseList() {
     }, []);
 
     return (
+        <Layout>
         <div>
             <h1>Courses</h1>
             {courses.map(course => (
@@ -21,6 +23,7 @@ function CourseList() {
                 </h2>
             ))}
         </div>
+        </Layout>
     );
 }
 
