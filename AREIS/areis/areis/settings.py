@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'users',
     'managedata',
     'managestudents',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
