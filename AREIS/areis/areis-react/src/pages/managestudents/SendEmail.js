@@ -7,7 +7,7 @@ const SendEmail = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch('http://localhost:8000/send-email/', {
+        const response = await fetch('/managestudents/send-email/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
