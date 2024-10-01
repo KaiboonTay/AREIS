@@ -10,6 +10,7 @@ const Sidebar = () => {
         <li><Link to="/about">🔎 Search</Link></li>
         <li><Link to="/about">🚩 At Risk Students</Link></li>
         <li><Link to="/courses">📌 Trigger At-Risk</Link></li>
+        <li><Link to="/sendemail">📌 Send Email</Link></li>
       </ul>
     </aside>
   );

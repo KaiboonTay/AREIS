@@ -6,6 +6,11 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from managedata.serializers import CourseSerializer, StudentSerializer, StudentGradeSerializer
 import json  # Import the json module
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import os 
 
 # Create your views here.
 
@@ -57,3 +62,32 @@ def trigger_students_list(request, CourseId):
         'studentsgrades': StudentGradeSerializer(studentsgrades, many=True).data
     }
     return Response(data)
+
+
+@csrf_exempt
+def send_email(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        to_email = data.get('email')
+
+        # Email content
+        message = Mail(
+            from_email='uonareis@gmail.com',
+            to_emails=to_email,
+            subject='Important Form for You',
+            html_content=(
+                'Please fill out the form: '
+                '<a href="https://forms.office.com/pages/responsepage.aspx?id=yz2Q7ncrpU2-AsRSNXg9rTspLCQKMIpMuek5x6ObROFUNDlPTEVIQlZNMDdKSlRUWFVBRDRITzA5VC4u">'
+                'Office Form Link</a>'
+            )
+        )
+        
+        try:
+            sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+            response = sg.send(message)
+            return JsonResponse({'status': 'Email sent successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'Failed to send email', 'error': str(e)}, status=500)
+        
+    
+    return JsonResponse({'status': 'Invalid request method'}, status=400)
