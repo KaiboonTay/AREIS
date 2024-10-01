@@ -2,17 +2,13 @@ import "./login.css";
 
 const Login = () => {
   return (
-    <div className="bg flex justify-center items-center flex-col relative">
+    <div style={{backgroundImage: `url(${"/bg.png"})`}} className="bg flex justify-center items-center flex-col relative">
       <div className="mb-48">
         <img src="/logoLogin.png" alt="" />
       </div>
       <div className="absolute top-[50%] flex flex-col justify-center text-center items-center">
         <h2 className="font-bold text-[24px] shadow-slate-500">Sign In</h2>
-<<<<<<< Updated upstream
-        <p className="mb-4">Enter your UoN email to sign in</p>
-=======
         <p className="mb-">Enter your UoN email to sign in</p>
->>>>>>> Stashed changes
         <div className="w-[400px] mt-[14px] flex flex-col justify-center items-center">
           <div className="w-full">
             <input

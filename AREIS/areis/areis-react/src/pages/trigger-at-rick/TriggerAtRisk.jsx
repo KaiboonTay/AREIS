@@ -48,6 +48,18 @@ const TriggerAtRisk = () => {
         { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
         { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
         { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+        { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
         // More dummy students...
       ],
       bgColor: "bg-blue-100",
@@ -57,10 +69,7 @@ const TriggerAtRisk = () => {
       totalStudents: 25,
       lecturer: "Dr. Smith",
       students: [
-        { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        // More dummy students...
+        // Data for students in Web Programming...
       ],
       bgColor: "bg-green-200",
     },
@@ -99,8 +108,8 @@ const TriggerAtRisk = () => {
                   <p>Total Students: {course.totalStudents}</p>
                   <p>Lecturer: {course.lecturer}</p>
 
-                  {/* Table for students */}
-                  <div className="overflow-x-auto mt-4">
+                  {/* Scrollable Table for students */}
+                  <div className="overflow-y-auto max-h-96 mt-4">
                     <table className="table-auto w-full border-collapse">
                       <thead>
                         <tr className="bg-gray-200">

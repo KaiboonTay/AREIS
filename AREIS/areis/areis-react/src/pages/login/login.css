@@ -1,9 +1,4 @@
 .bg{
-<<<<<<< Updated upstream
-    /* background-image: url("/bg.png"); */
-=======
-    background-image: url("/bg.png");
->>>>>>> Stashed changes
     min-height: 100vh;
     object-fit: contain;
     background-repeat: round;

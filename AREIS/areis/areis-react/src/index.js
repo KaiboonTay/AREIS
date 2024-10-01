@@ -11,10 +11,6 @@ root.render(
     <BrowserRouter>
       <App />
     </BrowserRouter>
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
   </React.StrictMode>
 );
 
