@@ -3,6 +3,10 @@ import SideBar from "../components/side-bar/SideBar";
 import Header from "../components/header/Header";
 
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 const MainLayout = () => {
   return (
     <div>
