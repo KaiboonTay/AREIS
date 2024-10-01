@@ -103,3 +103,7 @@ def upload_csv(request):
                 messages.warning(request, f"Grade for {StudentId} already exists. Skipping.")
     
     return render(request, 'managedata/upload_csv.html')
+
+def index(request):
+    # Serve the React index.html for frontend routes
+    return render(request, 'index.html')

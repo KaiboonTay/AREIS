@@ -16,14 +16,19 @@ import json  # Import the json module
 
 @api_view(['GET'])
 def course_list(request):
-    courses = Courses.objects.all()
-    serializer = CourseSerializer(courses, many=True)
-    # Convert the serializer data to a JSON string
-    json_data = json.dumps(serializer.data, indent=4)
+    if request.path.startswith('/managestudents/courses/'):
+        courses = Courses.objects.all()
+        
+        serializer = CourseSerializer(courses, many=True)
+        # Convert the serializer data to a JSON string
+        json_data = json.dumps(serializer.data, indent=4)
+        
+        # Print the JSON data in the terminal
+        print(json_data)
+        return Response(serializer.data)
     
-    # Print the JSON data in the terminal
-    print(json_data)
-    return Response(serializer.data)
+    return render(request, 'index.html')
+
 
 # def trigger_students_list(request, CourseId):
 #     #students = Students.objects.all()
@@ -57,3 +62,8 @@ def trigger_students_list(request, CourseId):
         'studentsgrades': StudentGradeSerializer(studentsgrades, many=True).data
     }
     return Response(data)
+
+
+def index(request):
+    # Serve the React index.html for frontend routes
+    return render(request, 'index.html')
