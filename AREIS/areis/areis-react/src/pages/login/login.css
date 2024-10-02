@@ -1,0 +1,5 @@
+.bg{
+    min-height: 100vh;
+    object-fit: contain;
+    background-repeat: round;
+}
