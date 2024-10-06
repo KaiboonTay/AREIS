@@ -9,6 +9,7 @@ import Dashboard from './pages/dashboard/Dashboard';
 import { Route, Routes } from 'react-router-dom';
 import TriggerAtRisk from './pages/trigger-at-rick/TriggerAtRisk';
 import Login from './pages/login/Login';
+import CourseList from './pages/managestudents/CourseList';
 
 const App = () => {
   return (
@@ -24,6 +25,8 @@ const App = () => {
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="/managestudents/trigger-at-risk/" element={<TriggerAtRisk/>} />
+        {/* <Route path="/managestudents/trigger-at-risk/" element={<CourseList/>} /> */}
+        
       </Route>
       <Route path="/login" element={<Login />} />
     </Routes>

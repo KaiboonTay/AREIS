@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const TriggerAtRisk = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [data, setData] = useState({ courses: [], students: [], studentGrades: []});
+  const [data, setData] = useState({ courses: [], students: [], studentsgrades: []});
   const [selectedStudent, setSelectedStudent] = useState(null);
   const modalRef = useRef(null); // Create a ref to track the modal element
 
@@ -115,8 +115,8 @@ const TriggerAtRisk = () => {
             <div className={`overflow-hidden transition-max-height duration-500 ease-in-out ${activeIndex === index ? 'max-h-screen' : 'max-h-0'}`}>
               {activeIndex === index && (
                 <div className="p-4 text-gray-700 bg-white">
-                  <p>Total Students: {/*course.totalStudents*/}</p>
-                  <p>Lecturer: {/*course.lecturer*/}</p>
+                  <p>Total Students: {data.studentsgrades.filter(grade => grade.courseid === course.courseid).length}</p>
+                  {/* <p>Lecturer: course.lecturer</p> */}
 
                   {/* Scrollable Table for students */}
                   <div className="overflow-y-auto max-h-96 mt-4">
@@ -133,31 +133,31 @@ const TriggerAtRisk = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        <td className="border p-2">sample</td>
-                        <td className="border p-2">sample</td>
-                        <td className="border p-2">sample</td>
-                        <td className="border p-2">sample</td>
-                        <td className="border p-2">sample</td>
-                        <td className="border p-2">sample</td>
-                        <td className="border p-2">sample</td>
-                        {/* {course.students.map((student, studentIndex) => (
+                        
+                         {data.studentsgrades
+                          .filter(grade => grade.courseid === course.courseid)
+                          .map((grade, studentIndex) => {
+                            const student = data.students.find(student => student.studentid === grade.studentid);
+                          return (
                           <tr key={studentIndex} className="text-center">
-                            <td className="border p-2">{student.firstName}</td>
-                            <td className="border p-2">{student.surname}</td>
-                            <td className="border p-2">{student.grade}</td>
-                            <td className="border p-2">{student.officialGrade}</td>
-                            <td className="border p-2">{student.phone}</td>
+                            <td className="border p-2">{student.firstname}</td>
+                            <td className="border p-2">{student.lastname}</td>
+                            <td className="border p-2">{grade.gradeinput}</td>
+                            <td className="border p-2">{grade.officialgrade}</td>
+                            <td className="border p-2">{student.phoneno}</td>
                             <td className="border p-2">{student.email}</td>
                             <td className="border p-2">
-                              <button
+                              sample
+                              {/* <button
                                 className="text-red-500"
                                 onClick={() => openModal(student)}
                               >
                                 {student.flag}
-                              </button>
+                              </button> */}
                             </td>
                           </tr>
-                        ))} */}
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
