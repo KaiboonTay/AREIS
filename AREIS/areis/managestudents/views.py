@@ -16,18 +16,39 @@ import json  # Import the json module
 
 @api_view(['GET'])
 def course_list(request):
+    
     if request.path.startswith('/managestudents/trigger-at-risk/'):
         courses = Courses.objects.all()
-        
-        serializer = CourseSerializer(courses, many=True)
+        studentsgrades = Studentgrades.objects.all()
+        students = Students.objects.all()
+
+        data = {
+        'courses': CourseSerializer(courses, many=True).data,
+        'students': StudentSerializer(students, many=True).data,
+        'studentsgrades': StudentGradeSerializer(studentsgrades, many=True).data
+        }
+        #serializer = CourseSerializer(courses, many=True)
         # Convert the serializer data to a JSON string
-        json_data = json.dumps(serializer.data, indent=4)
+        json_data = json.dumps(data, indent=4)
         
         # Print the JSON data in the terminal
         print(json_data)
-        return Response(serializer.data)
+        return Response(data)
     
     return render(request, 'index.html')
+
+# if request.path.startswith('/managestudents/trigger-at-risk/'):
+    #     courses = Courses.objects.all()
+        
+    #     serializer = CourseSerializer(courses, many=True)
+    #     # Convert the serializer data to a JSON string
+    #     json_data = json.dumps(serializer.data, indent=4)
+        
+    #     # Print the JSON data in the terminal
+    #     print(json_data)
+    #     return Response(serializer.data)
+    
+    # return render(request, 'index.html')
 
 
 # def trigger_students_list(request, CourseId):

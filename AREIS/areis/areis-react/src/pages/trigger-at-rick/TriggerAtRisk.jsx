@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const TriggerAtRisk = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [courses, setCourses] = useState([]);
+  const [data, setData] = useState({ courses: [], students: [], studentGrades: []});
   const [selectedStudent, setSelectedStudent] = useState(null);
   const modalRef = useRef(null); // Create a ref to track the modal element
 
@@ -23,12 +23,14 @@ const TriggerAtRisk = () => {
     setSelectedStudent(null);
   };
 
+  useEffect(() => {
+    fetch('/managestudents/trigger-at-risk/')
+        .then(response => response.json())
+        .then(data => setData(data));
+}, []);
+
   // Close modal when clicking outside of the modal content
   useEffect(() => {
-
-    fetch('/managestudents/trigger-at-risk/')
-            .then(response => response.json())
-            .then(data => setCourses(data));
 
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -96,7 +98,7 @@ const TriggerAtRisk = () => {
     <div className="px-20 mx-auto mt-8">
       {/* Accordion Items */}
       <div className="space-y-4">
-        {courses.map((course,index) => (
+        {data.courses.map((course,index) => (
           <div key={index} className="border border-gray-300 rounded-lg">
             {/* Header */}
             <div 
@@ -108,7 +110,7 @@ const TriggerAtRisk = () => {
                 {activeIndex === index ? '-' : '>'}
               </span>
             </div>
-
+            
             {/* Content */}
             <div className={`overflow-hidden transition-max-height duration-500 ease-in-out ${activeIndex === index ? 'max-h-screen' : 'max-h-0'}`}>
               {activeIndex === index && (
@@ -131,6 +133,13 @@ const TriggerAtRisk = () => {
                         </tr>
                       </thead>
                       <tbody>
+                        <td className="border p-2">sample</td>
+                        <td className="border p-2">sample</td>
+                        <td className="border p-2">sample</td>
+                        <td className="border p-2">sample</td>
+                        <td className="border p-2">sample</td>
+                        <td className="border p-2">sample</td>
+                        <td className="border p-2">sample</td>
                         {/* {course.students.map((student, studentIndex) => (
                           <tr key={studentIndex} className="text-center">
                             <td className="border p-2">{student.firstName}</td>
