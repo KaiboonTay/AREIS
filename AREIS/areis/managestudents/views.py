@@ -16,7 +16,7 @@ import json  # Import the json module
 
 @api_view(['GET'])
 def course_list(request):
-    if request.path.startswith('/managestudents/courses/'):
+    if request.path.startswith('/managestudents/trigger-at-risk/'):
         courses = Courses.objects.all()
         
         serializer = CourseSerializer(courses, many=True)

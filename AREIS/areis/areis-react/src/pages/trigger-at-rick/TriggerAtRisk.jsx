@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 const TriggerAtRisk = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [courses, setCourses] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const modalRef = useRef(null); // Create a ref to track the modal element
 
+  
   const handleToggle = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
@@ -22,6 +25,11 @@ const TriggerAtRisk = () => {
 
   // Close modal when clicking outside of the modal content
   useEffect(() => {
+
+    fetch('/managestudents/trigger-at-risk/')
+            .then(response => response.json())
+            .then(data => setCourses(data));
+
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
         closeModal();
@@ -39,63 +47,63 @@ const TriggerAtRisk = () => {
     };
   }, [isModalOpen]);
 
-  const courses = [
-    {
-      title: "INFT3800 - Professional Practice in IT",
-      totalStudents: 20,
-      lecturer: "Dr. Vincent",
-      students: [
-        { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
-        // More dummy students...
-      ],
-      bgColor: "bg-blue-100",
-    },
-    {
-      title: "INFT3050 - Web Programming",
-      totalStudents: 25,
-      lecturer: "Dr. Smith",
-      students: [
-        // Data for students in Web Programming...
-      ],
-      bgColor: "bg-green-200",
-    },
-    {
-      title: "INFT3080 - Games Design",
-      totalStudents: 18,
-      lecturer: "Dr. Johnson",
-      students: [
-        // Data for students in Games Design...
-      ],
-      bgColor: "bg-red-200",
-    }
-  ];
+  // const courses = [
+  //   {
+  //     title: "INFT3800 - Professional Practice in IT",
+  //     totalStudents: 20,
+  //     lecturer: "Dr. Vincent",
+  //     students: [
+  //       { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Ploynapha", surname: "Jampanaun", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Thai Tung", surname: "Mai", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       { firstName: "Eugene", surname: "Ngew", grade: 55, officialGrade: "P", phone: "12345678", email: "c3423222@uon.edu.au", flag: "🚩" },
+  //       // More dummy students...
+  //     ],
+  //     bgColor: "bg-blue-100",
+  //   },
+  //   {
+  //     title: "INFT3050 - Web Programming",
+  //     totalStudents: 25,
+  //     lecturer: "Dr. Smith",
+  //     students: [
+  //       // Data for students in Web Programming...
+  //     ],
+  //     bgColor: "bg-green-200",
+  //   },
+  //   {
+  //     title: "INFT3080 - Games Design",
+  //     totalStudents: 18,
+  //     lecturer: "Dr. Johnson",
+  //     students: [
+  //       // Data for students in Games Design...
+  //     ],
+  //     bgColor: "bg-red-200",
+  //   }
+  // ];
 
   return (
     <div className="px-20 mx-auto mt-8">
       {/* Accordion Items */}
       <div className="space-y-4">
-        {courses.map((course, index) => (
+        {courses.map((course,index) => (
           <div key={index} className="border border-gray-300 rounded-lg">
             {/* Header */}
             <div 
-              className={`p-4 flex justify-between items-center cursor-pointer ${course.bgColor}`}
+              className={`p-4 flex justify-between items-center cursor-pointer${course.bgColor}`}
               onClick={() => handleToggle(index)}
             >
-              <h3 className="font-medium text-lg">{course.title}</h3>
+              <h3 className="font-medium text-lg">{course.courseid} : {course.classdescription}</h3>
               <span className="text-lg">
                 {activeIndex === index ? '-' : '>'}
               </span>
@@ -105,8 +113,8 @@ const TriggerAtRisk = () => {
             <div className={`overflow-hidden transition-max-height duration-500 ease-in-out ${activeIndex === index ? 'max-h-screen' : 'max-h-0'}`}>
               {activeIndex === index && (
                 <div className="p-4 text-gray-700 bg-white">
-                  <p>Total Students: {course.totalStudents}</p>
-                  <p>Lecturer: {course.lecturer}</p>
+                  <p>Total Students: {/*course.totalStudents*/}</p>
+                  <p>Lecturer: {/*course.lecturer*/}</p>
 
                   {/* Scrollable Table for students */}
                   <div className="overflow-y-auto max-h-96 mt-4">
@@ -123,7 +131,7 @@ const TriggerAtRisk = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {course.students.map((student, studentIndex) => (
+                        {/* {course.students.map((student, studentIndex) => (
                           <tr key={studentIndex} className="text-center">
                             <td className="border p-2">{student.firstName}</td>
                             <td className="border p-2">{student.surname}</td>
@@ -140,7 +148,7 @@ const TriggerAtRisk = () => {
                               </button>
                             </td>
                           </tr>
-                        ))}
+                        ))} */}
                       </tbody>
                     </table>
                   </div>

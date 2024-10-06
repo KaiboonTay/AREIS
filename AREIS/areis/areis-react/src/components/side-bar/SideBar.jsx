@@ -45,7 +45,7 @@ const SideBar = () => {
         </NavLink>
 
         <NavLink
-          to="/trigger-at-risk"
+          to="/managestudents/trigger-at-risk/"
           className={({ isActive }) =>
             `w-full px-4 py-3 flex items-center space-x-4 ${
               isActive ? "bg-blue-300" : ""
