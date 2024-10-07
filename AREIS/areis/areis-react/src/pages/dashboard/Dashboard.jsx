@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Legend, Sector, ResponsiveContainer } from 'recharts';
 
-const data = [
-  { name: 'Course Content', value: 12, color: '#00C49F' },
-  { name: 'Learning Issues', value: 22, color: '#0088FE' },
-  { name: 'Personal', value: 12, color: '#FFBB28' },
-];
+// const data = [
+//   { name: 'Course Content', value: 12, color: '#00C49F' },
+//   { name: 'Learning Issues', value: 22, color: '#0088FE' },
+//   { name: 'Personal', value: 12, color: '#FFBB28' },
+// ];
+
 
 // Function to render the active sector with an expanded radius
 const renderActiveShape = (props) => {
@@ -46,6 +47,14 @@ const renderActiveShape = (props) => {
 
 const Dashboard = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [data, setData] = useState({ casecategory: [], studentcases: [] });
+  const colors = [ '#00C49F', '#0088FE', '#FFBB28' ]
+  
+  useEffect(() => {
+    fetch('/dashboard/')
+        .then(response => response.json())
+        .then(data => setData(data));
+  }, []);
 
   const onPieEnter = (_, index) => {
     setActiveIndex(index);
@@ -64,7 +73,10 @@ const Dashboard = () => {
               <Pie
                 activeIndex={activeIndex}
                 activeShape={renderActiveShape}
-                data={data}
+                data={data.casecategory.map((category) => ({
+                  name: category.categoryname,
+                  value: data.studentcases.filter(studentcase => studentcase.categoryid === category.categoryid).length,
+                }))}
                 cx="50%"
                 cy="50%"
                 innerRadius={80}
@@ -74,8 +86,8 @@ const Dashboard = () => {
                 dataKey="value"
                 onMouseEnter={onPieEnter}
               >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                {data.casecategory.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                 ))}
               </Pie>
               <Legend layout="vertical" align="right" verticalAlign="middle" />
@@ -87,16 +99,16 @@ const Dashboard = () => {
         <div className="ml-24 flex flex-col justify-center w-1/2">
           <h3 className="text-xl font-bold mb-4 text-gray-500">Value</h3>
           <ul>
-            {data.map((entry, index) => (
+            {data.casecategory.map((category, index) => (
               <li key={index} className="flex justify-between mb-2">
                 <div className="flex items-center">
                   <div
                     className="w-4 h-4 rounded-full mr-2"
-                    style={{ backgroundColor: entry.color }}
+                    style={{ backgroundColor: colors[index % colors.length] }}
                   ></div>
-                  <span>{entry.name}</span>
+                  <span>{category.categoryname}</span>
                 </div>
-                <span className="ml-24">{entry.value}</span>
+                <span className="ml-24">{data.studentcases.filter(studentcase => studentcase.categoryid === category.categoryid).length}</span>
               </li>
             ))}
           </ul>

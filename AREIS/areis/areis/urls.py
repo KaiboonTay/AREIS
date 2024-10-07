@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='home'), #first part is the link, second part is the method from the views.py
     path('about/', views.index, name='about'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     #register the urls inside the posts app
     #telling django to look inside posts app and look at the URLs file inside of that 
     #posts application created inside of project

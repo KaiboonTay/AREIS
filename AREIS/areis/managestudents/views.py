@@ -1,6 +1,4 @@
 from django.shortcuts import render, redirect
-
-
 from managedata.models import Students, Courses, Studentgrades
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
