@@ -47,7 +47,7 @@ const renderActiveShape = (props) => {
 
 const Dashboard = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [data, setData] = useState({ casecategory: [], studentcases: [] });
+  const [data, setData] = useState({ casecategory: [], studentcases: [], studentgrades:[] });
   const colors = [ '#00C49F', '#0088FE', '#FFBB28' ]
   
   useEffect(() => {
