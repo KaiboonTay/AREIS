@@ -87,13 +87,14 @@ def upload_csv(request):
             # check if the studentgrades already exists before inserting
             if not Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId, trimester=Trimester).exists():
                 try:
-                    # add the course
+                    # add the grades
                     Studentgrades.objects.create(
                         studentid=Students.objects.get(studentid=StudentId),
                         courseid=Courses.objects.get(courseid=CourseId),
                         gradeinput=GradeInput,
                         officialgrade=OfficialGrade,
-                        trimester=Trimester
+                        trimester=Trimester,
+                        flagstatus=0
                     )
                 except IntegrityError:
                     # Handle any integrity error (like UNIQUE constraint)

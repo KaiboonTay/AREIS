@@ -147,13 +147,13 @@ const TriggerAtRisk = () => {
                             <td className="border p-2">{student.phoneno}</td>
                             <td className="border p-2">{student.email}</td>
                             <td className="border p-2">
-                              sample
-                              {/* <button
+                              
+                              { <button
                                 className="text-red-500"
                                 onClick={() => openModal(student)}
                               >
-                                {student.flag}
-                              </button> */}
+                                {grade.flagstatus}
+                              </button> }
                             </td>
                           </tr>
                           );

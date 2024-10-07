@@ -39,6 +39,7 @@ class Studentgrades(models.Model):
     gradeinput = models.IntegerField(db_column='GradeInput', blank=True, null=True)  # Field name made lowercase.
     officialgrade = models.TextField(db_column='OfficialGrade', blank=True, null=True)  # Field name made lowercase.
     trimester = models.TextField(db_column='Trimester', blank=True, null=True)  # Field name made lowercase.
+    flagstatus = models.IntegerField(db_column='FlagStatus', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
