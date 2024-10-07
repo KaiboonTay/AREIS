@@ -8,7 +8,8 @@ const TriggerAtRisk = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const modalRef = useRef(null); // Create a ref to track the modal element
 
-  
+  const colors = ["bg-yellow-100", "bg-blue-100", "bg-green-100", "bg-red-100", "bg-purple-100", "bg-orange-100", "bg-indigo-100"];
+
   const handleToggle = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
@@ -98,11 +99,11 @@ const TriggerAtRisk = () => {
     <div className="px-20 mx-auto mt-8">
       {/* Accordion Items */}
       <div className="space-y-4">
-        {data.courses.map((course,index) => (
+        {data.courses.map((course, index) => (
           <div key={index} className="border border-gray-300 rounded-lg">
             {/* Header */}
             <div 
-              className={`p-4 flex justify-between items-center cursor-pointer${course.bgColor}`}
+              className={`p-4 flex justify-between items-center cursor-pointer ${colors[index % colors.length]}`}
               onClick={() => handleToggle(index)}
             >
               <h3 className="font-medium text-lg">{course.courseid} : {course.classdescription}</h3>
