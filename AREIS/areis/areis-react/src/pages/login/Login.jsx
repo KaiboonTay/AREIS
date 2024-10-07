@@ -4,7 +4,7 @@ const Login = () => {
   return (
     <div style={{backgroundImage: `url(${"/bg.png"})`}} className="bg flex justify-center items-center flex-col relative">
       <div className="mb-48">
-        <img src="/logoLogin.png" alt="" />
+        <img src={`/static/logoLogin.png`} alt="" />
       </div>
       <div className="absolute top-[50%] flex flex-col justify-center text-center items-center">
         <h2 className="font-bold text-[24px] shadow-slate-500">Sign In</h2>

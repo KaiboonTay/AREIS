@@ -135,9 +135,11 @@ STATIC_URL = 'static/'
 
 #for the static files like css were telling django the location of the static files
 STATICFILES_DIRS =[
-    os.path.join(BASE_DIR, 'areis-react/build/static') 
+    os.path.join(BASE_DIR, 'areis-react/build/static'),
+    os.path.join(BASE_DIR, 'areis-react/build'), 
 ]
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

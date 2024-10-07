@@ -5,7 +5,7 @@ const SideBar = () => {
   return (
     <div className="w-[266px] bg-[#D9D9D9] min-h-[100vh]">
       <div className=" ">
-        <img className="" src="/logoLogin.png" alt="" />
+        <img className="" src={`/static/logoLogin.png`} alt="" />
       </div>
       <div className="w-full flex flex-col mt-4">
         <NavLink
