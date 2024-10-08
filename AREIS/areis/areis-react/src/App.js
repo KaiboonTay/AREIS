@@ -5,11 +5,11 @@ import React from 'react';
 // import About from './pages/About'; // Adjusted path to About.js in src
 // import CourseList from './pages/managestudents/CourseList';
 import MainLayout from './layout/MainLayout';
-import Dashboard from './pages/dashboard/Dashboard';
+import Dashboard from './pages/Dashboard';
 import { Route, Routes } from 'react-router-dom';
-import TriggerAtRisk from './pages/trigger-at-rick/TriggerAtRisk';
-import Login from './pages/login/Login';
-import CourseList from './pages/managestudents/CourseList';
+import TriggerAtRisk from './pages/TriggerAtRisk';
+import Login from './pages/Login';
+import CourseList from './pages/CourseList';
 
 const App = () => {
   return (
@@ -24,10 +24,11 @@ const App = () => {
     <Routes>
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Dashboard />} />
-        <Route path="/managestudents/trigger-at-risk/" element={<TriggerAtRisk/>} />
+        <Route path="managestudents/trigger-at-risk/" element={<TriggerAtRisk/>} />
         {/* <Route path="/managestudents/trigger-at-risk/" element={<CourseList/>} /> */}
         
       </Route>
+      <Route path="/courselist" element={<CourseList />} />
       <Route path="/login" element={<Login />} />
     </Routes>
     </>
