@@ -140,7 +140,7 @@ const TriggerAtRisk = () => {
                           .map((grade, studentIndex) => {
                             const student = data.students.find(student => student.studentid === grade.studentid);
                           return (
-                          <tr key={studentIndex} className="text-center">
+                            <tr key={studentIndex} className="text-center">
                             <td className="border p-2">{student.firstname}</td>
                             <td className="border p-2">{student.lastname}</td>
                             <td className="border p-2">{grade.gradeinput}</td>
@@ -148,15 +148,35 @@ const TriggerAtRisk = () => {
                             <td className="border p-2">{student.phoneno}</td>
                             <td className="border p-2">{student.email}</td>
                             <td className="border p-2">
-                              
-                              { <button
-                                className="text-red-500"
-                                onClick={() => openModal(student)}
-                              >
-                                {grade.flagstatus}
-                              </button> }
+                              {/* Flex container to center the flag horizontally and vertically */}
+                              <div className="flex justify-center items-center h-full">
+                                {/* Button that opens the modal with student details */}
+                                <button onClick={() => openModal(student)} className="flex items-center justify-center">
+                                  {/* Show yellow flag if grade is below 50 */}
+                                  {grade.gradeinput < 50 && (
+                                    <span className="relative inline-block">
+                                      {/* Flag pole */}
+                                      <span className="block w-1 h-6 bg-yellow-400"></span>
+                                      {/* Yellow flag */}
+                                      <span className="absolute left-1 top-0 w-3 h-3 bg-yellow-400 clip-flag"></span>
+                                    </span>
+                                  )}
+                                  {/* Show no flag if grade is 50 or above */}
+                                  {grade.gradeinput >= 50 && (
+                                    <span className="relative inline-block">
+                                      {/* Flag pole */}
+                                      <span className="block w-1 h-6 bg-gray-400"></span>
+                                      {/* Gray flag (no flag) */}
+                                      <span className="absolute left-1 top-0 w-3 h-3 bg-gray-400 clip-flag"></span>
+                                    </span>
+                                  )}
+                                  {/* Display "Flagged" or "No Flag" text */}
+                                  <span className="ml-2">{grade.flagstatus ? "" : ""}</span>
+                                </button>
+                              </div>
                             </td>
                           </tr>
+                          
                           );
                         })}
                       </tbody>
