@@ -11,6 +11,8 @@ from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import os 
+#from .models import Students
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
@@ -63,31 +65,37 @@ def trigger_students_list(request, CourseId):
     }
     return Response(data)
 
-
+#send_email logic 
 @csrf_exempt
 def send_email(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        to_email = data.get('email')
+        email = data.get('email')
 
-        # Email content
+        # Get the student based on the email
+        student = get_object_or_404(Students, email=email)
+        studentid = student.studentid
+
+        # Create the unique link with the student ID appended
+        form_link = f"http://localhost:3000/student-form?studentId={studentid}"
+
+
+        # Send the email with SendGrid
         message = Mail(
             from_email='uonareis@gmail.com',
-            to_emails=to_email,
-            subject='Important Form for You',
-            html_content=(
-                'Please fill out the form: '
-                '<a href="https://forms.office.com/pages/responsepage.aspx?id=yz2Q7ncrpU2-AsRSNXg9rTspLCQKMIpMuek5x6ObROFUNDlPTEVIQlZNMDdKSlRUWFVBRDRITzA5VC4u">'
-                'Office Form Link</a>'
-            )
+            to_emails=email,
+            subject='Complete Your Form',
+            html_content=f'Please complete the form at <a href="{form_link}">{form_link}</a>'
         )
-        
+        print(message)
+
         try:
             sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+            
             response = sg.send(message)
+            print(response)
+            
             return JsonResponse({'status': 'Email sent successfully'})
         except Exception as e:
             return JsonResponse({'status': 'Failed to send email', 'error': str(e)}, status=500)
-        
-    
-    return JsonResponse({'status': 'Invalid request method'}, status=400)
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

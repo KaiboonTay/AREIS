@@ -4,7 +4,10 @@ from django.contrib import messages
 from tablib import Dataset
 import csv, io
 from django.db import IntegrityError
-
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import FormResponse
 
 # Create your views here.
 
@@ -54,6 +57,7 @@ def upload_csv(request):
                         studentid=StudentId,
                         lastname=Lastname,
                         firstname=FirstName,
+                        
                         acadprogdesc=AcadProgDesc,
                         phoneno=PhoneNo,
                         email=Email
@@ -103,3 +107,37 @@ def upload_csv(request):
                 messages.warning(request, f"Grade for {StudentId} already exists. Skipping.")
     
     return render(request, 'managedata/upload_csv.html')
+
+
+
+#Student Forms Response
+@csrf_exempt
+def submit_form(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            form_id = f"{data['studentId']}-{data['content1']}-{data['content2']}"  # Create unique form ID
+            
+            if FormResponse.objects.filter(form_id=form_id).exists():
+                return JsonResponse({'error': 'You have already submitted the form.'}, status=400)
+
+            FormResponse.objects.create(
+                form_id=form_id,
+                student_id=data['studentId'],
+                content1=data['content1'],
+                content2=data['content2'],
+                content3=data['content3'],
+                content4=data['content4'],
+                content5=data['content5'],
+                content6=data['content6'],
+                content7=data['content7'],
+                content8=data['content8'],
+                content9=data['content9'],
+                content10=data['content10'],
+                responded=True,
+            )
+
+            return JsonResponse({'status': 'Form submitted successfully'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

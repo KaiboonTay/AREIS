@@ -11,6 +11,7 @@ const Sidebar = () => {
         <li><Link to="/about">🚩 At Risk Students</Link></li>
         <li><Link to="/courses">📌 Trigger At-Risk</Link></li>
         <li><Link to="/sendemail">📌 Send Email</Link></li>
+        <li><Link to="/student-form">📌 Student form</Link></li>
       </ul>
     </aside>
   );

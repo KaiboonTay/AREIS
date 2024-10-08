@@ -43,3 +43,23 @@ class Studentgrades(models.Model):
     class Meta:
         managed = False
         db_table = 'studentGrades'
+
+
+#Student Response Form
+class FormResponse(models.Model):
+    form_id = models.CharField(max_length=255, primary_key=True)
+    studentid =models.ForeignKey('Students', models.DO_NOTHING, db_column='StudentID', blank=True, null=True)
+    content1 = models.IntegerField()
+    content2 = models.IntegerField()
+    content3 = models.IntegerField()
+    content4 = models.IntegerField()
+    content5 = models.IntegerField()
+    content6 = models.IntegerField()
+    content7 = models.IntegerField()
+    content8 = models.IntegerField()
+    content9 = models.IntegerField()
+    content10 = models.IntegerField()
+    responded = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Response from {self.student.student_id}"

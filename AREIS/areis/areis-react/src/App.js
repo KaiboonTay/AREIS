@@ -5,6 +5,8 @@ import Home from './pages/Home'; // Adjusted path to Home.js in src
 import About from './pages/About'; // Adjusted path to About.js in src
 import CourseList from './pages/managestudents/CourseList';
 import SendEmail from './pages/managestudents/SendEmail';
+import StudentForm from './pages/managestudents/StudentForm';
+
 
 const App = () => {
   return (
@@ -14,6 +16,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/courses" element={<CourseList />} />
         <Route path="/sendemail" element={<SendEmail />} />
+        <Route path="/student-form" element={<StudentForm />} />
       </Routes>
     </Router>
   );
