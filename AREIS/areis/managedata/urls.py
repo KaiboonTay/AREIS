@@ -9,6 +9,6 @@ urlpatterns = [
     #should be before the link after it (the post_page link) because of the slug if put underneath that link it will catch whatever we put first and assume it's a slug
     #first part is the link, second part is the method from the views.py
     path('upload-csv/', views.upload_csv, name="upload-csv"),
-    path('submit-form/', views.submit_form, name='submit_form'),
+    path('student-form/', views.submit_form, name='student-form'),
 
 ]

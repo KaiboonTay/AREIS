@@ -77,7 +77,7 @@ def send_email(request):
         studentid = student.studentid
 
         # Create the unique link with the student ID appended
-        form_link = f"http://localhost:3000/student-form?studentId={studentid}"
+        form_link = f"http://localhost:8000/student-form?studentId={studentid}"
 
 
         # Send the email with SendGrid

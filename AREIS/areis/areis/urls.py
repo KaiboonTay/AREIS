@@ -35,6 +35,7 @@ urlpatterns = [
     path('managedata/', include('managedata.urls')),
     #for student management
     path('managestudents/', include('managestudents.urls')),
+    path('student-form/', views.index)
 ]
 
 #used for upload image feature
