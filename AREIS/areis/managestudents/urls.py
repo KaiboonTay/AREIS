@@ -8,5 +8,5 @@ urlpatterns = [
     path('courses/', views.course_list, name="course-list"), #first part is the link, second part is the method from the views.py, third part is the name of the url
     #should be before the link after it (the post_page link) because of the slug if put underneath that link it will catch whatever we put first and assume it's a slug
     path('trigger-students-list/<str:CourseId>/', views.trigger_students_list, name="trigger-students-list"),
-    path('send-email/', views.send_email, name='send_email'),
+    path('send-email/', views.send_email, name='send-email'),
 ]

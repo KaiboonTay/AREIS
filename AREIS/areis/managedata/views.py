@@ -118,11 +118,14 @@ def submit_form(request):
             data = json.loads(request.body)
             student_id = data['student_id']
             form_id = f"{student_id}-{data['content1']}-{data['content2']}"  # Create a unique form ID
-            print(form_id)
-            student = Students.objects.get(studentid=data['student_id'])
-            print(student)
 
-            # Check if the form has already been submitted (form exists)
+            # Retrieve the student instance
+            student = Students.objects.get(studentid=student_id)
+
+            # Check if the form has already been submitted
+            if FormResponse.objects.filter(studentid=student).exists():
+                return JsonResponse({'error': 'Form has already been submitted.'}, status=400)
+
             form_response, created = FormResponse.objects.get_or_create(
                 form_id=form_id,
                 defaults={
@@ -149,33 +152,16 @@ def submit_form(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     elif request.method == 'GET':
-        # Extract studentId from the query string
-        student_id = request.GET.get('studentId')
-        
+        student_id = request.GET.get('studentId')  # Extract studentId from the query string
+
         if student_id:
             try:
                 # Check if there is a form already created for this student
-                form_response = FormResponse.objects.get(studentid=student_id)
-                # Return the existing form data
-                data = {
-                    'student_id': form_response.studentid,
-                    'content1': form_response.content1,
-                    'content2': form_response.content2,
-                    'content3': form_response.content3,
-                    'content4': form_response.content4,
-                    'content5': form_response.content5,
-                    'content6': form_response.content6,
-                    'content7': form_response.content7,
-                    'content8': form_response.content8,
-                    'content9': form_response.content9,
-                    'content10': form_response.content10,
-                }
-                print("Received data:", data)
+                form_response = FormResponse.objects.filter(studentid__studentid=student_id).first()
+                if form_response:
+                    # If the form has been submitted, notify the front-end
+                    return JsonResponse({'formSubmitted': True})
 
-                return JsonResponse(data)
-            
-
-            except FormResponse.DoesNotExist:
                 # Return empty form fields if no form data exists
                 data = {
                     'student_id': student_id,
@@ -192,7 +178,11 @@ def submit_form(request):
                 }
                 return JsonResponse(data)
 
+            except FormResponse.DoesNotExist:
+                return JsonResponse({'error': 'Form data not found'}, status=400)
+
         else:
             return JsonResponse({'error': 'studentId query parameter is missing.'}, status=400)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
