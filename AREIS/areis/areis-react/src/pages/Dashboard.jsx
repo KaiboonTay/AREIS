@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Legend, Sector, ResponsiveContainer } from 'recharts';
+import Modal from './Modal';
 
 // Function to render the active sector with an expanded radius
 const renderActiveShape = (props) => {
@@ -43,12 +44,21 @@ const Dashboard = () => {
   const [data, setData] = useState({ casecategory: [], studentcases: [], studentgrades: [] });
   const colors = ['#00C49F', '#0088FE', '#FFBB28'];
   const [expandedSection, setExpandedSection] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
-  const cardsData = [
-    { title: 'Course Content', chartData: [{ name: 'Completed', value: 32, color: '#FF5A5A' }] },
-    { title: 'Learning Issues', chartData: [{ name: 'Completed', value: 22, color: '#3498db' }] },
-    { title: 'Personal', chartData: [{ name: 'Completed', value: 15, color: '#f39c12' }] }
-  ];
+ // const cardsData = [
+   // { title: 'Course Content', chartData: [{ name: 'Completed', value: 32, color: '#FF5A5A' }] },
+   // { title: 'Learning Issues', chartData: [{ name: 'Completed', value: 22, color: '#3498db' }] },
+   // { title: 'Personal', chartData: [{ name: 'Completed', value: 15, color: '#f39c12' }] }
+ // ];
+
+ const cardsData = [
+  { title: 'Course Issues', id: 1, chartData: [{ name: 'Completed', value: 32, color: '#FF5A5A' }] },
+  { title: 'Personal Issues', id: 2, chartData: [{ name: 'Completed', value: 22, color: '#3498db' }] },
+  { title: 'Learning Issues', id: 3, chartData: [{ name: 'Completed', value: 15, color: '#f39c12' }] }
+];
+
 
   useEffect(() => {
     fetch('/dashboard/')
@@ -61,7 +71,23 @@ const Dashboard = () => {
   };
 
   const handleExpand = (section) => {
+    if (isModalOpen) return; // if pop up window is open, do not collapse the section
     setExpandedSection((prevSection) => (prevSection === section ? null : section));
+  };
+
+  // Function to handle opening the modal
+  const handleModalOpen = (student, cardTitle) => {
+    setSelectedStudent(student);
+    setIsModalOpen(true);
+
+    // Ensure that the card stays expanded when the modal is opened
+  setExpandedSection(cardTitle); 
+  };
+
+  // Function to handle closing the modal
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedStudent(null);
   };
 
   return (
@@ -186,7 +212,7 @@ const Dashboard = () => {
                         <td>🚩</td>
                         <td>Dr Kim</td>
                         <td>❌</td>
-                        <td>•••</td>
+                        <td onClick={() => handleModalOpen({ name: 'Alpha', lecturer: 'Dr Vincent', courseNo: 1234, grades: { assignment1: 25, assignment2: 15 } })}>•••</td>
                       </tr>
                       <tr>
                         <td>Beta</td>
@@ -195,7 +221,7 @@ const Dashboard = () => {
                         <td>🚩</td>
                         <td>Dr Kim</td>
                         <td>✔️</td>
-                        <td>•••</td>
+                        <td onClick={() => handleModalOpen({ name: 'Beta', lecturer: 'Dr Vincent', courseNo: 1234, grades: { assignment1: 25, assignment2: 15 } })}>•••</td>
                       </tr>
                     </tbody>
                   </table>
@@ -205,6 +231,11 @@ const Dashboard = () => {
           </div>
         ))}
       </div>
+
+      {/* Render Modal */}
+      {isModalOpen && (
+        <Modal isOpen={isModalOpen} onClose={handleModalClose} student={selectedStudent} />
+      )}
     </div>
   );
 };
