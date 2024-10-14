@@ -15,7 +15,7 @@ import json  # Import the json module
 @api_view(['GET'])
 def course_list(request):
     
-    if request.path.startswith('/managestudents/trigger-at-risk/'):
+    #if request.path.startswith('/managestudents/trigger-at-risk/'):
         courses = Courses.objects.all()
         studentsgrades = Studentgrades.objects.all()
         students = Students.objects.all()
@@ -33,7 +33,7 @@ def course_list(request):
         print(json_data)
         return Response(data)
     
-    return render(request, 'index.html')
+    #return render(request, 'index.html')
 
 # if request.path.startswith('/managestudents/trigger-at-risk/'):
     #     courses = Courses.objects.all()
@@ -68,19 +68,19 @@ def course_list(request):
 #     }
 #     return render(request, 'managestudents/trigger_students_list.html', context)
 
-@api_view(['GET'])
-def trigger_students_list(request, CourseId):
-    studentsgrades = Studentgrades.objects.filter(courseid=CourseId)
-    student_ids = studentsgrades.values_list('studentid', flat=True)
-    students = Students.objects.filter(studentid__in=student_ids)
-    course = Courses.objects.get(courseid=CourseId)
+# @api_view(['GET'])
+# def trigger_students_list(request, CourseId):
+#     studentsgrades = Studentgrades.objects.filter(courseid=CourseId)
+#     student_ids = studentsgrades.values_list('studentid', flat=True)
+#     students = Students.objects.filter(studentid__in=student_ids)
+#     course = Courses.objects.get(courseid=CourseId)
 
-    data = {
-        'course': CourseSerializer(course).data,
-        'students': StudentSerializer(students, many=True).data,
-        'studentsgrades': StudentGradeSerializer(studentsgrades, many=True).data
-    }
-    return Response(data)
+#     data = {
+#         'course': CourseSerializer(course).data,
+#         'students': StudentSerializer(students, many=True).data,
+#         'studentsgrades': StudentGradeSerializer(studentsgrades, many=True).data
+#     }
+#     return Response(data)
 
 
 def index(request):

@@ -10,6 +10,8 @@ import { Route, Routes } from 'react-router-dom';
 import TriggerAtRisk from './pages/TriggerAtRisk';
 import Login from './pages/Login';
 import CourseList from './pages/CourseList';
+import UploadCsv from './pages/UploadCsv';
+import UploadGrades from './pages/UploadGrades';
 
 const App = () => {
   return (
@@ -26,7 +28,8 @@ const App = () => {
         <Route index element={<Dashboard />} />
         <Route path="managestudents/trigger-at-risk/" element={<TriggerAtRisk/>} />
         {/* <Route path="/managestudents/trigger-at-risk/" element={<CourseList/>} /> */}
-        
+        <Route path="managedata/upload-csv/" element={<UploadCsv/>} />
+        <Route path="managedata/upload-grades/" element={<UploadGrades/>} />
       </Route>
       <Route path="/courselist" element={<CourseList />} />
       <Route path="/login" element={<Login />} />

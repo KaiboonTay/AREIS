@@ -55,6 +55,30 @@ const SideBar = () => {
           <FaBell />
           <span>Trigger At Risk</span>
         </NavLink>
+
+        <NavLink
+          to="/managedata/upload-csv/"
+          className={({ isActive }) =>
+            `w-full px-4 py-3 flex items-center space-x-4 ${
+              isActive ? "bg-blue-300" : ""
+            } hover:bg-blue-200`
+          }
+        >
+          <FaBell />
+          <span>Upload CSV (Admin)</span>
+        </NavLink>
+
+        <NavLink
+          to="/managedata/upload-grades/"
+          className={({ isActive }) =>
+            `w-full px-4 py-3 flex items-center space-x-4 ${
+              isActive ? "bg-blue-300" : ""
+            } hover:bg-blue-200`
+          }
+        >
+          <FaBell />
+          <span>Upload Grades</span>
+        </NavLink>
       </div>
     </div>
   );

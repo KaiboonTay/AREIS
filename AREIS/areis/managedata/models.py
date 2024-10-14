@@ -36,10 +36,15 @@ class Courses(models.Model):
 class Studentgrades(models.Model):
     studentid = models.ForeignKey('Students', models.DO_NOTHING, db_column='StudentID', blank=True, null=True)  # Field name made lowercase.
     courseid = models.ForeignKey(Courses, models.DO_NOTHING, db_column='CourseID', blank=True, null=True)  # Field name made lowercase.
-    gradeinput = models.IntegerField(db_column='GradeInput', blank=True, null=True)  # Field name made lowercase.
-    officialgrade = models.TextField(db_column='OfficialGrade', blank=True, null=True)  # Field name made lowercase.
     trimester = models.TextField(db_column='Trimester', blank=True, null=True)  # Field name made lowercase.
     flagstatus = models.IntegerField(db_column='FlagStatus', blank=True, null=True)  # Field name made lowercase.
+    journal1 = models.IntegerField(db_column='Journal1', blank=True, null=True)  # Field name made lowercase.
+    journal2 = models.IntegerField(db_column='Journal2', blank=True, null=True)  # Field name made lowercase.
+    assessment1 = models.IntegerField(db_column='Assessment1', blank=True, null=True)  # Field name made lowercase.
+    assessment2 = models.IntegerField(db_column='Assessment2', blank=True, null=True)  # Field name made lowercase.
+    assessment3 = models.IntegerField(db_column='Assessment3', blank=True, null=True)  # Field name made lowercase.
+    currentscore = models.IntegerField(db_column='CurrentScore', blank=True, null=True)  # Field name made lowercase.
+    finalgrade = models.IntegerField(db_column='FinalGrade', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
