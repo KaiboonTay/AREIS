@@ -8,7 +8,6 @@ class Casecategory(models.Model):
     categoryname = models.TextField(db_column='CategoryName', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
         db_table = 'caseCategory'
 
 
@@ -18,9 +17,16 @@ class Forms(models.Model):
     content1 = models.IntegerField(db_column='Content1', blank=True, null=True)  # Field name made lowercase.
     content2 = models.IntegerField(db_column='Content2', blank=True, null=True)  # Field name made lowercase.
     content3 = models.IntegerField(db_column='Content3', blank=True, null=True)  # Field name made lowercase.
+    content4 = models.IntegerField(db_column='Content4', blank=True, null=True)  # Field name made lowercase.
+    content5 = models.IntegerField(db_column='Content5', blank=True, null=True)  # Field name made lowercase.
+    content6 = models.IntegerField(db_column='Content6', blank=True, null=True)  # Field name made lowercase.
+    content7 = models.IntegerField(db_column='Content7', blank=True, null=True)  # Field name made lowercase.
+    content8 = models.IntegerField(db_column='Content8', blank=True, null=True)  # Field name made lowercase.
+    content9 = models.IntegerField(db_column='Content9', blank=True, null=True)  # Field name made lowercase.
+    content10 = models.IntegerField(db_column='Content10', blank=True, null=True)  # Field name made lowercase.
+    responded = models.BooleanField(default=False)
 
     class Meta:
-        managed = False
         db_table = 'forms'
 
 
@@ -33,5 +39,4 @@ class Studentcases(models.Model):
     formid = models.ForeignKey(Forms, models.DO_NOTHING, db_column='FormID', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
         db_table = 'studentCases'
