@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from django.shortcuts import render
 from managestudents.serializers import StudentcasesSerializer, CasecategorySerializer
 from managestudents.models import Studentcases, Casecategory
-from managedata.serializers import StudentGradeSerializer
-from managedata.models import Studentgrades
+from managedata.serializers import StudentGradeSerializer, StudentSerializer
+from managedata.models import Studentgrades, Students
 import json  # Import the json module
 
 
@@ -25,10 +25,12 @@ def dashboard(request):
     casecategory = Casecategory.objects.all()
     studentcases = Studentcases.objects.all()
     studentgrades = Studentgrades.objects.all()
+    students = Students.objects.all()
     data ={
         'casecategory': CasecategorySerializer(casecategory, many = True).data,
         'studentcases': StudentcasesSerializer(studentcases, many = True).data,
-        'studentgrades': StudentGradeSerializer(studentgrades, many = True).data
+        'studentgrades': StudentGradeSerializer(studentgrades, many = True).data,
+        'students': StudentSerializer(students, many = True).data
     }
     
     json_data = json.dumps(data, indent=4)

@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import CourseList from './pages/CourseList';
 import UploadCsv from './pages/UploadCsv';
 import UploadGrades from './pages/UploadGrades';
+import AtRiskStudents from './pages/AtRiskStudents';
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
     <Routes>
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Dashboard />} />
+        <Route path="managestudents/at-risk-students/" element={<AtRiskStudents/>} />
         <Route path="managestudents/trigger-at-risk/" element={<TriggerAtRisk/>} />
         {/* <Route path="/managestudents/trigger-at-risk/" element={<CourseList/>} /> */}
         <Route path="managedata/upload-csv/" element={<UploadCsv/>} />
