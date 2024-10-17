@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Legend, Sector, ResponsiveContainer } from 'recharts';
+import Modal from './Modal';
 
 // Function to render the active sector with an expanded radius
 const renderActiveShape = (props) => {
@@ -43,12 +44,29 @@ const Dashboard = () => {
   const [data, setData] = useState({ casecategory: [], studentcases: [], studentgrades: [] });
   const colors = ['#00C49F', '#0088FE', '#FFBB28'];
   const [expandedSection, setExpandedSection] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  
 
-  const cardsData = [
-    { title: 'Course Content', chartData: [{ name: 'Completed', value: 32, color: '#FF5A5A' }] },
-    { title: 'Learning Issues', chartData: [{ name: 'Completed', value: 22, color: '#3498db' }] },
-    { title: 'Personal', chartData: [{ name: 'Completed', value: 15, color: '#f39c12' }] }
-  ];
+ // const cardsData = [
+   // { title: 'Course Content', chartData: [{ name: 'Completed', value: 32, color: '#FF5A5A' }] },
+   // { title: 'Learning Issues', chartData: [{ name: 'Completed', value: 22, color: '#3498db' }] },
+   // { title: 'Personal', chartData: [{ name: 'Completed', value: 15, color: '#f39c12' }] }
+ // ];
+
+ const cardsData = data.casecategory.map((category, index) => ({
+  title: category.categoryname,
+  id: category.categoryid,
+  chartData: [
+    {
+      name: 'Completed',
+      value: data.studentcases.filter((studentcase) => studentcase.categoryid === category.categoryid).length,
+      color: colors[index % colors.length]
+    }
+  ]
+}));
+
+
 
   useEffect(() => {
     fetch('/dashboard/')
@@ -61,7 +79,23 @@ const Dashboard = () => {
   };
 
   const handleExpand = (section) => {
+    if (isModalOpen) return; // if pop up window is open, do not collapse the section
     setExpandedSection((prevSection) => (prevSection === section ? null : section));
+  };
+
+  // Function to handle opening the modal
+  const handleModalOpen = (student, cardTitle) => {
+    setSelectedStudent(student);
+    setIsModalOpen(true);
+
+    // Ensure that the card stays expanded when the modal is opened
+  setExpandedSection(cardTitle); 
+  };
+
+  // Function to handle closing the modal
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedStudent(null);
   };
 
   return (
@@ -162,49 +196,51 @@ const Dashboard = () => {
                 {card.chartData[0].value} students
               </div>
 
-              {/* Table Section (Visible only when expanded) */}
+
               {expandedSection === card.title && (
-                <div className="flex-grow bg-gray-200 p-4 rounded-lg mt-4 w-full">
-                  <h5 className="font-bold mb-2">{card.title} Details</h5>
-                  <table className="w-full text-left table-auto">
-                    <thead>
-                      <tr>
-                        <th>Student Name</th>
-                        <th>Course No</th>
-                        <th>Lecturer</th>
-                        <th>Status</th>
-                        <th>Automated Ref.</th>
-                        <th>Form Status</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Alpha</td>
-                        <td>1234</td>
-                        <td>Dr Vincent</td>
-                        <td>🚩</td>
-                        <td>Dr Kim</td>
-                        <td>❌</td>
-                        <td>•••</td>
-                      </tr>
-                      <tr>
-                        <td>Beta</td>
-                        <td>1234</td>
-                        <td>Dr Vincent</td>
-                        <td>🚩</td>
-                        <td>Dr Kim</td>
-                        <td>✔️</td>
-                        <td>•••</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              )}
+  <div className="flex-grow bg-gray-200 p-4 rounded-lg mt-4 w-full">
+    <h5 className="font-bold mb-2">{card.title} Details</h5>
+    <table className="w-full text-left table-auto">
+      <thead>
+        <tr>
+          <th>First Name</th>
+          <th>Surname</th>
+          <th>Student ID</th>
+          <th>Course ID</th>
+          <th>Status</th>
+          <th>Automated Ref.</th>
+          <th>Form Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.students.map((student) => (
+          <tr key={student.studentid}>
+            <td>{student.firstname}</td>
+            <td>{student.lastname}</td>
+            <td>{student.studentid}</td>
+            <td>{student.courseid}</td>
+            <td>{/* Display student status (e.g., flag) */}</td>
+            <td>{/* Automated ref, e.g., lecturer's name */}</td>
+            <td>{/* Form status, e.g., completion */}</td>
+            <td onClick={() => handleModalOpen({ name: 'Beta', lecturer: 'Dr Vincent', courseNo: 1234, grades: { assignment1: 25, assignment2: 15 } })}>•••</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+              
             </div>
           </div>
         ))}
       </div>
+
+      {/* Render Modal */}
+      {isModalOpen && (
+        <Modal isOpen={isModalOpen} onClose={handleModalClose} student={selectedStudent} />
+      )}
     </div>
   );
 };

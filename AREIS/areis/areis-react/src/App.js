@@ -13,6 +13,7 @@ import CourseList from './pages/CourseList';
 import UploadCsv from './pages/UploadCsv';
 import UploadGrades from './pages/UploadGrades';
 import AtRiskStudents from './pages/AtRiskStudents';
+import StudentForm from './pages/StudentForm';
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
       </Route>
       <Route path="/courselist" element={<CourseList />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/studentform" element={<StudentForm/>} />
     </Routes>
     </>
   );
