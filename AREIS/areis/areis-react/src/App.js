@@ -35,7 +35,7 @@ const App = () => {
         <Route path="managedata/upload-grades/" element={<UploadGrades/>} />
       </Route>
       <Route path="/courselist" element={<CourseList />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="users/login" element={<Login />} />
       <Route path="/studentform" element={<StudentForm/>} />
     </Routes>
     </>

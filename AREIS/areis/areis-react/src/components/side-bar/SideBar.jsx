@@ -79,6 +79,18 @@ const SideBar = () => {
           <FaBell />
           <span>Upload Grades</span>
         </NavLink>
+
+        <NavLink
+          to="/users/login/"
+          className={({ isActive }) =>
+            `w-full px-4 py-3 flex items-center space-x-4 ${
+              isActive ? "bg-blue-300" : ""
+            } hover:bg-blue-200`
+          }
+        >
+          <FaBell />
+          <span>Login Test</span>
+        </NavLink>
       </div>
     </div>
   );

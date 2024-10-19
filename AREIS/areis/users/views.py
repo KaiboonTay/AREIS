@@ -1,36 +1,44 @@
-from django.shortcuts import render, redirect #similar to asp.net for navigation of pages
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm #this is for using the built-in forms in django
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
 
-
-# Create your views here.
-
+@api_view(['POST'])
 def register_user(request):
-    if request.method == "POST": #for the HTTP POST method in the form
+    if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            login(request, form.save()) #save the new user. form.save() also returns a user value same as form.get_user()
-            return redirect("home") #similar to asp.net it will go to the posts_list view
-    else:
-        form = UserCreationForm()
-    return render(request, "users/register.html", { "form" : form })
+            user = form.save()  # Save the user
+            login(request, user)  # Automatically log the user in after registration
+            return JsonResponse({'status': 'success', 'message': 'User registered and logged in', 'user': {'username': user.username}}, status=200)
+        else:
+            # Return validation errors as JSON
+            return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Only POST requests are allowed'}, status=405)
 
+@api_view(['POST'])
 def login_user(request):
-    if request.method == "POST":
-        form = AuthenticationForm(data=request.POST) #data talks about the login information of the users if it is valid it is a kwargs. kwargs stands for keyword arguments
-        if form.is_valid():
-            #LOGIN here
-            login(request, form.get_user())
-            if 'next' in request.POST: #'next' refers to the value from the input field named 'next' inside the login.html
-                return redirect(request.POST.get('next')) #request.POST.get('next') this line is trying to get the value from the input field named 'next' inside the login.html
-            else:
-                return redirect("home")
+    username_or_email = request.data.get('username_or_email')
+    password = request.data.get('password')
 
+    if not username_or_email or not password:
+        return JsonResponse({'status': 'error', 'message': 'Username or email and password are required.'}, status=400)
+
+    # Try to authenticate the user
+    form = AuthenticationForm(request, data={'username': username_or_email, 'password': password})
+    if form.is_valid():
+        user = form.get_user()
+        login(request, user)
+        return JsonResponse({'status': 'success', 'message': 'User logged in', 'user': {'username': user.username}}, status=200)
     else:
-        form = AuthenticationForm()      
-    return render(request, "users/login.html", { "form" : form })
+        # Return validation errors as JSON
+        return JsonResponse({'status': 'error', 'errors': form.errors}, status=401)
 
+
+@api_view(['POST'])
 def logout_user(request):
     if request.method == "POST":
         logout(request)
-        return redirect("home")
+        return JsonResponse({'status': 'success', 'message': 'User logged out'}, status=200)
+    return JsonResponse({'status': 'error', 'message': 'Only POST requests are allowed'}, status=405)
