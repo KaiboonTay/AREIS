@@ -14,6 +14,7 @@ from sendgrid.helpers.mail import Mail
 from managestudents.models import Forms
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_exempt
 
 
 
@@ -98,7 +99,7 @@ def index(request):
     return render(request, 'index.html')
 
 
-@csrf_protect
+@csrf_exempt
 def send_email_to_student(request):
     if request.method == 'POST':
         try:

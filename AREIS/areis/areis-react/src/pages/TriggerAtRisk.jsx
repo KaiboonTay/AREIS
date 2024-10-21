@@ -25,56 +25,49 @@ const TriggerAtRisk = () => {
     setEmailStatus('');
   };
 
- // Function to retrieve the CSRF token from the cookie
-function getCSRFToken() {
-  let csrfToken = null;
-  if (document.cookie && document.cookie !== '') {
-      document.cookie.split(';').forEach(cookie => {
-          const [name, value] = cookie.trim().split('=');
-          if (name === 'csrftoken') {
-              csrfToken = decodeURIComponent(value);
-          }
-      });
-  }
-  return csrfToken;
+  function getCSRFToken() {
+    let csrfToken = null;
+    if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(cookie => {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'csrftoken') {
+                csrfToken = decodeURIComponent(value);
+            }
+        });
+    }
+    return csrfToken;
 }
 
-
   // Function to handle flagging and sending email
-const handleFlagClick = async (student) => {
-  try {
-      const csrfToken = getCSRFToken();  // Retrieve the CSRF token
-      console.log("Sending email to: ", student.email);  // Log the email for debugging
-      console.log("CSRF Token: ", csrfToken);  // Log the CSRF token
+  const handleFlagClick = async (student) => {
+    try {
+        const csrfToken = getCSRFToken();  // Retrieve the CSRF token
+        console.log("Sending email to: ", student.email);  // Log the email for debugging
+        console.log("CSRF Token: ", csrfToken);  // Log the CSRF token
 
-      if (!csrfToken) {
-          console.error("CSRF Token not found!");
-          setEmailStatus("CSRF Token not found. Email could not be sent.");
-          return;
-      }
+        const response = await fetch('/managestudents/trigger-at-risk/send-email/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,  // Add the CSRF token to the headers
+            },
+            body: JSON.stringify({ email: student.email }),
+        });
 
-      const response = await fetch('/managestudents/trigger-at-risk/send-email/', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': csrfToken,  // Add the CSRF token to the headers
-          },
-          body: JSON.stringify({ email: student.email }),
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-          console.log("Email sent successfully:", result);
-          setEmailStatus('Email sent successfully');
-      } else {
-          console.error("Failed to send email:", result.error);
-          setEmailStatus(`Failed to send email: ${result.error}`);
-      }
-  } catch (error) {
-      console.error('Error sending email:', error);
-      setEmailStatus('An error occurred while sending the email.');
-  }
+        const result = await response.json();
+        if (response.ok) {
+            console.log("Email sent successfully:", result);
+            setEmailStatus('Email sent successfully');
+        } else {
+            console.error("Failed to send email:", result.error);
+            setEmailStatus(`Failed to send email: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error sending email:', error);
+        setEmailStatus('An error occurred while sending the email.');
+    }
 };
+
 
   useEffect(() => {
     fetch('/managestudents/trigger-at-risk/')
