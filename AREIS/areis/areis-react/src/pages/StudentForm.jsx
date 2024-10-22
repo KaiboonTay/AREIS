@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const StudentForm = () => {
   const [responses, setResponses] = useState({});
@@ -7,14 +8,48 @@ const StudentForm = () => {
     option2: false,
     option3: false,
   });
-  const [error, setError] = useState(false); // To track if there's an error
+  const [error, setError] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [studentId, setStudentId] = useState(null);
+
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const studentIdParam = searchParams.get('studentId');
+    setStudentId(studentIdParam);
+
+    // Fetch existing form data from the server
+    if (studentIdParam) {
+      fetch(`/managestudents/student-form/?studentId=${studentIdParam}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            setError(true);
+          } else if (data.formSubmitted) {
+            setFormSubmitted(true);
+          } else {
+            setResponses({
+              content1: data.content1,
+              content2: data.content2,
+              content3: data.content3,
+              // Add other content responses if necessary
+            });
+            setLoading(false);
+          }
+        })
+        .catch(() => setError(true));
+    } else {
+      setError(true);
+    }
+  }, [searchParams]);
 
   const handleChange = (question, value) => {
     setResponses((prev) => ({
       ...prev,
       [question]: value,
     }));
-    setError(false); // Clear the error when a valid response is selected
+    setError(false);
   };
 
   const handleCheckboxChange = (option) => {
@@ -27,15 +62,35 @@ const StudentForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // to check if all the qns have been answered
+    // Check if all the questions have been answered
     const allQuestionsAnswered = Object.keys(responses).length === questions.length;
-    
+
     if (!allQuestionsAnswered) {
-      setError(true); // setting errors if all questions are not answered
+      setError(true);
       return;
     }
-    
-    console.log(responses, checkboxes); // can send data to backend here
+
+    // Submit the form to the server
+    fetch('/managestudents/student-form/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        student_id: studentId,
+        ...responses,
+        ...checkboxes
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          setError(true);
+        } else {
+          setFormSubmitted(true);
+        }
+      })
+      .catch(() => setError(true));
   };
 
   const questions = [
@@ -56,6 +111,10 @@ const StudentForm = () => {
     "Personal",
   ];
 
+  if (loading) return <div>Loading...</div>;
+  if (formSubmitted) return <div>You have already submitted this form.</div>;
+  if (error) return <div>There was an error loading the form.</div>;
+
   return (
     <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
       <h1 className="text-3xl font-semibold mb-6 text-center">Student Form</h1>
@@ -67,18 +126,18 @@ const StudentForm = () => {
               <label key={value} className="flex flex-col items-center">
                 <input
                   type="radio"
-                  name={question}
+                  name={`content${index + 1}`}
                   value={value}
-                  onChange={() => handleChange(question, value)}
+                  onChange={() => handleChange(`content${index + 1}`, value)}
                   className="hidden"
                 />
-                <span className={`flex items-center justify-center w-10 h-10 rounded-full border-2 cursor-pointer ${responses[question] === value ? 'border-blue-500 bg-blue-100 text-blue-600' : 'border-gray-300'} transition duration-200`}>
+                <span className={`flex items-center justify-center w-10 h-10 rounded-full border-2 cursor-pointer ${responses[`content${index + 1}`] === value ? 'border-blue-500 bg-blue-100 text-blue-600' : 'border-gray-300'} transition duration-200`}>
                   {value}
                 </span>
               </label>
             ))}
           </div>
-          {error && !responses[question] && (
+          {error && !responses[`content${index + 1}`] && (
             <p className="text-red-500 text-sm mt-1">This question is required.</p>
           )}
         </div>

@@ -5,6 +5,7 @@ const TriggerAtRisk = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState({ courses: [], students: [], studentsgrades: [] });
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [emailStatus, setEmailStatus] = useState(''); // For displaying email success or failure message
   const modalRef = useRef(null);
 
   const colors = [
@@ -28,6 +29,49 @@ const TriggerAtRisk = () => {
     setIsModalOpen(false);
     setSelectedStudent(null);
   };
+
+  function getCSRFToken() {
+    let csrfToken = null;
+    if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(cookie => {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'csrftoken') {
+                csrfToken = decodeURIComponent(value);
+            }
+        });
+    }
+    return csrfToken;
+}
+
+  // Function to handle flagging and sending email
+  const handleFlagClick = async (student) => {
+    try {
+        const csrfToken = getCSRFToken();  // Retrieve the CSRF token
+        console.log("Sending email to: ", student.email);  // Log the email for debugging
+        console.log("CSRF Token: ", csrfToken);  // Log the CSRF token
+
+        const response = await fetch('/managestudents/trigger-at-risk/send-email/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,  // Add the CSRF token to the headers
+            },
+            body: JSON.stringify({ email: student.email }),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            console.log("Email sent successfully:", result);
+            setEmailStatus('Email sent successfully');
+        } else {
+            console.error("Failed to send email:", result.error);
+            setEmailStatus(`Failed to send email: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error sending email:', error);
+        setEmailStatus('An error occurred while sending the email.');
+    }
+};
 
   useEffect(() => {
     fetch('/managestudents/api/trigger-at-risk/')
@@ -161,11 +205,13 @@ const TriggerAtRisk = () => {
               <textarea rows="4" placeholder="Issues" className="w-full border border-gray-300 p-2 rounded-lg mb-4"></textarea>
 
               <div className="flex justify-center">
-                <button type="button" className="bg-black text-white py-2 px-4 rounded" onClick={closeModal}>
+                <button type="button" className="bg-black text-white py-2 px-4 rounded" onClick={() => handleFlagClick(selectedStudent)}>
                   Save & Flag Student
                 </button>
               </div>
             </form>
+             {/* Show email status message */}
+             {emailStatus && <p className="mt-4 text-center">{emailStatus}</p>}
           </div>
         </div>
       )}
