@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Legend, Sector, ResponsiveContainer } from 'recharts';
-import Modal from './Modal';
 
 // Function to render the active sector with an expanded radius
 const renderActiveShape = (props) => {
@@ -66,8 +65,6 @@ const Dashboard = () => {
   ]
 }));
 
-
-
   useEffect(() => {
     fetch('/dashboard/')
       .then((response) => response.json())
@@ -88,7 +85,7 @@ const Dashboard = () => {
     setSelectedStudent(student);
     setIsModalOpen(true);
 
-    // Ensure that the card stays expanded when the modal is opened
+    //Ensure that the card stays expanded when the modal is opened
   setExpandedSection(cardTitle); 
   };
 
@@ -98,12 +95,17 @@ const Dashboard = () => {
     setSelectedStudent(null);
   };
 
+  const handleViewStudentCopy = () => {
+    const copyLink = student.copyLink || 'https://example.com/student-copy';
+    window.open(copyLink, '_blank');
+  };
+
   return (
     <div className="p-6">
       {/* Main Dashboard Container */}
       <div className="w-full h-[316px] bg-[#D9D9D9] rounded-xl p-6 flex">
         <h3 className="text-xl font-bold mb-4">Overview</h3>
-
+  
         {/* Left Section: Donut Chart with ResponsiveContainer */}
         <div className="flex justify-center items-center ml-24 w-1/2">
           <ResponsiveContainer width="120%" height={300}>
@@ -134,7 +136,7 @@ const Dashboard = () => {
             </PieChart>
           </ResponsiveContainer>
         </div>
-
+  
         {/* Right Section: Data Summary */}
         <div className="ml-24 flex flex-col justify-center w-1/2">
           <h3 className="text-xl font-bold mb-4 text-gray-500">Value</h3>
@@ -157,7 +159,7 @@ const Dashboard = () => {
           </ul>
         </div>
       </div>
-
+  
       {/* Cards Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         {cardsData.map((card, index) => (
@@ -190,59 +192,166 @@ const Dashboard = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-
+  
               {/* Number of students */}
               <div className={`text-lg font-semibold ${expandedSection === card.title ? 'text-center mt-4' : ''}`}>
                 {card.chartData[0].value} students
               </div>
-
-
+  
               {expandedSection === card.title && (
-  <div className="flex-grow bg-gray-200 p-4 rounded-lg mt-4 w-full">
-    <h5 className="font-bold mb-2">{card.title} Details</h5>
-    <table className="w-full text-left table-auto">
-      <thead>
-        <tr>
-          <th>First Name</th>
-          <th>Surname</th>
-          <th>Student ID</th>
-          <th>Course ID</th>
-          <th>Status</th>
-          <th>Automated Ref.</th>
-          <th>Form Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.students.map((student) => (
-          <tr key={student.studentid}>
-            <td>{student.firstname}</td>
-            <td>{student.lastname}</td>
-            <td>{student.studentid}</td>
-            <td>{student.courseid}</td>
-            <td>{/* Display student status (e.g., flag) */}</td>
-            <td>{/* Automated ref, e.g., lecturer's name */}</td>
-            <td>{/* Form status, e.g., completion */}</td>
-            <td onClick={() => handleModalOpen({ name: 'Beta', lecturer: 'Dr Vincent', courseNo: 1234, grades: { assignment1: 25, assignment2: 15 } })}>•••</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
-
-              
+                <div className="overflow-hidden transition-max-height duration-500 ease-in-out">
+                  <div className="p-4 text-gray-700 bg-white">
+                    <p>Total Students: {data.studentcases.filter(studentcase => studentcase.categoryid === card.id).length}</p>
+  
+                    {/* Scrollable Table for students */}
+                    <div className="overflow-y-auto max-h-96 mt-4">
+                      <table className="table-auto w-full border-collapse">
+                        <thead>
+                          <tr className="bg-gray-200">
+                            <th className="border p-2">Student Name</th>
+                            <th className="border p-2">Course No</th>
+                            <th className="border p-2">Flag Status</th>
+                            <th className="border p-2">Referral</th>
+                            <th className="border p-2">Form Status</th>
+                            <th className="border p-2">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {data.studentcases
+                            .filter(studentcase => studentcase.categoryid === card.id)
+                            .map((studentcase, studentIndex) => {
+                              const student = data.students.find(student => student.studentid === studentcase.studentid);
+                              const grade = data.studentgrades.find(grade => grade.studentid === studentcase.studentid);
+                              return (
+                                <tr key={studentIndex} className="text-center">
+                                  <td className="border p-2">
+                                    <div className="flex justify-center items-center h-full">
+                                      <span className="ml-2">{student?.lastname} {student?.firstname}</span>
+                                    </div>
+                                  </td>
+                                  <td className="border p-2">{studentcase.courseid}</td>
+                                  <td className="border p-2">{grade?.flagstatus}</td>
+                                  <td className="border p-2">Not in DB table</td>
+                                  <td className="border p-2">Not in DB table</td>
+                                  <td className="border p-2">
+                                    <button onClick={() => handleModalOpen(student)} className="text-lg font-bold">
+                                      ...
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
+  
+      {isModalOpen && selectedStudent && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-xl w-96 relative">
+          <button onClick={handleModalClose} className="absolute top-4 right-4">✕</button>
 
-      {/* Render Modal */}
-      {isModalOpen && (
-        <Modal isOpen={isModalOpen} onClose={handleModalClose} student={selectedStudent} />
+            <button 
+              className="absolute top-4 left-4 flex items-center bg-gray-100 p-2 rounded-lg shadow"
+              onClick={handleViewStudentCopy}
+            >
+              <span role="img" aria-label="document" className="mr-2">📄</span> 
+              View Student Copy
+            </button>
+
+            <h2 className="text-xl font-bold text-center mb-4">Review Action</h2>
+  
+            <div className="mb-4">
+              <p><strong>Student Name:</strong> {selectedStudent.lastname} {selectedStudent.firstname}</p>
+              <p><strong>Student ID:</strong> {selectedStudent.studentid}</p>
+              <p><strong>Course:</strong> {
+                  (() => {
+                    const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
+                    return (studentcase.courseid);
+                  })()
+                }</p>
+              <p><strong>Trimester:</strong> {
+                  (() => {
+                    const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
+                    const grade = data.studentgrades.find(grade => grade.studentid === selectedStudent.studentid && grade.courseid === studentcase.courseid);
+                    return (grade.trimester);
+                  })()
+                }</p>
+              <p><strong>Case: </strong> {
+                (() => {
+                  const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
+                  const category = data.casecategory.find(category => category.categoryid === studentcase.categoryid);
+                  return (category.categoryname);
+                })()
+                }</p>
+  
+              <p><strong>Grades: </strong></p>
+              <div className="overflow-y-auto max-h-96 mt-4">
+                <table className="table-auto w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-200">
+                      <th className="border p-2">Journal 1</th>
+                      <th className="border p-2">Journal 2</th>
+                      <th className="border p-2">Assessment 1</th>
+                      <th className="border p-2">Assessment 2</th>
+                      <th className="border p-2">Assessment 3</th>
+                      <th className="border p-2">Current Grade</th>
+                      <th className="border p-2">Final Grade</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(() => {
+                      const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
+                      const grade = data.studentgrades.find(grade => grade.studentid === selectedStudent.studentid && grade.courseid === studentcase.courseid);
+                      return (
+                        <tr className="text-center">
+                          <td className="border p-2">{grade.journal1}</td>
+                          <td className="border p-2">{grade.journal2}</td>
+                          <td className="border p-2">{grade.assessment1}</td>
+                          <td className="border p-2">{grade.assessment2}</td>
+                          <td className="border p-2">{grade.assessment3}</td>
+                          <td className="border p-2">{grade.currentgrade}</td>
+                          <td className="border p-2">{grade.finalgrade}</td>
+                        </tr>
+                      );
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Action Select */}
+          <label htmlFor="action" className="block font-semibold">Action:</label>
+          <select id="action" className="w-full mb-4 border p-2 rounded">
+            <option value="refer">Refer to</option>
+            <option value="flag-lecturer">Lecturer</option>
+            <option value="flag-counsellor">Counsellor</option>
+            <option value="flag-coordinator">Course Coordinator</option>
+          </select>
+  
+            {/* Advisor Select */}
+          <label htmlFor="advisor" className="block font-semibold">Advisor:</label>
+          <select id="advisor" className="w-full mb-4 border p-2 rounded">
+            <option value="dr-kim">Dr Kim</option>
+            <option value="dr-jones">Dr Jones</option>
+            <option value="dr-Vincent">Dr Vincent</option>
+          </select>
+
+            <div className="flex justify-between">
+              <button onClick={handleModalClose} className="px-4 py-2 bg-blue-500 text-white rounded">Save & Flag</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
+  
 };
 
 export default Dashboard;
