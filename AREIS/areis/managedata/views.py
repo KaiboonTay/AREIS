@@ -130,7 +130,7 @@ def upload_grades(request):
         if Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).exists():
             try:
                 # add the grades
-                if int(CurrentScore) <= 50:
+                if CurrentScore and int(CurrentScore) <= 50 :
                     Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
                         journal1=float(Journal1) if Journal1 else None,
                         journal2=float(Journal2) if Journal2 else None,
