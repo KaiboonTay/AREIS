@@ -2,13 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 const StudentForm = () => {
-  const [responses, setResponses] = useState({});
+  const [responses, setResponses] = useState({
+    content1: '',
+    content2: '',
+    content3: '',
+    content4: '',
+    content5: '',
+    content6: '',
+    content7: '',
+    content8: '',
+    content9: '',
+  });
   const [checkboxes, setCheckboxes] = useState({
     option1: false,
     option2: false,
     option3: false,
   });
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [studentId, setStudentId] = useState(null);
@@ -16,81 +26,100 @@ const StudentForm = () => {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const studentIdParam = searchParams.get('studentId');
-    setStudentId(studentIdParam);
+    const fetchFormData = async () => {
+      const studentIdParam = searchParams.get('studentId');
+      console.log("Fetching data for student ID:", studentIdParam); // Debug log
+      if (!studentIdParam) {
+        setError('Student ID is missing');
+        setLoading(false);
+        return;
+      }
 
-    // Fetch existing form data from the server
-    if (studentIdParam) {
-      fetch(`/managestudents/student-form/?studentId=${studentIdParam}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.error) {
-            setError(true);
-          } else if (data.formSubmitted) {
-            setFormSubmitted(true);
-          } else {
-            setResponses({
-              content1: data.content1,
-              content2: data.content2,
-              content3: data.content3,
-              // Add other content responses if necessary
-            });
-            setLoading(false);
-          }
-        })
-        .catch(() => setError(true));
-    } else {
-      setError(true);
-    }
+      setStudentId(studentIdParam);
+
+      try {
+        const requestUrl = `/managestudents/api/student-form/?studentId=${studentIdParam}`;
+        console.log("Request URL:", requestUrl); // Debug log
+        const response = await fetch(requestUrl);
+
+        if (!response.ok) throw new Error('Failed to fetch form data');
+        
+        const data = await response.json();
+        console.log("Fetched data:", data); // Debug log
+        if (data.error) {
+          setError(data.error);
+        } else if (data.formSubmitted) {
+          setFormSubmitted(true);
+        } else {
+          setResponses({
+            content1: data.content1 || '',
+            content2: data.content2 || '',
+            content3: data.content3 || '',
+            content4: data.content4 || '',
+            content5: data.content5 || '',
+            content6: data.content6 || '',
+            content7: data.content7 || '',
+            content8: data.content8 || '',
+            content9: data.content9 || ''
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching form data:', err);
+        setError('Failed to load form data.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFormData();
   }, [searchParams]);
 
   const handleChange = (question, value) => {
-    setResponses((prev) => ({
-      ...prev,
+    setResponses(prevResponses => ({
+      ...prevResponses,
       [question]: value,
     }));
-    setError(false);
   };
 
   const handleCheckboxChange = (option) => {
-    setCheckboxes((prev) => ({
-      ...prev,
-      [option]: !prev[option],
+    setCheckboxes(prevCheckboxes => ({
+      ...prevCheckboxes,
+      [option]: !prevCheckboxes[option],
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Check if all the questions have been answered
-    const allQuestionsAnswered = Object.keys(responses).length === questions.length;
+    try {
+      const response = await fetch('/managestudents/api/student-form/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          student_id: studentId,
+          ...responses,
+          ...checkboxes
+        }),
+      });
 
-    if (!allQuestionsAnswered) {
-      setError(true);
-      return;
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setFormSubmitted(true);
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      setError(`Failed to submit form: ${err.message}`);
     }
-
-    // Submit the form to the server
-    fetch('/managestudents/student-form/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        student_id: studentId,
-        ...responses,
-        ...checkboxes
-      }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          setError(true);
-        } else {
-          setFormSubmitted(true);
-        }
-      })
-      .catch(() => setError(true));
   };
 
   const questions = [
@@ -111,13 +140,40 @@ const StudentForm = () => {
     "Personal",
   ];
 
-  if (loading) return <div>Loading...</div>;
-  if (formSubmitted) return <div>You have already submitted this form.</div>;
-  if (error) return <div>There was an error loading the form.</div>;
+  console.log("Component state - loading:", loading, "formSubmitted:", formSubmitted, "error:", error); // Debugging output for state
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-xl font-semibold text-gray-600">Loading form...</div>
+      </div>
+    );
+  }
+
+  if (formSubmitted) {
+    return (
+      <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-8">
+        <div className="text-center text-lg text-green-600">
+          Thank you! Your form has been successfully submitted.
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-8">
+        <div className="text-center text-lg text-red-600">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
+    <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-8">
       <h1 className="text-3xl font-semibold mb-6 text-center">Student Form</h1>
+      
       {questions.map((question, index) => (
         <div key={index} className="mb-6">
           <label className="block text-lg font-medium mb-2">{question}</label>
@@ -128,18 +184,20 @@ const StudentForm = () => {
                   type="radio"
                   name={`content${index + 1}`}
                   value={value}
+                  checked={responses[`content${index + 1}`] === value}
                   onChange={() => handleChange(`content${index + 1}`, value)}
                   className="hidden"
                 />
-                <span className={`flex items-center justify-center w-10 h-10 rounded-full border-2 cursor-pointer ${responses[`content${index + 1}`] === value ? 'border-blue-500 bg-blue-100 text-blue-600' : 'border-gray-300'} transition duration-200`}>
+                <span className={`flex items-center justify-center w-10 h-10 rounded-full border-2 cursor-pointer ${
+                  responses[`content${index + 1}`] === value 
+                    ? 'border-blue-500 bg-blue-100 text-blue-600' 
+                    : 'border-gray-300'
+                } transition duration-200`}>
                   {value}
                 </span>
               </label>
             ))}
           </div>
-          {error && !responses[`content${index + 1}`] && (
-            <p className="text-red-500 text-sm mt-1">This question is required.</p>
-          )}
         </div>
       ))}
 
@@ -149,6 +207,7 @@ const StudentForm = () => {
           <label key={index} className="flex items-center cursor-pointer">
             <input
               type="checkbox"
+              checked={checkboxes[`option${index + 1}`]}
               onChange={() => handleCheckboxChange(`option${index + 1}`)}
               className="hidden"
             />
@@ -161,7 +220,10 @@ const StudentForm = () => {
         ))}
       </div>
 
-      <button type="submit" className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition duration-200">
+      <button 
+        type="submit" 
+        className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition duration-200"
+      >
         Submit
       </button>
     </form>
