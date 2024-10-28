@@ -14,7 +14,7 @@ const TriggerAtRisk = () => {
     "bg-indigo-100"
   ];
 
-  const flagColors = ["#d1d5db", "#facc15", "#fb923c", "#ef4444"]; // Gray, Yellow, Orange, Red
+  const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"]; // Gray, Orange, Blue, Red
 
   const handleToggle = (index) => {
     setActiveIndex(activeIndex === index ? null : index);

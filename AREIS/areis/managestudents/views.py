@@ -93,6 +93,31 @@ def course_list(request):
 #     }
 #     return Response(data)
 
+
+@api_view(['GET']) #will add post method for the modal
+def at_risk_students(request):
+    
+    #if request.path.startswith('/managestudents/trigger-at-risk/'):
+        courses = Courses.objects.all()
+        studentgrades = Studentgrades.objects.all()
+        students = Students.objects.all()
+
+        data = {
+        'courses': CourseSerializer(courses, many=True).data,
+        'students': StudentSerializer(students, many=True).data,
+        'studentgrades': StudentGradeSerializer(studentgrades, many=True).data
+        }
+        #serializer = CourseSerializer(courses, many=True)
+        # Convert the serializer data to a JSON string
+        json_data = json.dumps(data, indent=4)
+        
+        # Print the JSON data in the terminal
+        print(json_data)
+        return Response(data)
+
+
+
+
 @csrf_exempt
 def send_email_to_student(request):
     if request.method == 'POST':

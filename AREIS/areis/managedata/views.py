@@ -120,7 +120,7 @@ def upload_grades(request):
         Assessment1 = row.get('Assessment 1 Final Score', '').strip()
         Assessment2 = row.get('Assessment 2 Final Score', '').strip()
         Assessment3 = row.get('Assessment 3 Final Score', '').strip()
-        CurrentScore = row.get('Class Descr', '').strip()
+        CurrentScore = row.get('Current Score', '').strip()
         FinalGrade = row.get('Final Score', '').strip()
         Section = row.get('Section', '').strip()
         #Trimester = Section.split(' ')[0] Issue does not match with the other csv file
@@ -130,6 +130,20 @@ def upload_grades(request):
         if Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).exists():
             try:
                 # add the grades
+                if int(CurrentScore) <= 50:
+                    Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
+                        journal1=float(Journal1) if Journal1 else None,
+                        journal2=float(Journal2) if Journal2 else None,
+                        assessment1=float(Assessment1) if Assessment1 else None,
+                        assessment2=float(Assessment2) if Assessment2 else None,
+                        assessment3=float(Assessment3) if Assessment3 else None,
+                        currentscore=float(CurrentScore) if CurrentScore else None,
+                        finalgrade=float(FinalGrade) if FinalGrade else None,
+                        #trimester=Trimester,
+                        flagstatus=2
+                )
+                    
+                else:
                     Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
                         journal1=float(Journal1) if Journal1 else None,
                         journal2=float(Journal2) if Journal2 else None,
@@ -141,6 +155,7 @@ def upload_grades(request):
                         #trimester=Trimester,
                         flagstatus=0
                 )
+                    
             except IntegrityError:
                 return Response({"error": f"Error inserting student {StudentId}. Does not exist."}, 
                                 status=status.HTTP_409_CONFLICT)
