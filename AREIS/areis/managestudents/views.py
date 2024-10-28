@@ -107,7 +107,7 @@ def send_email_to_student(request):
 
             student = get_object_or_404(Students, email=email)
             student_id = student.studentid
-            form_link = f"http://localhost:8000/student-form?studentId={student_id}"
+            form_link = f"http://localhost:8000/managestudents/student-form/?studentId={student_id}"
 
             sendgrid_api_key = os.getenv('SENDGRID_API_KEY')
             if not sendgrid_api_key:
