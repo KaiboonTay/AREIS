@@ -107,7 +107,7 @@ def send_email_to_student(request):
 
             student = get_object_or_404(Students, email=email)
             student_id = student.studentid
-            form_link = f"http://localhost:8000/student-form?studentId={student_id}"
+            form_link = f"http://localhost:8000/managestudents/student-form/?studentId={student_id}"
 
             sendgrid_api_key = os.getenv('SENDGRID_API_KEY')
             if not sendgrid_api_key:
@@ -143,10 +143,12 @@ def send_email_to_student(request):
 
 
 @csrf_exempt
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def submit_form(request):
+    # Add CORS headers if needed
     if request.method == 'GET':
         student_id = request.GET.get('studentId')
+        print(f"Received GET request for student ID: {student_id}")  # Debug log
         
         if not student_id:
             return JsonResponse({'error': 'studentId query parameter is missing.'}, status=400)
@@ -154,16 +156,20 @@ def submit_form(request):
         try:
             # First check if the student exists
             student = Students.objects.filter(studentid=student_id).first()
+            print(f"Looking up student with ID: {student_id}")  # Debug log
+
             if not student:
+                print(f"Student not found with ID: {student_id}")  # Debug log
                 return JsonResponse({'error': 'Student not found.'}, status=404)
 
             # Check if there is a form already submitted for this student
             form_response = Forms.objects.filter(studentid=student).first()
-            
             if form_response and form_response.responded:
+                print(f"Form already submitted for student: {student_id}")  # Debug log
                 return JsonResponse({'formSubmitted': True})
             
             # If no submitted form exists, return initial form data
+            print(f"Returning initial form data for student: {student_id}")  # Debug log
             return JsonResponse({
                 'formSubmitted': False,
                 'content1': '',
@@ -179,6 +185,7 @@ def submit_form(request):
             })
 
         except Exception as e:
+            print(f"Error processing request: {str(e)}")  # Debug log
             return JsonResponse({'error': str(e)}, status=500)
 
     elif request.method == 'POST':
@@ -222,6 +229,7 @@ def submit_form(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 
 
