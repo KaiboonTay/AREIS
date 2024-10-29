@@ -11,13 +11,11 @@ const StudentForm = () => {
     content6: '',
     content7: '',
     content8: '',
-    content9: '',
+    content9: ''
   });
-  const [checkboxes, setCheckboxes] = useState({
-    option1: false,
-    option2: false,
-    option3: false,
-  });
+
+  const checkboxOptions = ["Course Content", "Learning Issues", "Personal"];
+  const [selectedOptions, setSelectedOptions] = useState([]); // Array to hold selected checkboxes
   const [error, setError] = useState(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -28,7 +26,6 @@ const StudentForm = () => {
   useEffect(() => {
     const fetchFormData = async () => {
       const studentIdParam = searchParams.get('studentId');
-      console.log("Fetching data for student ID:", studentIdParam); // Debug log
       if (!studentIdParam) {
         setError('Student ID is missing');
         setLoading(false);
@@ -39,13 +36,11 @@ const StudentForm = () => {
 
       try {
         const requestUrl = `/managestudents/api/student-form/?studentId=${studentIdParam}`;
-        console.log("Request URL:", requestUrl); // Debug log
         const response = await fetch(requestUrl);
 
         if (!response.ok) throw new Error('Failed to fetch form data');
         
         const data = await response.json();
-        console.log("Fetched data:", data); // Debug log
         if (data.error) {
           setError(data.error);
         } else if (data.formSubmitted) {
@@ -62,6 +57,11 @@ const StudentForm = () => {
             content8: data.content8 || '',
             content9: data.content9 || ''
           });
+
+          // If data has checkbox options saved, load them into selectedOptions
+          if (data.checkbox_options) {
+            setSelectedOptions(data.checkbox_options.split(', '));
+          }
         }
       } catch (err) {
         console.error('Error fetching form data:', err);
@@ -82,15 +82,23 @@ const StudentForm = () => {
   };
 
   const handleCheckboxChange = (option) => {
-    setCheckboxes(prevCheckboxes => ({
-      ...prevCheckboxes,
-      [option]: !prevCheckboxes[option],
-    }));
+    setSelectedOptions(prevSelected => {
+      if (prevSelected.includes(option)) {
+        return prevSelected.filter(item => item !== option);
+      } else {
+        return [...prevSelected, option];
+      }
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    if (selectedOptions.length === 0) {
+      setError('Please select at least one option from Additional Options.');
+      return;
+    }
+
     try {
       const response = await fetch('/managestudents/api/student-form/', {
         method: 'POST',
@@ -100,7 +108,7 @@ const StudentForm = () => {
         body: JSON.stringify({
           student_id: studentId,
           ...responses,
-          ...checkboxes
+          checkbox_options: JSON.stringify(selectedOptions) // Send selected options as checkbox_options
         }),
       });
 
@@ -133,14 +141,6 @@ const StudentForm = () => {
     "I have difficulties balancing other commitments (e.g., work, family).",
     "I have financial issues.",
   ];
-
-  const checkboxOptions = [
-    "Course Content",
-    "Learning Issues",
-    "Personal",
-  ];
-
-  console.log("Component state - loading:", loading, "formSubmitted:", formSubmitted, "error:", error); // Debugging output for state
 
   if (loading) {
     return (
@@ -207,12 +207,13 @@ const StudentForm = () => {
           <label key={index} className="flex items-center cursor-pointer">
             <input
               type="checkbox"
-              checked={checkboxes[`option${index + 1}`]}
-              onChange={() => handleCheckboxChange(`option${index + 1}`)}
+              value={option}
+              checked={selectedOptions.includes(option)}
+              onChange={() => handleCheckboxChange(option)}
               className="hidden"
             />
             <span className={`flex items-center justify-center w-32 h-10 rounded-lg border-2 cursor-pointer transition duration-200 
-              ${checkboxes[`option${index + 1}`] ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-200 border-gray-400'}
+              ${selectedOptions.includes(option) ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-200 border-gray-400'}
               hover:bg-blue-400 hover:text-white`}>
               {option}
             </span>
