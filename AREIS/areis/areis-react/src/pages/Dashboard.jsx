@@ -100,6 +100,8 @@ const Dashboard = () => {
     window.open(copyLink, '_blank');
   };
 
+  const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"]; // Gray, Yellow, Orange, Red
+
   return (
     <div className="p-6">
       {/* Main Dashboard Container */}
@@ -159,98 +161,126 @@ const Dashboard = () => {
           </ul>
         </div>
       </div>
+
   
       {/* Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-        {cardsData.map((card, index) => (
-          <div
-            key={index}
-            className={`bg-[#D9D9D9] p-4 rounded-xl shadow-md transition-all duration-300 ease-in-out ${
-              expandedSection === card.title ? 'col-span-3 h-auto' : 'h-[316px]'
-            }`}
-            onClick={() => handleExpand(card.title)}
-          >
-            <h4 className="text-lg font-bold mb-4">{card.title}</h4>
-            <div
-              className={`flex ${
-                expandedSection === card.title ? 'flex-col' : 'flex-col items-center justify-center'
-              }`}
-            >
-              {/* Donut Chart Section */}
-              <div className="flex justify-center items-center w-full md:w-1/3 mb-4">
-                <ResponsiveContainer width="100%" height={150}>
-                  <PieChart>
-                    <Pie
-                      data={card.chartData}
-                      dataKey="value"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={40}
-                      outerRadius={60}
-                      fill={card.chartData[0].color}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-  
-              {/* Number of students */}
-              <div className={`text-lg font-semibold ${expandedSection === card.title ? 'text-center mt-4' : ''}`}>
-                {card.chartData[0].value} students
-              </div>
-  
-              {expandedSection === card.title && (
-                <div className="overflow-hidden transition-max-height duration-500 ease-in-out">
-                  <div className="p-4 text-gray-700 bg-white">
-                    <p>Total Students: {data.studentcases.filter(studentcase => studentcase.categoryid === card.id).length}</p>
-  
-                    {/* Scrollable Table for students */}
-                    <div className="overflow-y-auto max-h-96 mt-4">
-                      <table className="table-auto w-full border-collapse">
-                        <thead>
-                          <tr className="bg-gray-200">
-                            <th className="border p-2">Student Name</th>
-                            <th className="border p-2">Course No</th>
-                            <th className="border p-2">Flag Status</th>
-                            <th className="border p-2">Referral</th>
-                            <th className="border p-2">Form Status</th>
-                            <th className="border p-2">Action</th>
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+  {cardsData.map((card, index) => (
+    <div
+      key={index}
+      className={`bg-[#D9D9D9] p-4 rounded-xl shadow-md transition-all duration-300 ease-in-out ${
+        expandedSection === card.title ? 'col-span-3 h-auto' : 'h-[316px]'
+      }`}
+      onClick={() => handleExpand(card.title)}
+    >
+      <h4 className="text-lg font-bold mb-4">{card.title}</h4>
+
+      <div
+        className={`${
+          expandedSection === card.title ? 'flex flex-row' : 'flex flex-col items-center justify-center'
+        }`}
+      >
+        {/* Donut Chart Section on the Left */}
+        <div className={`w-full md:w-1/3 mb-4 ${expandedSection === card.title ? 'mr-4' : ''}`}>
+          <ResponsiveContainer width="100%" height={150}>
+            <PieChart>
+              <Pie
+                data={card.chartData}
+                dataKey="value"
+                cx="50%"
+                cy="50%"
+                innerRadius={40}
+                outerRadius={60}
+                fill={card.chartData[0].color}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+
+          {/* Total Students below Donut Chart */}
+          <div className="text-lg font-semibold text-center mt-4">
+            Total Students: {data.studentcases.filter(studentcase => studentcase.categoryid === card.id).length}
+          </div>
+        </div>
+
+        {/* Table on the Right */}
+        {expandedSection === card.title && (
+          <div className="w-full md:w-2/3 overflow-hidden transition-max-height duration-500 ease-in-out">
+            <div className="p-4 text-gray-700">
+              {/* Scrollable Table for students */}
+              <div className="overflow-y-auto max-h-96 mt-4">
+                <table className="table-auto w-full border-collapse">
+                  <thead>
+                    <tr className="bg-white-200">
+                      <th className="border p-2">Student Name</th>
+                      <th className="border p-2">Course No</th>
+                      <th className="border p-2">Flag Status</th>
+                      <th className="border p-2">Referral</th>
+                      <th className="border p-2">Form Status</th>
+                      <th className="border p-2">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.studentcases
+                      .filter(studentcase => studentcase.categoryid === card.id)
+                      .map((studentcase, studentIndex) => {
+                        const student = data.students.find(student => student.studentid === studentcase.studentid);
+                        const grade = data.studentgrades.find(
+                          grade => grade.studentid === studentcase.studentid &&
+                                   grade.courseid === studentcase.courseid);
+                        return (
+                          <tr key={studentIndex} className="text-center bg-white">
+                            <td className="border p-2">
+                              <div className="flex justify-center items-center h-full">
+                                <span className="ml-2">{student?.lastname} {student?.firstname}</span>
+                              </div>
+                            </td>
+                            <td className="border p-2">{studentcase.courseid}</td>
+                            <td className="border p-2">
+                              <div className="flex justify-center items-center h-full">
+                                <button onClick={() => openModal(student)} className="flex items-center justify-center">
+                                  <svg
+                                    className={`w-8 h-8`}
+                                    viewBox="0 0 64 64"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    {/* Flagpole */}
+                                    <line 
+                                      x1="10" y1="5" 
+                                      x2="10" y2="60" 
+                                      stroke="black" 
+                                      strokeWidth="2" 
+                                    />
+                                    {/* Flag */}
+                                    <polygon 
+                                      points="10,5 40,15 10,25" 
+                                      fill={flagColors[grade.flagstatus]} 
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
+                            </td>
+                            <td className="border p-2">Not in DB table</td>
+                            <td className="border p-2">Not in DB table</td>
+                            <td className="border p-2">
+                              <button onClick={() => handleModalOpen(student)} className="text-lg font-bold">
+                                ...
+                              </button>
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {data.studentcases
-                            .filter(studentcase => studentcase.categoryid === card.id)
-                            .map((studentcase, studentIndex) => {
-                              const student = data.students.find(student => student.studentid === studentcase.studentid);
-                              const grade = data.studentgrades.find(grade => grade.studentid === studentcase.studentid);
-                              return (
-                                <tr key={studentIndex} className="text-center">
-                                  <td className="border p-2">
-                                    <div className="flex justify-center items-center h-full">
-                                      <span className="ml-2">{student?.lastname} {student?.firstname}</span>
-                                    </div>
-                                  </td>
-                                  <td className="border p-2">{studentcase.courseid}</td>
-                                  <td className="border p-2">{grade?.flagstatus}</td>
-                                  <td className="border p-2">Not in DB table</td>
-                                  <td className="border p-2">Not in DB table</td>
-                                  <td className="border p-2">
-                                    <button onClick={() => handleModalOpen(student)} className="text-lg font-bold">
-                                      ...
-                                    </button>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              )}
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        ))}
+        )}
       </div>
+    </div>
+  ))}
+</div>
+
+
   
       {isModalOpen && selectedStudent && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
