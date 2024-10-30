@@ -108,7 +108,8 @@ const AtRiskStudents = () => {
                             <td className="border p-2">{grade.trimester}</td>
                             <td className="border p-2">
                                   <div className="flex justify-center items-center h-full">
-                                    <button onClick={() => openModal(student)} className="flex items-center justify-center">
+                                    {grade.flagstatus === 2 ? (
+                                      <button onClick={() => openModal(student)} className="flex items-center justify-center">
                                       <svg
                                         className={`w-8 h-8`}
                                         viewBox="0 0 64 64"
@@ -127,7 +128,26 @@ const AtRiskStudents = () => {
                                           fill={flagColors[grade.flagstatus]} 
                                         />
                                       </svg>
-                                    </button>
+                                    </button>) : 
+                                    <svg
+                                    className={`w-8 h-8`}
+                                    viewBox="0 0 64 64"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    {/* Flagpole */}
+                                    <line 
+                                      x1="10" y1="5" 
+                                      x2="10" y2="60" 
+                                      stroke="black" 
+                                      strokeWidth="2" 
+                                    />
+                                    {/* Flag */}
+                                    <polygon 
+                                      points="10,5 40,15 10,25" 
+                                      fill={flagColors[grade.flagstatus]} 
+                                    />
+                                  </svg> }
+                                    
                                   </div>
                                 </td>
                             
