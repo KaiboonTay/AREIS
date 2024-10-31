@@ -99,6 +99,122 @@ const TriggerAtRisk = () => {
 
   return (
     <div className="px-20 mx-auto mt-8">
+      
+      <div className="space-y-4">
+        
+          <div key="master-list" className="border border-gray-300 rounded-lg">
+            <div
+              className={`p-4 flex justify-between items-center cursor-pointer`}
+              onClick={() => handleToggle(-1)}
+            >
+              <h3 className="font-medium text-lg">UON Students: Master List</h3>
+              <span className="text-lg">{activeIndex === -1 ? '-' : '>'}</span>
+            </div>
+
+            <div className={`overflow-hidden transition-max-height duration-500 ease-in-out ${activeIndex === -1 ? 'max-h-screen' : 'max-h-0'}`}>
+              {activeIndex === -1 && (
+                <div className="p-4 text-gray-700 bg-white">
+                  <p>Total Students: {data.studentsgrades.length}</p>
+
+                  <div className="overflow-y-auto max-h-96 mt-4">
+                    <table className="table-auto w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gray-200">
+                          <th className="border p-2">Student ID</th>
+                          <th className="border p-2">First Name</th>
+                          <th className="border p-2">Surname</th>
+                          <th className="border p-2">Course ID</th>
+                          <th className="border p-2">Course Description</th>
+                          <th className="border p-2">Journal 1</th>
+                          <th className="border p-2">Journal 2</th>
+                          <th className="border p-2">Assessment 1</th>
+                          <th className="border p-2">Assessment 2</th>
+                          <th className="border p-2">Assessment 3</th>
+                          <th className="border p-2">Current Grade</th>
+                          <th className="border p-2">Final Grade</th>
+                          <th className="border p-2">Phone No.</th>
+                          <th className="border p-2">Email Address</th>
+                          <th className="border p-2">Flag Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.studentsgrades
+                          .sort((a, b) => b.flagstatus - a.flagstatus)
+                          .map((grade, studentIndex) => {
+                            const student = data.students.find(student => student.studentid === grade.studentid);
+                            const course = data.courses.find(course => course.courseid === grade.courseid);
+                            return (
+                              <tr key={studentIndex} className="text-center">
+                                <td className="border p-2">{student.studentid}</td>
+                                <td className="border p-2">{student.firstname}</td>
+                                <td className="border p-2">{student.lastname}</td>
+                                <td className="border p-2">{grade.courseid}</td>
+                                <td className="border p-2">{course.classdescription}</td>
+                                <td className="border p-2">{grade.journal1}</td>
+                                <td className="border p-2">{grade.journal2}</td>
+                                <td className="border p-2">{grade.assessment1}</td>
+                                <td className="border p-2">{grade.assessment2}</td>
+                                <td className="border p-2">{grade.assessment3}</td>
+                                <td className="border p-2">{grade.currentscore}</td>
+                                <td className="border p-2">{grade.finalgrade}</td>
+                                <td className="border p-2">{student.phoneno}</td>
+                                <td className="border p-2">{student.email}</td>
+                                <td className="border p-2">
+                                  <div className="flex justify-center items-center h-full">
+                                  {grade.flagstatus === 2 || grade.flagstatus === 0 ? (
+                                      <button onClick={() => openModal(student)} className="flex items-center justify-center">
+                                      <svg
+                                        className={`w-8 h-8`}
+                                        viewBox="0 0 64 64"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        {/* Flagpole */}
+                                        <line 
+                                          x1="10" y1="5" 
+                                          x2="10" y2="60" 
+                                          stroke="black" 
+                                          strokeWidth="2" 
+                                        />
+                                        {/* Flag */}
+                                        <polygon 
+                                          points="10,5 40,15 10,25" 
+                                          fill={flagColors[grade.flagstatus]} 
+                                        />
+                                      </svg>
+                                    </button>) : 
+                                    <svg
+                                    className={`w-8 h-8`}
+                                    viewBox="0 0 64 64"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    {/* Flagpole */}
+                                    <line 
+                                      x1="10" y1="5" 
+                                      x2="10" y2="60" 
+                                      stroke="black" 
+                                      strokeWidth="2" 
+                                    />
+                                    {/* Flag */}
+                                    <polygon 
+                                      points="10,5 40,15 10,25" 
+                                      fill={flagColors[grade.flagstatus]} 
+                                    />
+                                  </svg> }
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        
+      </div>
+
       <div className="space-y-4">
         {data.courses.map((course, index) => (
           <div key={index} className="border border-gray-300 rounded-lg">
@@ -153,7 +269,8 @@ const TriggerAtRisk = () => {
                                 <td className="border p-2">{student.email}</td>
                                 <td className="border p-2">
                                   <div className="flex justify-center items-center h-full">
-                                    <button onClick={() => openModal(student)} className="flex items-center justify-center">
+                                  {grade.flagstatus === 2 || grade.flagstatus === 0 ? (
+                                      <button onClick={() => openModal(student)} className="flex items-center justify-center">
                                       <svg
                                         className={`w-8 h-8`}
                                         viewBox="0 0 64 64"
@@ -172,7 +289,25 @@ const TriggerAtRisk = () => {
                                           fill={flagColors[grade.flagstatus]} 
                                         />
                                       </svg>
-                                    </button>
+                                    </button>) : 
+                                    <svg
+                                    className={`w-8 h-8`}
+                                    viewBox="0 0 64 64"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    {/* Flagpole */}
+                                    <line 
+                                      x1="10" y1="5" 
+                                      x2="10" y2="60" 
+                                      stroke="black" 
+                                      strokeWidth="2" 
+                                    />
+                                    {/* Flag */}
+                                    <polygon 
+                                      points="10,5 40,15 10,25" 
+                                      fill={flagColors[grade.flagstatus]} 
+                                    />
+                                  </svg> }
                                   </div>
                                 </td>
                               </tr>
