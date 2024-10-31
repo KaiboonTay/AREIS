@@ -134,83 +134,91 @@ def send_email_to_student(request):
             student_id = student.studentid
             form_link = f"http://localhost:8000/managestudents/student-form/?studentId={student_id}"
 
+            # Prepare the email
             sendgrid_api_key = os.getenv('SENDGRID_API_KEY')
             if not sendgrid_api_key:
                 print("SendGrid API key is missing")
                 return JsonResponse({'status': 'SendGrid API key is missing'}, status=500)
 
-            # Create and send the email
+            # Send email
             message = Mail(
                 from_email='uonareis@gmail.com',
                 to_emails=email,
                 subject='Complete Your At-Risk Form',
                 html_content=f'Please complete the form at <a href="{form_link}">{form_link}</a>'
             )
-            
             sg = SendGridAPIClient(sendgrid_api_key)
             response = sg.send(message)
-            print(f"SendGrid Response Status: {response.status_code}")
-            print(f"SendGrid Response Body: {response.body}")
-            
+
             if response.status_code != 202:
                 print(f"Failed to send email: {response.body}")
                 return JsonResponse({'status': 'Failed to send email', 'error': response.body}, status=500)
 
-            return JsonResponse({'status': 'Email sent successfully'})
-        
+            # Create a new form entry in the Forms table with responded=False
+            form_response, created = Forms.objects.update_or_create(
+                 formid=student_id,  # Use student ID as FormID
+                 defaults={
+                    'studentid': student,
+                    'responded': False,
+                    'checkbox_options': '',  # Initial blank values
+                 }
+            )
+                 
+          
+            # Update the student's flagstatus to 3 in the TriggerAtRisk page
+            student.flagstatus = 3
+            student.save()
+
+            return JsonResponse({'status': 'Email sent successfully and form entry created'})
+
         except Exception as e:
             print(f"Error occurred: {str(e)}")
             return JsonResponse({'status': 'Failed to send email', 'error': str(e)}, status=500)
-    
-    return JsonResponse({'status': 'Invalid request method'}, status=400)
 
+    return JsonResponse({'status': 'Invalid request method'}, status=400)
 
 
 
 @csrf_exempt
 @api_view(['GET', 'POST'])
 def submit_form(request):
-    # Add CORS headers if needed
     if request.method == 'GET':
         student_id = request.GET.get('studentId')
-        print(f"Received GET request for student ID: {student_id}")  # Debug log
+        print(f"Received GET request for student ID: {student_id}")
         
         if not student_id:
             return JsonResponse({'error': 'studentId query parameter is missing.'}, status=400)
             
         try:
-            # First check if the student exists
             student = Students.objects.filter(studentid=student_id).first()
-            print(f"Looking up student with ID: {student_id}")  # Debug log
+            print(f"Looking up student with ID: {student_id}")
 
             if not student:
-                print(f"Student not found with ID: {student_id}")  # Debug log
+                print(f"Student not found with ID: {student_id}")
                 return JsonResponse({'error': 'Student not found.'}, status=404)
 
-            # Check if there is a form already submitted for this student
-            form_response = Forms.objects.filter(studentid=student).first()
-            if form_response and form_response.responded:
-                print(f"Form already submitted for student: {student_id}")  # Debug log
-                return JsonResponse({'formSubmitted': True})
-            
-            # If no submitted form exists, return initial form data
-            print(f"Returning initial form data for student: {student_id}")  # Debug log
+           
+            form_response = Forms.objects.filter(formid=student_id, responded=False).first()
+            if not form_response:
+                return JsonResponse({'error': 'No form found for student or form already submitted.'}, status=404)
+
             return JsonResponse({
                 'formSubmitted': False,
-                'content1': '',
-                'content2': '',
-                'content3': '',
-                'content4': '',
-                'content5': '',
-                'content6': '',
-                'content7': '',
-                'content8': '',
-                'content9': '',
+                'content1': form_response.content1,
+                'content2': form_response.content2,
+                'content3': form_response.content3,
+                'content4': form_response.content4,
+                'content5': form_response.content5,
+                'content6': form_response.content6,
+                'content7': form_response.content7,
+                'content8': form_response.content8,
+                'content9': form_response.content9,
+                'checkbox_options': form_response.checkbox_options,
                 'studentId': student_id
             })
 
         except Exception as e:
-            print(f"Error processing request: {str(e)}")  # Debug log
+            print(f"Error processing request: {str(e)}")
             return JsonResponse({'error': str(e)}, status=500)
 
     elif request.method == 'POST':
@@ -221,30 +229,35 @@ def submit_form(request):
             if not student_id:
                 return JsonResponse({'error': 'student_id is required'}, status=400)
 
-            # Get or validate student
             try:
                 student = Students.objects.get(studentid=student_id)
             except Students.DoesNotExist:
                 return JsonResponse({'error': 'Student not found'}, status=404)
 
-            # Check for existing form submission
             if Forms.objects.filter(studentid=student, responded=True).exists():
                 return JsonResponse({'error': 'Form has already been submitted.'}, status=400)
 
-            # Create form response
-            form_response = Forms.objects.create(
-                studentid=student,
-                content1=data.get('content1', ''),
-                content2=data.get('content2', ''),
-                content3=data.get('content3', ''),
-                content4=data.get('content4', ''),
-                content5=data.get('content5', ''),
-                content6=data.get('content6', ''),
-                content7=data.get('content7', ''),
-                content8=data.get('content8', ''),
-                content9=data.get('content9', ''),
-                responded=True
-            )
+            #Converting checkbox options to display as a string in database
+            checkbox_options = ', '.join(json.loads(data.get('checkbox_options', '[]')))
+            
+           
+            form_response = Forms.objects.filter(formid=student_id, responded=False).first()
+            if not form_response:
+                return JsonResponse({'error': 'No form entry found to update for this student.'}, status=404)
+
+            # Update the form with the submitted data
+            form_response.content1 = data.get('content1', '')
+            form_response.content2 = data.get('content2', '')
+            form_response.content3 = data.get('content3', '')
+            form_response.content4 = data.get('content4', '')
+            form_response.content5 = data.get('content5', '')
+            form_response.content6 = data.get('content6', '')
+            form_response.content7 = data.get('content7', '')
+            form_response.content8 = data.get('content8', '')
+            form_response.content9 = data.get('content9', '')
+            form_response.checkbox_options = ', '.join(json.loads(data.get('checkbox_options', '[]')))
+            form_response.responded = True
+            form_response.save()
 
             return JsonResponse({'status': 'success', 'message': 'Form submitted successfully'})
 
@@ -254,6 +267,9 @@ def submit_form(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+
 
 
 

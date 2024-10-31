@@ -23,11 +23,14 @@ class Forms(models.Model):
     content7 = models.IntegerField(db_column='Content7', blank=True, null=True)  # Field name made lowercase.
     content8 = models.IntegerField(db_column='Content8', blank=True, null=True)  # Field name made lowercase.
     content9 = models.IntegerField(db_column='Content9', blank=True, null=True)  # Field name made lowercase.
-    content10 = models.TextField(db_column='Content10', blank=True, null=True)  # Field name made lowercase.
+    #content10 = models.TextField(db_column='Content10', blank=True, null=True)  # Field name made lowercase.
+    checkbox_options = models.TextField(blank=True, null=True) # Checkbox field for content 10
     responded = models.BooleanField(default=False) #Track if it's submitted 
 
     class Meta:
         db_table = 'forms'
+        managed = True # This tells Django to create or alter this table
+
 
 
 class Studentcases(models.Model):
