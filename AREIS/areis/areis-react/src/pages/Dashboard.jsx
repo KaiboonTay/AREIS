@@ -75,6 +75,8 @@ const Dashboard = () => {
     setActiveIndex(index);
   };
 
+  const sortedCards = [...cardsData].sort((a, b) => (a.title === expandedSection ? -1 : b.title === expandedSection ? 1 : 0));
+
   const handleExpand = (section) => {
     if (isModalOpen) return; // if pop up window is open, do not collapse the section
     setExpandedSection((prevSection) => (prevSection === section ? null : section));
@@ -103,7 +105,8 @@ const Dashboard = () => {
   const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"]; // Gray, Yellow, Orange, Red
 
   return (
-    <div className="p-6">
+    <div>
+    <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
       {/* Main Dashboard Container */}
       <div className="w-full h-[316px] bg-[#D9D9D9] rounded-xl p-6 flex">
         <h3 className="text-xl font-bold mb-4">Overview</h3>
@@ -162,10 +165,71 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Main Dashboard Container */}
+      <div className="w-full h-[316px] bg-[#D9D9D9] rounded-xl p-6 flex">
+        <h3 className="text-xl font-bold mb-4">Overview</h3>
+  
+        {/* Left Section: Donut Chart with ResponsiveContainer */}
+        <div className="flex justify-center items-center ml-24 w-1/2">
+          <ResponsiveContainer width="120%" height={300}>
+            <PieChart>
+              <Pie
+                activeIndex={activeIndex}
+                activeShape={renderActiveShape}
+                data={data.casecategory.map((category) => ({
+                  name: category.categoryname,
+                  value: data.studentcases.filter(
+                    (studentcase) => studentcase.categoryid === category.categoryid
+                  ).length,
+                }))}
+                cx="50%"
+                cy="50%"
+                innerRadius={80}
+                outerRadius={120}
+                fill="#8884d8"
+                paddingAngle={3}
+                dataKey="value"
+                onMouseEnter={onPieEnter}
+              >
+                {data.casecategory.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                ))}
+              </Pie>
+              <Legend layout="vertical" align="right" verticalAlign="middle" />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+  
+        {/* Right Section: Data Summary */}
+        <div className="ml-24 flex flex-col justify-center w-1/2">
+          <h3 className="text-xl font-bold mb-4 text-gray-500">Value</h3>
+          <ul>
+            {data.casecategory.map((category, index) => (
+              <li key={index} className="flex justify-between mb-2">
+                <div className="flex items-center">
+                  <div
+                    className="w-4 h-4 rounded-full mr-2"
+                    style={{ backgroundColor: colors[index % colors.length] }}
+                  ></div>
+                  <span>{category.categoryname}</span>
+                </div>
+                <span className="ml-24">
+                  {data.studentcases.filter((studentcase) => studentcase.categoryid === category.categoryid)
+                    .length}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      </div>
+      
+
   
       {/* Cards Section */}
-<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-  {cardsData.map((card, index) => (
+      <div>
+<div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+  {sortedCards.map((card, index) => (
     <div
       key={index}
       className={`bg-[#D9D9D9] p-4 rounded-xl shadow-md transition-all duration-300 ease-in-out ${
@@ -200,6 +264,38 @@ const Dashboard = () => {
           <div className="text-lg font-semibold text-center mt-4">
             Total Students: {data.studentcases.filter(studentcase => studentcase.categoryid === card.id).length}
           </div>
+
+          {/* Legend for Flag Status (only when expanded) */}
+          {expandedSection === card.title && (
+            <div className="text-center mt-2">
+              <div className="flex justify-center space-x-4 text-sm items-center">
+                <div className="flex items-center">
+                  {/* Flagpole and flag icon for Moderate Risk */}
+                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                    <polygon points="10,5 40,15 10,25" fill="blue" />
+                  </svg>
+                  <span>Auto flagged</span>
+                </div>
+                <div className="flex items-center">
+                  {/* Flagpole and flag icon for Moderate Risk */}
+                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                    <polygon points="10,5 40,15 10,25" fill="orange" />
+                  </svg>
+                  <span>Manually flagged</span>
+                </div>
+                <div className="flex items-center">
+                  {/* Flagpole and flag icon for Low Risk */}
+                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                    <polygon points="10,5 40,15 10,25" fill="#ef4444" />
+                  </svg>
+                  <span>Flagged referral</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Table on the Right */}
@@ -279,6 +375,8 @@ const Dashboard = () => {
     </div>
   ))}
 </div>
+</div>
+
 
 
   
