@@ -1,11 +1,12 @@
+// src/components/Sidebar.jsx
 import { NavLink } from "react-router-dom";
-import { FaHome, FaSearch, FaUserAlt, FaBell } from "react-icons/fa";
+import { FaHome, FaSearch, FaUserAlt, FaBell, FaUsers, FaQuestionCircle } from "react-icons/fa";
 
 const SideBar = () => {
   return (
     <div className="w-[266px] bg-[#D9D9D9] min-h-[100vh]">
-      <div className=" ">
-        <img className="" src={`/static/logoLogin.png`} alt="" />
+      <div>
+        <img src={`/static/logoLogin.png`} alt="Logo" />
       </div>
       <div className="w-full flex flex-col mt-4">
         <NavLink
@@ -90,6 +91,32 @@ const SideBar = () => {
         >
           <FaBell />
           <span>Login Test</span>
+        </NavLink>
+
+        {/* Link to Manage User */}
+        <NavLink
+          to="/manageuser"
+          className={({ isActive }) =>
+            `w-full px-4 py-3 flex items-center space-x-4 ${
+              isActive ? "bg-blue-300" : ""
+            } hover:bg-blue-200`
+          }
+        >
+          <FaUsers />
+          <span>Manage User</span>
+        </NavLink>
+
+        {/* Link to Need Help */}
+        <NavLink
+          to="/need-help"
+          className={({ isActive }) =>
+            `w-full px-4 py-3 flex items-center space-x-4 ${
+              isActive ? "bg-blue-300" : ""
+            } hover:bg-blue-200`
+          }
+        >
+          <FaQuestionCircle />
+          <span>Need Help</span>
         </NavLink>
       </div>
     </div>
