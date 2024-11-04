@@ -98,78 +98,95 @@ const Dashboard = () => {
   };
 
   const handleViewStudentCopy = () => {
-    const copyLink = student.copyLink || 'https://example.com/student-copy';
-    window.open(copyLink, '_blank');
+    const newWindow = window.open("", "_blank"); // Open a blank page first
+    if (newWindow) {
+      newWindow.document.write("<h1>Student Copy Page</h1>"); // Display temporary content if desired
+    } else {
+      console.error("Failed to open new tab/window, possibly blocked by the browser.");
+    }
   };
+  
 
   const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"]; // Gray, Yellow, Orange, Red
 
   return (
     <div>
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-      {/* Main Dashboard Container */}
-      <div className="w-full h-[316px] bg-[#D9D9D9] rounded-xl p-6 flex">
-        <h3 className="text-xl font-bold mb-4">Overview</h3>
-  
-        {/* Left Section: Donut Chart with ResponsiveContainer */}
-        <div className="flex justify-center items-center ml-24 w-1/2">
-          <ResponsiveContainer width="120%" height={300}>
-            <PieChart>
-              <Pie
-                activeIndex={activeIndex}
-                activeShape={renderActiveShape}
-                data={data.casecategory.map((category) => ({
-                  name: category.categoryname,
-                  value: data.studentcases.filter(
-                    (studentcase) => studentcase.categoryid === category.categoryid
-                  ).length,
-                }))}
-                cx="50%"
-                cy="50%"
-                innerRadius={80}
-                outerRadius={120}
-                fill="#8884d8"
-                paddingAngle={3}
-                dataKey="value"
-                onMouseEnter={onPieEnter}
-              >
-                {data.casecategory.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                ))}
-              </Pie>
-              <Legend layout="vertical" align="right" verticalAlign="middle" />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-  
-        {/* Right Section: Data Summary */}
-        <div className="ml-24 flex flex-col justify-center w-1/2">
-          <h3 className="text-xl font-bold mb-4 text-gray-500">Value</h3>
-          <ul>
-            {data.casecategory.map((category, index) => (
-              <li key={index} className="flex justify-between mb-2">
-                <div className="flex items-center">
-                  <div
-                    className="w-4 h-4 rounded-full mr-2"
-                    style={{ backgroundColor: colors[index % colors.length] }}
-                  ></div>
-                  <span>{category.categoryname}</span>
-                </div>
-                <span className="ml-24">
-                  {data.studentcases.filter((studentcase) => studentcase.categoryid === category.categoryid)
-                    .length}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      {/* Main Dashboard Container - Flagged Students */}
+<div className="w-full h-[316px] bg-[#D9D9D9] rounded-xl p-6 flex">
+  <h3 className="text-xl font-bold mb-4">Flagged Students</h3>
 
-      {/* Main Dashboard Container */}
+  {/* Left Section: Flagged Students (Piechart) */}
+  <div className="flex justify-center items-center ml-24 w-1/2">
+    <ResponsiveContainer width="120%" height={300}>
+      <PieChart>
+        <Pie
+          activeIndex={activeIndex}
+          activeShape={renderActiveShape}
+          data={[
+            { name: 'Manually Flagged', value: data.studentgrades.filter((grade) => grade.flagstatus === 1).length },
+            { name: 'Auto-Flagged', value: data.studentgrades.filter((grade) => grade.flagstatus === 2).length },
+            { name: 'Responded', value: data.studentgrades.filter((grade) => grade.flagstatus === 3).length },
+          ]}
+          cx="50%"
+          cy="50%"
+          innerRadius={80}
+          outerRadius={120}
+          fill="#8884d8"
+          paddingAngle={3}
+          dataKey="value"
+          onMouseEnter={onPieEnter}
+        >
+          <Cell fill="#FFBB28" /> {/* Manually Flagged */}
+          <Cell fill="#FF8042" /> {/* Auto-Flagged */}
+          <Cell fill="#0088FE" /> {/* Responded */}
+        </Pie>
+        <Legend layout="vertical" align="right" verticalAlign="middle" />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+
+  {/* Left Section: Flagged Students (Data Summary) */}
+  <div className="ml-24 flex flex-col justify-center w-1/2">
+    <h3 className="text-xl font-bold mb-4 text-gray-500">Flagged Student Counts</h3>
+    <ul>
+      <li className="flex justify-between mb-2">
+        <div className="flex items-center">
+          <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#FFBB28" }}></div>
+          <span>Manually Flagged</span>
+        </div>
+        <span className="ml-24">
+          {data.studentgrades.filter((grade) => grade.flagstatus === 1).length}
+        </span>
+      </li>
+      <li className="flex justify-between mb-2">
+        <div className="flex items-center">
+          <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#FF8042" }}></div>
+          <span>Auto-Flagged</span>
+        </div>
+        <span className="ml-24">
+          {data.studentgrades.filter((grade) => grade.flagstatus === 2).length}
+        </span>
+      </li>
+      <li className="flex justify-between mb-2">
+        <div className="flex items-center">
+          <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#0088FE" }}></div>
+          <span>Responded</span>
+        </div>
+        <span className="ml-24">
+          {data.studentgrades.filter((grade) => grade.flagstatus === 3).length}
+        </span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+      {/* Second Dashboard Container */}
       <div className="w-full h-[316px] bg-[#D9D9D9] rounded-xl p-6 flex">
         <h3 className="text-xl font-bold mb-4">Overview</h3>
   
-        {/* Left Section: Donut Chart with ResponsiveContainer */}
+        {/* Right Section: Student cases (Piechart) */}
         <div className="flex justify-center items-center ml-24 w-1/2">
           <ResponsiveContainer width="120%" height={300}>
             <PieChart>
@@ -200,7 +217,7 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
   
-        {/* Right Section: Data Summary */}
+        {/* Right Section: Student cases (data) */}
         <div className="ml-24 flex flex-col justify-center w-1/2">
           <h3 className="text-xl font-bold mb-4 text-gray-500">Value</h3>
           <ul>
