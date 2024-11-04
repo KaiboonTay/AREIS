@@ -14,6 +14,8 @@ import UploadGrades from './pages/UploadGrades';
 import AtRiskStudents from './pages/AtRiskStudents';
 import StudentForm from './pages/StudentForm';
 import NeedHelp from './pages/NeedHelp'; // Import the NeedHelp component
+import SearchPage from './pages/SearchPage';
+import StudentProfile from './pages/StudentProfile';
 
 const App = () => {
   return (
@@ -42,6 +44,9 @@ const App = () => {
         
         {/* Route for Need Help */}
         <Route path="need-help" element={<NeedHelp />} />
+        {/* Route for Search bar */}
+        <Route path="managestudents/search" element={<SearchPage />} />
+        <Route path="managestudents/studentprofile/:studentid" element={<StudentProfile />} />
       </Route>
     </Routes>
   );

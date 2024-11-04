@@ -12,6 +12,8 @@ urlpatterns = [
     path('trigger-at-risk/send-email/', views.send_email_to_student, name='send-email-to-student'),
     path('api/student-form/', views.submit_form, name='submit-form'),
     path('api/at-risk-students/', views.at_risk_students, name="at-risk-students"),
+    path('api/students/', views.StudentSearchPage.as_view(), name="search-student"),
+    path('api/studentprofile/<str:studentid>/', views.student_profile, name="student-profile"),
     re_path(r'^.*$', views.index), # This will catch any route and serve the index.html
 
 ]

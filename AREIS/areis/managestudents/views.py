@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from managedata.models import Students, Courses, Studentgrades
+from django.db.models import Q
+from rest_framework import generics, filters
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from managedata.serializers import CourseSerializer, StudentSerializer, StudentGradeSerializer
 import json  # Import the json module
-from managedata.models import Students
 from django.views.decorators.csrf import csrf_exempt
 import os
 from django.http import JsonResponse
@@ -22,6 +23,67 @@ from django.views.decorators.csrf import csrf_exempt
 #     courses = Courses.objects.all()
 #     #first - request (the link I think ie about, home, posts), second - html file location, third - setting the value of 'courses' as the courses object this will be used in the html file
 #     return render(request, 'managestudents/trigger_course_list.html', { 'courses' : courses }) #'courses' : courses this is a dictionary datatype
+
+class StudentSearchPage(generics.ListAPIView):
+    #queryset = Students.objects.all()
+    serializer_class = StudentSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['^firstname', '^lastname', '=studentid']
+
+    def get_queryset(self):
+        queryset = Students.objects.all()
+        search_query = self.request.query_params.get('search', None)
+        
+        if search_query:
+            keywords = search_query.split()  # Split search term into keywords
+            
+            if len(keywords) == 2:
+                # Assuming format is "firstname lastname" or "lastname firstname"
+                queryset = queryset.filter(
+                    (Q(firstname__icontains=keywords[0]) & Q(lastname__icontains=keywords[1])) |
+                    (Q(firstname__icontains=keywords[1]) & Q(lastname__icontains=keywords[0]))
+                )
+            else:
+                # Search for any field if only one term is entered
+                if Students.objects.filter(studentid__icontains=search_query).exists():
+                    queryset = queryset.filter(studentid__icontains=search_query)
+                else:
+                    # Search for firstname, lastname, or acadprogdesc if not a student ID
+                    queryset = queryset.filter(
+                        Q(firstname__icontains=keywords[0]) |
+                        Q(lastname__icontains=keywords[0]) |
+                        Q(acadprogdesc__icontains=keywords[0])
+                    )
+
+        print("Search Query:", search_query)
+        print("Query Results:")
+        for student in queryset:
+            print(f"ID: {student.studentid}, First Name: {student.firstname}, Last Name: {student.lastname}")
+        
+        return queryset
+
+
+
+@api_view(['GET'])
+def student_profile(request, studentid):
+    student = Students.objects.get(studentid = studentid)
+    studentgrades = Studentgrades.objects.filter(studentid = studentid)
+    courses = Courses.objects.all()
+    
+    data = {
+    'student': StudentSerializer(student).data,
+    'studentgrades': StudentGradeSerializer(studentgrades, many=True).data,
+    'courses': CourseSerializer(courses, many=True).data
+    }
+
+    json_data = json.dumps(data, indent=4)
+        
+    # Print the JSON data in the terminal
+    print(json_data)
+    return Response(data)
+
+
+
 
 @api_view(['GET'])
 def course_list(request):

@@ -1,8 +1,24 @@
 
 import { FaCog } from "react-icons/fa"; // Icon for settings
 import { MdKeyboardArrowDown } from "react-icons/md"; // Icon for dropdown arrow
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+
+
+
 
 const Header = () => {
+
+  const [query, setQuery] = useState('');
+  const navigate = useNavigate();
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && query) {
+      navigate(`managestudents/search?name=${query}`);
+    }
+  };
+
   return (
     <div className="flex justify-between items-center w-full p-4 bg-white shadow-md">
       {/* Left Side: Welcome message */}
@@ -13,6 +29,17 @@ const Header = () => {
 
       {/* Right Side: Settings and User Profile */}
       <div className="flex items-center space-x-4">
+
+        {/* Search Bar */}
+        <input
+            type="text"
+            placeholder="Enter student name"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="p-2 border rounded-md"
+        />
+
         {/* Settings Icon */}
         <FaCog className="text-2xl cursor-pointer" />
 
