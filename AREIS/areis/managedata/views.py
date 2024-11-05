@@ -27,6 +27,14 @@ def upload_csv(request):
 
     csv_reader = csv.DictReader(io_string)
 
+    student_duplicates = set()
+    course_duplicates = set()
+    grade_duplicates = set()
+
+    new_students = set()
+    new_courses = set()
+    new_grades = set()
+
     for row in csv_reader:
         StudentId = row.get('Empl ID', '').strip()
         Lastname = row.get('Surname', '').strip()
@@ -40,59 +48,64 @@ def upload_csv(request):
         Trimester = row.get('Term', '').strip()
         CourseId = Subject + CatalogueNo
 
-        # check if student already exists
-        if not Students.objects.filter(studentid=StudentId).exists():
-            try:
-                Students.objects.create(
-                    studentid=StudentId,
-                    lastname=Lastname,
-                    firstname=FirstName,
-                    acadprogdesc=AcadProgDesc,
-                    phoneno=PhoneNo,
-                    email=Email
-                )
-            except IntegrityError:
-                return Response({"error": f"Error inserting student {StudentId}. Duplicate entry."}, 
-                                status=status.HTTP_409_CONFLICT)
-
-        # check if course exists
-        if not Courses.objects.filter(courseid=CourseId).exists():
-            try:
-                Courses.objects.create(
-                    courseid=CourseId,
-                    catalogueno=CatalogueNo,
-                    subject=Subject,
-                    classdescription=ClassDescription,
-                )
-            except IntegrityError:
-                return Response({"error": f"Error inserting course {CourseId}. Duplicate entry."}, 
-                                status=status.HTTP_409_CONFLICT)
-            
-        # check if the studentgrades already exists before inserting
-        if not Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId, trimester=Trimester).exists():
-            try:
-                # add the grades
-                Studentgrades.objects.create(
-                    studentid=Students.objects.get(studentid=StudentId),
-                    courseid=Courses.objects.get(courseid=CourseId),
-                    journal1=None,
-                    journal2=None,
-                    assessment1=None,
-                    assessment2=None,
-                    assessment3=None,
-                    currentscore=None,
-                    finalgrade=None,
-                    trimester=Trimester,
-                    flagstatus=0
-                )
-            except IntegrityError:
-                # Handle any integrity error (like UNIQUE constraint)
-                messages.error(request, f"Error inserting record for {StudentId}. Duplicate entry.")
+        # Check if student already exists
+        if Students.objects.filter(studentid=StudentId).exists():
+            if StudentId:  # Only add non-empty values
+                student_duplicates.add(StudentId)
         else:
-            # If the course already exists, show a message
-            messages.warning(request, f"Grade for {StudentId} already exists. Skipping.")
+            Students.objects.create(
+                studentid=StudentId,
+                lastname=Lastname,
+                firstname=FirstName,
+                acadprogdesc=AcadProgDesc,
+                phoneno=PhoneNo,
+                email=Email
+            )
+            new_students.add(StudentId)
 
-    return Response({"message": "CSV file successfully uploaded and processed."}, status=status.HTTP_201_CREATED)
+        # Check if course exists
+        if Courses.objects.filter(courseid=CourseId).exists():
+            if CourseId:  # Only add non-empty values
+                course_duplicates.add(CourseId)
+        else:
+            Courses.objects.create(
+                courseid=CourseId,
+                catalogueno=CatalogueNo,
+                subject=Subject,
+                classdescription=ClassDescription,
+            )
+            new_courses.add(CourseId)
+
+        # Check if the studentgrades already exists before inserting
+        if Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId, trimester=Trimester).exists():
+            if StudentId and CourseId:  # Only add non-empty values
+                grade_duplicates.add(f"{StudentId}-{CourseId}")
+        else:
+            Studentgrades.objects.create(
+                studentid=Students.objects.get(studentid=StudentId),
+                courseid=Courses.objects.get(courseid=CourseId),
+                journal1=None,
+                journal2=None,
+                assessment1=None,
+                assessment2=None,
+                assessment3=None,
+                currentscore=None,
+                finalgrade=None,
+                trimester=Trimester,
+                flagstatus=0
+            )
+            new_grades.add(f"{StudentId}-{CourseId}")
+
+    # Convert sets to lists and filter out any empty strings
+    return Response({
+        "message": "CSV file successfully uploaded and processed.",
+        "student_duplicates": [s for s in student_duplicates if s],
+        "course_duplicates": [c for c in course_duplicates if c],
+        "grade_duplicates": [g for g in grade_duplicates if g],
+        "new_students": list(new_students),
+        "new_courses": list(new_courses),
+        "new_grades": list(new_grades),
+    }, status=status.HTTP_201_CREATED)
 
 
 
