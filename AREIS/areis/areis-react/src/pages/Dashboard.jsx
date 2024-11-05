@@ -4,14 +4,14 @@ import { PieChart, Pie, Cell, Legend, Sector, ResponsiveContainer } from 'rechar
 // Function to render the active sector with an expanded radius
 const renderActiveShape = (props) => {
   const RADIAN = Math.PI / 180;
-  const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent, value } = props;
+  const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } = props;
   const sin = Math.sin(-RADIAN * midAngle);
   const cos = Math.cos(-RADIAN * midAngle);
   const sx = cx + (outerRadius + 10) * cos;
   const sy = cy + (outerRadius + 10) * sin;
-  const mx = cx + (outerRadius + 30) * cos;
-  const my = cy + (outerRadius + 30) * sin;
-  const ex = mx + (cos >= 0 ? 1 : -1) * 22;
+  const mx = cx + (outerRadius + 20) * cos;
+  const my = cy + (outerRadius + 20) * sin;
+  const ex = mx + (cos >= 0 ? 1 : -1) * 18;
   const ey = my;
 
   return (
@@ -30,13 +30,14 @@ const renderActiveShape = (props) => {
       />
       <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
       <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-      <text x={ex + (cos >= 0 ? 12 : -12)} y={ey} textAnchor={cos >= 0 ? 'start' : 'end'} fill="#333">{`Value: ${value}`}</text>
+      {/* Display only the percentage */}
       <text x={ex + (cos >= 0 ? 12 : -12)} y={ey + 12} textAnchor={cos >= 0 ? 'start' : 'end'} fill="#999">
-        {`(${(percent * 100).toFixed(2)}%)`}
+        {`${(percent * 100).toFixed(2)}%`}
       </text>
     </g>
   );
 };
+
 
 const Dashboard = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -86,6 +87,7 @@ const Dashboard = () => {
   const handleModalOpen = (student, cardTitle) => {
     setSelectedStudent(student);
     setIsModalOpen(true);
+    setSelectedAction("");
 
     //Ensure that the card stays expanded when the modal is opened
   setExpandedSection(cardTitle); 
@@ -109,16 +111,31 @@ const Dashboard = () => {
 
   const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"]; // Gray, Yellow, Orange, Red
 
+  const [selectedAction, setSelectedAction] = useState("");
+
+  const handleAutomate = () => {
+    const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
+    const category = data.casecategory.find(category => category.categoryid === studentcase.categoryid);
+  
+    if (category.categoryname === "Course Content") {
+      setSelectedAction("flag-lecturer");
+    } else if (category.categoryname === "Personal") {
+      setSelectedAction("flag-counsellor");
+    } else if (category.categoryname === "Learning Issues") {
+      setSelectedAction("flag-coordinator");
+    }
+  };
+
   return (
     <div>
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
       {/* Main Dashboard Container - Flagged Students */}
 <div className="w-full h-[316px] bg-[#D9D9D9] rounded-xl p-6 flex">
-  <h3 className="text-xl font-bold mb-4">Flagged Students</h3>
+  <h3 className="text-xl font-bold mb-4">Flagged Overview</h3>
 
   {/* Left Section: Flagged Students (Piechart) */}
   <div className="flex justify-center items-center ml-24 w-1/2">
-    <ResponsiveContainer width="120%" height={300}>
+    <ResponsiveContainer width="100%" height={300}>
       <PieChart>
         <Pie
           activeIndex={activeIndex}
@@ -141,14 +158,13 @@ const Dashboard = () => {
           <Cell fill="#FF8042" /> {/* Auto-Flagged */}
           <Cell fill="#0088FE" /> {/* Responded */}
         </Pie>
-        <Legend layout="vertical" align="right" verticalAlign="middle" />
       </PieChart>
     </ResponsiveContainer>
   </div>
 
   {/* Left Section: Flagged Students (Data Summary) */}
   <div className="ml-24 flex flex-col justify-center w-1/2">
-    <h3 className="text-xl font-bold mb-4 text-gray-500">Flagged Student Counts</h3>
+    <h3 className="text-xl font-bold mb-4 text-gray-500">Flagged Students</h3>
     <ul>
       <li className="flex justify-between mb-2">
         <div className="flex items-center">
@@ -184,11 +200,11 @@ const Dashboard = () => {
 
       {/* Second Dashboard Container */}
       <div className="w-full h-[316px] bg-[#D9D9D9] rounded-xl p-6 flex">
-        <h3 className="text-xl font-bold mb-4">Overview</h3>
+        <h3 className="text-xl font-bold mb-4">Case Overview</h3>
   
         {/* Right Section: Student cases (Piechart) */}
         <div className="flex justify-center items-center ml-24 w-1/2">
-          <ResponsiveContainer width="120%" height={300}>
+          <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
                 activeIndex={activeIndex}
@@ -212,14 +228,13 @@ const Dashboard = () => {
                   <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                 ))}
               </Pie>
-              <Legend layout="vertical" align="right" verticalAlign="middle" />
             </PieChart>
           </ResponsiveContainer>
         </div>
   
         {/* Right Section: Student cases (data) */}
         <div className="ml-24 flex flex-col justify-center w-1/2">
-          <h3 className="text-xl font-bold mb-4 text-gray-500">Value</h3>
+          <h3 className="text-xl font-bold mb-4 text-gray-500">Category</h3>
           <ul>
             {data.casecategory.map((category, index) => (
               <li key={index} className="flex justify-between mb-2">
@@ -262,20 +277,34 @@ const Dashboard = () => {
         }`}
       >
         {/* Donut Chart Section on the Left */}
-        <div className={`w-full md:w-1/3 mb-4 ${expandedSection === card.title ? 'mr-4' : ''}`}>
-          <ResponsiveContainer width="100%" height={150}>
-            <PieChart>
-              <Pie
-                data={card.chartData}
-                dataKey="value"
-                cx="50%"
-                cy="50%"
-                innerRadius={40}
-                outerRadius={60}
-                fill={card.chartData[0].color}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+<div className={`w-full md:w-1/3 mb-4 ${expandedSection === card.title ? 'mr-4' : ''}`}>
+  <ResponsiveContainer width="100%" height={150}>
+    <PieChart>
+      <Pie
+        data={[
+          { name: card.title, value: data.studentcases.filter(studentcase => studentcase.categoryid === card.id).length },
+          { name: "Remaining", value: data.studentcases.length - data.studentcases.filter(studentcase => studentcase.categoryid === card.id).length },
+        ]}
+        dataKey="value"
+        cx="50%"
+        cy="50%"
+        innerRadius={40}
+        outerRadius={60}
+        paddingAngle={3}
+      >
+        {/* Set slice colors based on card title */}
+        <Cell 
+          fill={
+            card.title === "Course Content" ? "#00C49F" : // Green
+            card.title === "Personal" ? "#FFBB28" : // Orange
+            card.title === "Learning Issues" ? "#0088FE" : // Blue
+            "#82ca9d" // Default color if none match
+          } 
+        />
+        <Cell fill="#e0e0e0" />  {/* Color for the remaining (empty) portion */}
+      </Pie>
+    </PieChart>
+  </ResponsiveContainer>
 
           {/* Total Students below Donut Chart */}
           <div className="text-lg font-semibold text-center mt-4">
@@ -471,22 +500,30 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Action Select */}
-          <label htmlFor="action" className="block font-semibold">Action:</label>
-          <select id="action" className="w-full mb-4 border p-2 rounded">
+           {/* Action Select */}
+        <label htmlFor="action" className="block font-semibold">Action:</label>
+        <div className="flex items-center space-x-2 mb-4">
+          <select
+            id="action"
+            className="w-full border p-2 rounded"
+            value={selectedAction}
+            onChange={(e) => setSelectedAction(e.target.value)}
+          >
             <option value="refer">Refer to</option>
             <option value="flag-lecturer">Lecturer</option>
             <option value="flag-counsellor">Counsellor</option>
             <option value="flag-coordinator">Course Coordinator</option>
           </select>
-  
-            {/* Advisor Select */}
-          <label htmlFor="advisor" className="block font-semibold">Advisor:</label>
-          <select id="advisor" className="w-full mb-4 border p-2 rounded">
-            <option value="dr-kim">Dr Kim</option>
-            <option value="dr-jones">Dr Jones</option>
-            <option value="dr-Vincent">Dr Vincent</option>
-          </select>
+          
+          {/* Automate Button */}
+          <button 
+            onClick={handleAutomate} 
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+          >
+            Automate
+          </button>
+        </div>
+
 
             <div className="flex justify-between">
               <button onClick={handleModalClose} className="px-4 py-2 bg-blue-500 text-white rounded">Save & Flag</button>
