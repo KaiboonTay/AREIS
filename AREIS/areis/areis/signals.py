@@ -8,4 +8,4 @@ def schedule_check_unresponded_forms(sender, **kwargs):
 
     # Schedule the task only once if it doesn't already exist
     if not Task.objects.filter(task_name='managestudents.tasks.check_unresponded_forms').exists():
-        check_unresponded_forms(repeat=60)  # Set for every 24 hours
+        check_unresponded_forms(repeat=60 * 60 * 24 * 2)  # Set for every 24 hours

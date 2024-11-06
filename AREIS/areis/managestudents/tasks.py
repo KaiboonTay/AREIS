@@ -2,7 +2,7 @@ from datetime import timedelta
 from django.utils import timezone
 from background_task import background
 
-@background(schedule=60)  # Schedule to run after a 1-minute delay
+@background(schedule=60 * 60 * 24 * 2)  # Schedule to run every 2 days
 def check_unresponded_forms():
     # Import dynamically to avoid early loading issues
     from django.apps import apps
@@ -13,7 +13,7 @@ def check_unresponded_forms():
     current_time = timezone.now()
 
     # Calculate the cutoff time for unresponded forms
-    cutoff_time = current_time - timedelta(minutes=1)  # For production, use days=2
+    cutoff_time = current_time - timedelta(days=2)  # For production, use days=2
 
     # Query unresponded forms where created_at is older than the cutoff time
     unresponded_forms = Forms.objects.filter(responded=False, created_at__lt=cutoff_time)
