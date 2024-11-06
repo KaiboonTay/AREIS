@@ -16,6 +16,9 @@ from managestudents.models import Forms
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import csrf_exempt
+import pytz
+from django.utils import timezone
+
 
 # Create your views here.
 
@@ -216,17 +219,22 @@ def send_email_to_student(request):
                 print(f"Failed to send email: {response.body}")
                 return JsonResponse({'status': 'Failed to send email', 'error': response.body}, status=500)
 
-            # Create a new form entry in the Forms table with responded=False
+            # Get Singapore time and convert to naive datetime
+            singapore_timezone = pytz.timezone('Asia/Singapore')
+            created_at_sg_time = timezone.now().astimezone(singapore_timezone)
+            created_at_naive = created_at_sg_time.replace(tzinfo=None)  # Make the datetime naive
+
+            # Create a new form entry in the Forms table with responded=False and created_at set
             form_response, created = Forms.objects.update_or_create(
-                 formid=student_id,  # Use student ID as FormID
-                 defaults={
+                formid=student_id,  # Use student ID as FormID
+                defaults={
                     'studentid': student,
                     'responded': False,
                     'checkbox_options': '',  # Initial blank values
-                 }
+                    'created_at': created_at_naive  # Set created_at timestamp as naive datetime
+                }
             )
-                 
-          
+
             # Update the student's flagstatus to 3 in the TriggerAtRisk page
             student.flagstatus = 3
             student.save()
@@ -240,6 +248,41 @@ def send_email_to_student(request):
     return JsonResponse({'status': 'Invalid request method'}, status=400)
 
 
+
+# Define question weights
+QUESTION_WEIGHTS = {
+    "content1": 1,  # "I understand the course materials."
+    "content2": 2,  # "I have sufficient knowledge from previous studies to progress in the course."
+    "content3": 3,  # "I have difficulties with concentrating or staying focused while studying."
+    "content4": 1,  # "I manage my time effectively to meet deadlines and complete assignments."
+    "content5": 2,  # "I have difficulty understanding English."
+    "content6": 3,  # "My overall stress level is high."
+    "content7": 3,  # "I have health issues (physical or mental) that impact my studies."
+    "content8": 2,  # "I have difficulties balancing other commitments (e.g., work, family)."
+    "content9": 2,  # "I have financial issues."
+}
+
+# Define recommendation calculation function
+def calculate_recommendation(responses):
+    course_content_score = responses['content1'] * QUESTION_WEIGHTS['content1'] + responses['content2'] * QUESTION_WEIGHTS['content2']
+    learning_issues_score = (
+        responses['content3'] * QUESTION_WEIGHTS['content3'] + 
+        responses['content4'] * QUESTION_WEIGHTS['content4'] + 
+        responses['content5'] * QUESTION_WEIGHTS['content5']
+    )
+    personal_issues_score = (
+        responses['content6'] * QUESTION_WEIGHTS['content6'] + 
+        responses['content7'] * QUESTION_WEIGHTS['content7'] + 
+        responses['content8'] * QUESTION_WEIGHTS['content8'] + 
+        responses['content9'] * QUESTION_WEIGHTS['content9']
+    )
+    
+    if course_content_score >= max(learning_issues_score, personal_issues_score):
+        return "Course Content"
+    elif learning_issues_score >= max(course_content_score, personal_issues_score):
+        return "Learning Issues"
+    else:
+        return "Personal Issues"
 
 @csrf_exempt
 @api_view(['GET', 'POST'])
@@ -259,11 +302,15 @@ def submit_form(request):
                 print(f"Student not found with ID: {student_id}")
                 return JsonResponse({'error': 'Student not found.'}, status=404)
 
-           
-            form_response = Forms.objects.filter(formid=student_id, responded=False).first()
-            if not form_response:
-                return JsonResponse({'error': 'No form found for student or form already submitted.'}, status=404)
+            # Check if the form has already been submitted
+            form_response = Forms.objects.filter(formid=student_id).first()
+            if form_response is None:
+                return JsonResponse({'error': 'No form found for student.'}, status=404)
+            elif form_response.responded:
+                # If the form is already submitted, indicate it to the frontend
+                return JsonResponse({'formSubmitted': True, 'message': 'Form has already been submitted.'})
 
+            # If the form hasn't been submitted, return the form data
             return JsonResponse({
                 'formSubmitted': False,
                 'content1': form_response.content1,
@@ -299,9 +346,8 @@ def submit_form(request):
             if Forms.objects.filter(studentid=student, responded=True).exists():
                 return JsonResponse({'error': 'Form has already been submitted.'}, status=400)
 
-            #Converting checkbox options to display as a string in database
+            # Converting checkbox options to display as a string in the database
             checkbox_options = ', '.join(json.loads(data.get('checkbox_options', '[]')))
-            
            
             form_response = Forms.objects.filter(formid=student_id, responded=False).first()
             if not form_response:
@@ -317,8 +363,23 @@ def submit_form(request):
             form_response.content7 = data.get('content7', '')
             form_response.content8 = data.get('content8', '')
             form_response.content9 = data.get('content9', '')
-            form_response.checkbox_options = ', '.join(json.loads(data.get('checkbox_options', '[]')))
+            form_response.checkbox_options = checkbox_options
             form_response.responded = True
+            
+            # Calculate recommendation based on student responses
+            recommendation = calculate_recommendation({
+                'content1': form_response.content1,
+                'content2': form_response.content2,
+                'content3': form_response.content3,
+                'content4': form_response.content4,
+                'content5': form_response.content5,
+                'content6': form_response.content6,
+                'content7': form_response.content7,
+                'content8': form_response.content8,
+                'content9': form_response.content9
+            })
+            
+            form_response.recommendation = recommendation
             form_response.save()
 
             return JsonResponse({'status': 'success', 'message': 'Form submitted successfully'})
