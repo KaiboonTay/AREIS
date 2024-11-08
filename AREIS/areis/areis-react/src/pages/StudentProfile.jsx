@@ -5,9 +5,7 @@ function StudentProfile() {
     const { studentid } = useParams();
     const [studentData, setStudentData] = useState(null);
     const [error, setError] = useState(null);
-    const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"]; // Gray, Orange, Blue, Red
-
-    
+    const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"];
 
     useEffect(() => {
         const fetchStudentProfile = async () => {
@@ -28,96 +26,69 @@ function StudentProfile() {
     if (!studentData) return <p>Loading...</p>;
 
     return (
-        <div>
-            <h2>{studentData.student.firstname} {studentData.student.lastname}</h2>
-            <p><strong>Student ID:</strong> {studentData.student.studentid}</p>
-            <p><strong>Email:</strong> {studentData.student.email}</p>
-            <p><strong>Phone No.:</strong> {studentData.student.phoneno}</p>
-            <p><strong>Grades: </strong></p>
-                <div className="overflow-y-auto max-h-96 mt-4">
-                    <table className="table-auto w-full border-collapse">
-                      <thead>
-                        <tr className="bg-gray-200">
-                            <th className="border p-2">Course ID</th>
-                            <th className="border p-2">Course Description</th>
-                            <th className="border p-2">Journal 1</th>
-                            <th className="border p-2">Journal 2</th>
-                            <th className="border p-2">Assessment 1</th>
-                            <th className="border p-2">Assessment 2</th>
-                            <th className="border p-2">Assessment 3</th>
-                            <th className="border p-2">Current Grade</th>
-                            <th className="border p-2">Final Grade</th>
-                            <th className="border p-2">Flag Status</th>
+        <div className="container mx-auto p-6">
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 className="text-4xl font-bold text-gray-800 mb-2">
+                    {studentData.student.firstname} {studentData.student.lastname}
+                </h2>
+                <p className="text-gray-600 text-lg">
+                    <strong>Student ID:</strong> {studentData.student.studentid}
+                </p>
+                <p className="text-gray-600 text-lg">
+                    <strong>Email:</strong> {studentData.student.email}
+                </p>
+                <p className="text-gray-600 text-lg">
+                    <strong>Phone No.:</strong> {studentData.student.phoneno}
+                </p>
+            </div>
+
+            <div className="overflow-x-auto">
+                <h3 className="text-2xl font-semibold text-gray-800 mb-4">Grades</h3>
+                <table className="min-w-full bg-white rounded-lg shadow-lg">
+                    <thead>
+                        <tr className="bg-gray-200 text-gray-700">
+                            <th className="p-3 text-left">Course ID</th>
+                            <th className="p-3 text-left">Course Description</th>
+                            <th className="p-3 text-left">Journal 1</th>
+                            <th className="p-3 text-left">Journal 2</th>
+                            <th className="p-3 text-left">Assessment 1</th>
+                            <th className="p-3 text-left">Assessment 2</th>
+                            <th className="p-3 text-left">Assessment 3</th>
+                            <th className="p-3 text-left">Current Grade</th>
+                            <th className="p-3 text-left">Final Grade</th>
+                            <th className="p-3 text-left">Flag Status</th>
                         </tr>
-                      </thead>
-                      <tbody>
-                        { studentData.studentgrades
-                        .map((grade)=> {
+                    </thead>
+                    <tbody>
+                        {studentData.studentgrades.map((grade) => {
                             const course = studentData.courses.find(course => course.courseid === grade.courseid);
-                        return (
-                       
-                            <tr className="text-center">
-                                <td className="border p-2">{grade.courseid}</td>
-                                <td className="border p-2">{course.classdescription}</td>
-                                <td className="border p-2">{grade.journal1}</td>
-                                <td className="border p-2">{grade.journal2}</td>
-                                <td className="border p-2">{grade.assessment1}</td>
-                                <td className="border p-2">{grade.assessment2}</td>
-                                <td className="border p-2">{grade.assessment3}</td>
-                                <td className="border p-2">{grade.currentscore}</td>
-                                <td className="border p-2">{grade.finalgrade}</td>
-                                <td className="border p-2">
-                                  <div className="flex justify-center items-center h-full">
-                                  {grade.flagstatus === 2 || grade.flagstatus === 0 ? (
-                                      <button onClick={() => openModal(student)} className="flex items-center justify-center">
-                                      <svg
-                                        className={`w-8 h-8`}
-                                        viewBox="0 0 64 64"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        {/* Flagpole */}
-                                        <line 
-                                          x1="10" y1="5" 
-                                          x2="10" y2="60" 
-                                          stroke="black" 
-                                          strokeWidth="2" 
-                                        />
-                                        {/* Flag */}
-                                        <polygon 
-                                          points="10,5 40,15 10,25" 
-                                          fill={flagColors[grade.flagstatus]} 
-                                        />
-                                      </svg>
-                                    </button>) : 
-                                    <svg
-                                    className={`w-8 h-8`}
-                                    viewBox="0 0 64 64"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    {/* Flagpole */}
-                                    <line 
-                                      x1="10" y1="5" 
-                                      x2="10" y2="60" 
-                                      stroke="black" 
-                                      strokeWidth="2" 
-                                    />
-                                    {/* Flag */}
-                                    <polygon 
-                                      points="10,5 40,15 10,25" 
-                                      fill={flagColors[grade.flagstatus]} 
-                                    />
-                                  </svg> }
-                                  </div>
-                                </td>
-                                
-                            </tr>
-                            );})
-                          }
-                      </tbody>
-                    </table>
-                  </div>
-
-
+                            return (
+                                <tr key={grade.courseid} className="border-t border-gray-200">
+                                    <td className="p-3">{grade.courseid}</td>
+                                    <td className="p-3">{course.classdescription}</td>
+                                    <td className="p-3">{grade.journal1}</td>
+                                    <td className="p-3">{grade.journal2}</td>
+                                    <td className="p-3">{grade.assessment1}</td>
+                                    <td className="p-3">{grade.assessment2}</td>
+                                    <td className="p-3">{grade.assessment3}</td>
+                                    <td className="p-3">{grade.currentscore}</td>
+                                    <td className="p-3">{grade.finalgrade}</td>
+                                    <td className="p-3">
+                                        <svg
+                                            className="w-6 h-6 mx-auto"
+                                            viewBox="0 0 64 64"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                                            <polygon points="10,5 40,15 10,25" fill={flagColors[grade.flagstatus]} />
+                                        </svg>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

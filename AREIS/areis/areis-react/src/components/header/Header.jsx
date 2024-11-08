@@ -1,21 +1,22 @@
-
-import { FaCog } from "react-icons/fa"; // Icon for settings
+import { FaCog, FaSearch } from "react-icons/fa"; // Importing FaSearch for search icon
 import { MdKeyboardArrowDown } from "react-icons/md"; // Icon for dropdown arrow
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
-
-
-
 const Header = () => {
-
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
 
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter' && query) {
+  const handleSearch = () => {
+    if (query) {
       navigate(`managestudents/search?name=${query}`);
+      setQuery(''); // Clear the search bar after navigating
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
     }
   };
 
@@ -29,16 +30,22 @@ const Header = () => {
 
       {/* Right Side: Settings and User Profile */}
       <div className="flex items-center space-x-4">
-
+        
         {/* Search Bar */}
-        <input
-            type="text"
-            placeholder="Enter student name"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="p-2 border rounded-md"
-        />
+        <div className="flex items-center border rounded-md">
+          <input
+              type="text"
+              placeholder="Enter student name"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="p-2 outline-none"
+          />
+          {/* Search Icon */}
+          <button onClick={handleSearch} className="p-2">
+            <FaSearch className="text-gray-500 cursor-pointer" />
+          </button>
+        </div>
 
         {/* Settings Icon */}
         <FaCog className="text-2xl cursor-pointer" />

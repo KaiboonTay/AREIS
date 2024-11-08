@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from managedata.models import Students, Courses, Studentgrades
-from django.db.models import Q
+from django.db.models import Q, Value, IntegerField
 from rest_framework import generics, filters
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -18,6 +18,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import csrf_exempt
 import pytz
 from django.utils import timezone
+from django.db.models import Case, When
 
 
 # Create your views here.
@@ -28,7 +29,6 @@ from django.utils import timezone
 #     return render(request, 'managestudents/trigger_course_list.html', { 'courses' : courses }) #'courses' : courses this is a dictionary datatype
 
 class StudentSearchPage(generics.ListAPIView):
-    #queryset = Students.objects.all()
     serializer_class = StudentSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['^firstname', '^lastname', '=studentid']
@@ -36,53 +36,89 @@ class StudentSearchPage(generics.ListAPIView):
     def get_queryset(self):
         queryset = Students.objects.all()
         search_query = self.request.query_params.get('search', None)
-        
-        if search_query:
-            keywords = search_query.split()  # Split search term into keywords
-            
-            if len(keywords) == 2:
-                # Assuming format is "firstname lastname" or "lastname firstname"
-                queryset = queryset.filter(
-                    (Q(firstname__icontains=keywords[0]) & Q(lastname__icontains=keywords[1])) |
-                    (Q(firstname__icontains=keywords[1]) & Q(lastname__icontains=keywords[0]))
-                )
-            else:
-                # Search for any field if only one term is entered
-                if Students.objects.filter(studentid__icontains=search_query).exists():
-                    queryset = queryset.filter(studentid__icontains=search_query)
-                else:
-                    # Search for firstname, lastname, or acadprogdesc if not a student ID
-                    queryset = queryset.filter(
-                        Q(firstname__icontains=keywords[0]) |
-                        Q(lastname__icontains=keywords[0]) |
-                        Q(acadprogdesc__icontains=keywords[0])
-                    )
 
+        if search_query:
+            keywords = search_query.split()
+
+            if len(keywords) >= 2:
+                # Flexible matching for multiple keywords
+                name_filters = Q()
+
+                # Build conditions for each keyword to match any part of first or last name
+                for keyword in keywords:
+                    name_filters |= Q(firstname__icontains=keyword) | Q(lastname__icontains=keyword)
+
+                # Annotate fields based on the match priority
+                queryset = queryset.filter(name_filters).annotate(
+                    # Prioritize cases where both names match any keywords
+                    both_names_match=Case(
+                        When(Q(firstname__icontains=keywords[0]) & Q(lastname__icontains=keywords[1]), then=Value(2)),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    ),
+                    # Assign score based on first and last name matching start of keywords
+                    first_name_match=Case(
+                        When(firstname__istartswith=keywords[0], then=Value(1)),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    ),
+                    last_name_match=Case(
+                        When(lastname__istartswith=keywords[-1], then=Value(1)),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    )
+                ).order_by('-both_names_match', '-first_name_match', '-last_name_match')
+            else:
+                # Single keyword, prioritize both names starting with the query, but allow partial matches
+                single_keyword = keywords[0]
+                queryset = queryset.filter(
+                    Q(firstname__icontains=single_keyword) |
+                    Q(lastname__icontains=single_keyword)
+                ).annotate(
+                    both_names_match=Case(
+                        When(Q(firstname__istartswith=single_keyword) & Q(lastname__istartswith=single_keyword), then=Value(2)),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    ),
+                    first_name_match=Case(
+                        When(firstname__istartswith=single_keyword, then=Value(1)),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    ),
+                    last_name_match=Case(
+                        When(lastname__istartswith=single_keyword, then=Value(1)),
+                        default=Value(0),
+                        output_field=IntegerField()
+                    )
+                ).order_by('-both_names_match', '-first_name_match', '-last_name_match')
+
+        # Debugging output for search and results
         print("Search Query:", search_query)
-        print("Query Results:")
-        for student in queryset:
-            print(f"ID: {student.studentid}, First Name: {student.firstname}, Last Name: {student.lastname}")
-        
+        print("Query Results:", list(queryset.values()))
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 
 @api_view(['GET'])
 def student_profile(request, studentid):
-    student = Students.objects.get(studentid = studentid)
-    studentgrades = Studentgrades.objects.filter(studentid = studentid)
+    student = get_object_or_404(Students, studentid=studentid)
+    studentgrades = Studentgrades.objects.filter(studentid=studentid)
     courses = Courses.objects.all()
     
     data = {
-    'student': StudentSerializer(student).data,
-    'studentgrades': StudentGradeSerializer(studentgrades, many=True).data,
-    'courses': CourseSerializer(courses, many=True).data
+        'student': StudentSerializer(student).data,
+        'studentgrades': StudentGradeSerializer(studentgrades, many=True).data,
+        'courses': CourseSerializer(courses, many=True).data
     }
 
     json_data = json.dumps(data, indent=4)
-        
-    # Print the JSON data in the terminal
     print(json_data)
+    
     return Response(data)
 
 
