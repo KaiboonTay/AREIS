@@ -40,13 +40,16 @@ const renderActiveShape = (props) => {
 
 
 const Dashboard = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex1, setActiveIndex1] = useState(0); // for left piechart (flagged)
+  const [activeIndex2, setActiveIndex2] = useState(0); // for right piechart (cases)
   const [data, setData] = useState({ casecategory: [], studentcases: [], studentgrades: [] });
   const colors = ['#00C49F', '#0088FE', '#FFBB28'];
   const [expandedSection, setExpandedSection] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   
+  const onPieEnter1 = (_, index) => setActiveIndex1(index);
+  const onPieEnter2 = (_, index) => setActiveIndex2(index);
 
  // const cardsData = [
    // { title: 'Course Content', chartData: [{ name: 'Completed', value: 32, color: '#FF5A5A' }] },
@@ -138,7 +141,7 @@ const Dashboard = () => {
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
         <Pie
-          activeIndex={activeIndex}
+          activeIndex={activeIndex1}
           activeShape={renderActiveShape}
           data={[
             { name: 'Manually Flagged', value: data.studentgrades.filter((grade) => grade.flagstatus === 1).length },
@@ -152,7 +155,7 @@ const Dashboard = () => {
           fill="#8884d8"
           paddingAngle={3}
           dataKey="value"
-          onMouseEnter={onPieEnter}
+          onMouseEnter={onPieEnter1}
         >
           <Cell fill="#FFBB28" /> {/* Manually Flagged */}
           <Cell fill="#FF8042" /> {/* Auto-Flagged */}
@@ -207,7 +210,7 @@ const Dashboard = () => {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                activeIndex={activeIndex}
+                activeIndex={activeIndex2}
                 activeShape={renderActiveShape}
                 data={data.casecategory.map((category) => ({
                   name: category.categoryname,
@@ -222,7 +225,7 @@ const Dashboard = () => {
                 fill="#8884d8"
                 paddingAngle={3}
                 dataKey="value"
-                onMouseEnter={onPieEnter}
+                onMouseEnter={onPieEnter2}
               >
                 {data.casecategory.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
@@ -446,7 +449,7 @@ const Dashboard = () => {
       className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 ml-auto"
       onClick={handleViewStudentCopy}
     >
-      <span role="img" aria-label="document" className="text-sm mb-1">📄 Student Response</span> 
+      <span role="img" aria-label="document" className="mb-1">📄 Student Response</span> 
     </button>
   </div>
             <p><strong>Student ID:</strong> {selectedStudent.studentid}</p>
