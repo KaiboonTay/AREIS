@@ -120,9 +120,9 @@ const Dashboard = () => {
     if (category.categoryname === "Course Content") {
       setSelectedAction("flag-lecturer");
     } else if (category.categoryname === "Personal") {
-      setSelectedAction("flag-counsellor");
+      setSelectedAction("flag-uoncounsellor");
     } else if (category.categoryname === "Learning Issues") {
-      setSelectedAction("flag-coordinator");
+      setSelectedAction("flag-advisor");
     }
   };
 
@@ -426,111 +426,167 @@ const Dashboard = () => {
 
 
   
-      {isModalOpen && selectedStudent && (
-        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-xl w-96 relative">
-          <button onClick={handleModalClose} className="absolute top-4 right-4">✕</button>
+{isModalOpen && selectedStudent && (
+  <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded-xl w-full max-w-5xl relative flex">
+      <button onClick={handleModalClose} className="absolute top-4 right-4">✕</button>
 
-            <button 
-              className="absolute top-4 left-4 flex items-center bg-gray-100 p-2 rounded-lg shadow"
-              onClick={handleViewStudentCopy}
-            >
-              <span role="img" aria-label="document" className="mr-2">📄</span> 
-              View Student Copy
-            </button>
+      <div className="flex w-full space-x-6">
+        
+        {/* Left Section */}
+        <div className="w-1/2">
+          <h2 className="text-xl font-bold text-center mb-4">Review Action</h2>
 
-            <h2 className="text-xl font-bold text-center mb-4">Review Action</h2>
-  
-            <div className="mb-4">
-              <p><strong>Student Name:</strong> {selectedStudent.lastname} {selectedStudent.firstname}</p>
-              <p><strong>Student ID:</strong> {selectedStudent.studentid}</p>
-              <p><strong>Course:</strong> {
-                  (() => {
-                    const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
-                    return (studentcase.courseid);
-                  })()
-                }</p>
-              <p><strong>Trimester:</strong> {
-                  (() => {
+          <div className="mb-4">
+          <div className="flex items-center justify-between">
+    <p>
+      <strong>Student Name:</strong> {selectedStudent.lastname} {selectedStudent.firstname}
+    </p>
+    <button 
+      className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 ml-auto"
+      onClick={handleViewStudentCopy}
+    >
+      <span role="img" aria-label="document" className="text-sm mb-1">📄 Student Response</span> 
+    </button>
+  </div>
+            <p><strong>Student ID:</strong> {selectedStudent.studentid}</p>
+            <p><strong>Course:</strong> {
+              (() => {
+                const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
+                return (studentcase.courseid);
+              })()
+            }</p>
+            <p><strong>Trimester:</strong> {
+              (() => {
+                const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
+                const grade = data.studentgrades.find(grade => grade.studentid === selectedStudent.studentid && grade.courseid === studentcase.courseid);
+                return (grade.trimester);
+              })()
+            }</p>
+            <p><strong>Case: </strong> {
+              (() => {
+                const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
+                const category = data.casecategory.find(category => category.categoryid === studentcase.categoryid);
+                return (category.categoryname);
+              })()
+            }</p>
+
+            <p><strong>Grades: </strong></p>
+            <div className="overflow-x-auto max-h-96 mt-4">
+              <table className="table-auto w-full border-collapse min-w-[700px]">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="border p-2">Journal 1</th>
+                    <th className="border p-2">Journal 2</th>
+                    <th className="border p-2">Assessment 1</th>
+                    <th className="border p-2">Assessment 2</th>
+                    <th className="border p-2">Assessment 3</th>
+                    <th className="border p-2">Current Grade</th>
+                    <th className="border p-2">Final Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(() => {
                     const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
                     const grade = data.studentgrades.find(grade => grade.studentid === selectedStudent.studentid && grade.courseid === studentcase.courseid);
-                    return (grade.trimester);
-                  })()
-                }</p>
-              <p><strong>Case: </strong> {
-                (() => {
-                  const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
-                  const category = data.casecategory.find(category => category.categoryid === studentcase.categoryid);
-                  return (category.categoryname);
-                })()
-                }</p>
-  
-              <p><strong>Grades: </strong></p>
-              <div className="overflow-y-auto max-h-96 mt-4">
-                <table className="table-auto w-full border-collapse">
-                  <thead>
-                    <tr className="bg-gray-200">
-                      <th className="border p-2">Journal 1</th>
-                      <th className="border p-2">Journal 2</th>
-                      <th className="border p-2">Assessment 1</th>
-                      <th className="border p-2">Assessment 2</th>
-                      <th className="border p-2">Assessment 3</th>
-                      <th className="border p-2">Current Grade</th>
-                      <th className="border p-2">Final Grade</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(() => {
-                      const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
-                      const grade = data.studentgrades.find(grade => grade.studentid === selectedStudent.studentid && grade.courseid === studentcase.courseid);
-                      return (
-                        <tr className="text-center">
-                          <td className="border p-2">{grade.journal1}</td>
-                          <td className="border p-2">{grade.journal2}</td>
-                          <td className="border p-2">{grade.assessment1}</td>
-                          <td className="border p-2">{grade.assessment2}</td>
-                          <td className="border p-2">{grade.assessment3}</td>
-                          <td className="border p-2">{grade.currentgrade}</td>
-                          <td className="border p-2">{grade.finalgrade}</td>
-                        </tr>
-                      );
-                    })()}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-           {/* Action Select */}
-        <label htmlFor="action" className="block font-semibold">Action:</label>
-        <div className="flex items-center space-x-2 mb-4">
-          <select
-            id="action"
-            className="w-full border p-2 rounded"
-            value={selectedAction}
-            onChange={(e) => setSelectedAction(e.target.value)}
-          >
-            <option value="refer">Refer to</option>
-            <option value="flag-lecturer">Lecturer</option>
-            <option value="flag-counsellor">Counsellor</option>
-            <option value="flag-coordinator">Course Coordinator</option>
-          </select>
-          
-          {/* Automate Button */}
-          <button 
-            onClick={handleAutomate} 
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-          >
-            Automate
-          </button>
-        </div>
-
-
-            <div className="flex justify-between">
-              <button onClick={handleModalClose} className="px-4 py-2 bg-blue-500 text-white rounded">Save & Flag</button>
+                    return (
+                      <tr className="text-center">
+                        <td className="border p-2">{grade.journal1}</td>
+                        <td className="border p-2">{grade.journal2}</td>
+                        <td className="border p-2">{grade.assessment1}</td>
+                        <td className="border p-2">{grade.assessment2}</td>
+                        <td className="border p-2">{grade.assessment3}</td>
+                        <td className="border p-2">{grade.currentgrade}</td>
+                        <td className="border p-2">{grade.finalgrade}</td>
+                      </tr>
+                    );
+                  })()}
+                </tbody>
+              </table>
             </div>
           </div>
+
+          {/* Action Select */}
+          <label htmlFor="action" className="block font-semibold">Action:</label>
+          <div className="flex items-center space-x-2 mb-4">
+            <select
+              id="action"
+              className="w-full border p-2 rounded"
+              value={selectedAction}
+              onChange={(e) => setSelectedAction(e.target.value)}
+            >
+              <option value="refer">Refer to</option>
+              <option value="flag-lecturer">Lecturer</option>
+              <option value="flag-uoncounsellor">UON Counsellor</option>
+              <option value="flag-advisor">Advisor</option>
+            </select>
+
+            {/* Automate Button */}
+            <button 
+              onClick={handleAutomate} 
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            >
+              Automate
+            </button>
+          </div>
+
+          {/* Save & Flag Button */}
+          <div className="mt-6">
+            <button onClick={handleModalClose} className="w-full px-4 py-2 bg-blue-500 text-white rounded">Save & Update</button>
+          </div>
         </div>
-      )}
+
+        {/* Right Section - Student History */}
+        <div className="w-1/2 border-l pl-6">
+  <h2 className="text-xl font-bold text-center mb-4">Student History</h2>
+
+  {/* Adjusted Scrollable Text Log */}
+  <div className="mt-4 max-h-[30rem] overflow-y-auto bg-gray-100 p-6 rounded-lg shadow-inner">
+    {/* Hardcoded sample log entries */}
+    <div className="mb-4">
+      <p className="text-sm text-gray-500">2024-11-01 10:30 AM</p>
+      <p>Student submitted Assignment 1 late but with valid reason. Allowed partial credit.</p>
+      <hr className="my-2 border-gray-300" />
+    </div>
+    <div className="mb-4">
+      <p className="text-sm text-gray-500">2024-11-05 3:15 PM</p>
+      <p>Attended counseling session to discuss progress and received positive feedback.</p>
+      <hr className="my-2 border-gray-300" />
+    </div>
+    <div className="mb-4">
+      <p className="text-sm text-gray-500">2024-11-08 9:00 AM</p>
+      <p>Missed Quiz 2 without prior notice. Notified student of potential impact on grades.</p>
+      <hr className="my-2 border-gray-300" />
+    </div>
+    <div className="mb-4">
+      <p className="text-sm text-gray-500">2024-11-09 1:45 PM</p>
+      <p>Student requested extra credit opportunities for additional points.</p>
+      <hr className="my-2 border-gray-300" />
+    </div>
+    <div className="mb-4">
+      <p className="text-sm text-gray-500">2024-11-10 2:30 PM</p>
+      <p>Met with course coordinator to discuss intervention plan for improvement.</p>
+      <hr className="my-2 border-gray-300" />
+    </div>
+    <div className="mb-4">
+      <p className="text-sm text-gray-500">2024-11-11 2:30 PM</p>
+      <p>Missed meeting with course coordinator to discuss intervention plan for improvement.</p>
+      <hr className="my-2 border-gray-300" />
+    </div>
+    <div className="mb-4">
+      <p className="text-sm text-gray-500">2024-11-12 2:30 PM</p>
+      <p>Met with course coordinator to discuss intervention plan for improvement.</p>
+      <hr className="my-2 border-gray-300" />
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
   
