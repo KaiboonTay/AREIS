@@ -340,7 +340,15 @@ const Dashboard = () => {
                     <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
                     <polygon points="10,5 40,15 10,25" fill="#ef4444" />
                   </svg>
-                  <span>Flagged referral</span>
+                  <span>Responded</span>
+                </div>
+                <div className="flex items-center">
+                  {/* Flagpole and flag icon for Low Risk */}
+                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                    <polygon points="10,5 40,15 10,25" fill="green" />
+                  </svg>
+                  <span>Acknowledged</span>
                 </div>
               </div>
             </div>
