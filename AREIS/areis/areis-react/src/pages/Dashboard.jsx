@@ -133,12 +133,12 @@ const Dashboard = () => {
     <div>
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
       {/* Main Dashboard Container - Flagged Students */}
-<div className="w-full h-[316px] bg-[#D9D9D9] rounded-xl p-6 flex">
-  <h3 className="text-xl font-bold mb-4">Flagged Overview</h3>
+      <div className="w-full h-auto bg-[#D9D9D9] rounded-xl p-6 flex flex-wrap">
+  <h3 className="text-xl font-bold mb-4 w-full">Flagged Overview</h3>
 
-  {/* Left Section: Flagged Students (Piechart) */}
-  <div className="flex justify-center items-center ml-24 w-1/2">
-    <ResponsiveContainer width="100%" height={300}>
+  {/*  Flagged Overview */}
+  <div className="flex justify-center items-center w-full md:w-1/2"> 
+    <ResponsiveContainer width="200%" height={250}> 
       <PieChart>
         <Pie
           activeIndex={activeIndex1}
@@ -148,10 +148,10 @@ const Dashboard = () => {
             { name: 'Auto-Flagged', value: data.studentgrades.filter((grade) => grade.flagstatus === 2).length },
             { name: 'Responded', value: data.studentgrades.filter((grade) => grade.flagstatus === 3).length },
           ]}
-          cx="50%"
+          cx="50%" 
           cy="50%"
-          innerRadius={80}
-          outerRadius={120}
+          innerRadius="50%" 
+          outerRadius="80%"
           fill="#8884d8"
           paddingAngle={3}
           dataKey="value"
@@ -165,34 +165,34 @@ const Dashboard = () => {
     </ResponsiveContainer>
   </div>
 
-  {/* Left Section: Flagged Students (Data Summary) */}
-  <div className="ml-24 flex flex-col justify-center w-1/2">
-    <h3 className="text-xl font-bold mb-4 text-gray-500">Flagged Students</h3>
+  {/* Flagged Students (Data Summary) */}
+  <div className="flex flex-col w-full md:w-1/2 mt-4 md:mt-0 md:pl-4"> 
+    <h3 className="text-lg font-semibold mb-2 text-gray-500">Flagged Students</h3>
     <ul>
       <li className="flex justify-between mb-2">
         <div className="flex items-center">
           <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#FFBB28" }}></div>
-          <span>Manually Flagged</span>
+          <span className="text-sm">Manually Flagged</span> 
         </div>
-        <span className="ml-24">
+        <span className="text-sm ml-2">
           {data.studentgrades.filter((grade) => grade.flagstatus === 1).length}
         </span>
       </li>
       <li className="flex justify-between mb-2">
         <div className="flex items-center">
           <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#FF8042" }}></div>
-          <span>Auto-Flagged</span>
+          <span className="text-sm">Auto-Flagged</span>
         </div>
-        <span className="ml-24">
+        <span className="text-sm ml-2">
           {data.studentgrades.filter((grade) => grade.flagstatus === 2).length}
         </span>
       </li>
       <li className="flex justify-between mb-2">
         <div className="flex items-center">
           <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#0088FE" }}></div>
-          <span>Responded</span>
+          <span className="text-sm">Responded</span>
         </div>
-        <span className="ml-24">
+        <span className="text-sm ml-2">
           {data.studentgrades.filter((grade) => grade.flagstatus === 3).length}
         </span>
       </li>
@@ -201,62 +201,62 @@ const Dashboard = () => {
 </div>
 
 
-      {/* Second Dashboard Container */}
-      <div className="w-full h-[316px] bg-[#D9D9D9] rounded-xl p-6 flex">
-        <h3 className="text-xl font-bold mb-4">Case Overview</h3>
+
+<div className="w-full h-auto bg-[#D9D9D9] rounded-xl p-6 flex flex-wrap">
+  <h3 className="text-xl font-bold mb-4 w-full">Case Overview</h3>
+
   
-        {/* Right Section: Student cases (Piechart) */}
-        <div className="flex justify-center items-center ml-24 w-1/2">
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                activeIndex={activeIndex2}
-                activeShape={renderActiveShape}
-                data={data.casecategory.map((category) => ({
-                  name: category.categoryname,
-                  value: data.studentcases.filter(
-                    (studentcase) => studentcase.categoryid === category.categoryid
-                  ).length,
-                }))}
-                cx="50%"
-                cy="50%"
-                innerRadius={80}
-                outerRadius={120}
-                fill="#8884d8"
-                paddingAngle={3}
-                dataKey="value"
-                onMouseEnter={onPieEnter2}
-              >
-                {data.casecategory.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-  
-        {/* Right Section: Student cases (data) */}
-        <div className="ml-24 flex flex-col justify-center w-1/2">
-          <h3 className="text-xl font-bold mb-4 text-gray-500">Category</h3>
-          <ul>
-            {data.casecategory.map((category, index) => (
-              <li key={index} className="flex justify-between mb-2">
-                <div className="flex items-center">
-                  <div
-                    className="w-4 h-4 rounded-full mr-2"
-                    style={{ backgroundColor: colors[index % colors.length] }}
-                  ></div>
-                  <span>{category.categoryname}</span>
-                </div>
-                <span className="ml-24">
-                  {data.studentcases.filter((studentcase) => studentcase.categoryid === category.categoryid)
-                    .length}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+  <div className="flex justify-center items-center w-full md:w-1/2"> 
+    <ResponsiveContainer width="200%" height={250}> 
+      <PieChart>
+        <Pie
+          activeIndex={activeIndex2}
+          activeShape={renderActiveShape}
+          data={data.casecategory.map((category) => ({
+            name: category.categoryname,
+            value: data.studentcases.filter(
+              (studentcase) => studentcase.categoryid === category.categoryid
+            ).length,
+          }))}
+          cx="50%" 
+          cy="50%"
+          innerRadius="50%" 
+          outerRadius="80%"
+          fill="#8884d8"
+          paddingAngle={3}
+          dataKey="value"
+          onMouseEnter={onPieEnter2}
+        >
+          {data.casecategory.map((_, index) => (
+            <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+          ))}
+        </Pie>
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+
+  {/* Phần Phải: Category Data */}
+  <div className="flex flex-col w-full md:w-1/2 mt-4 md:mt-0 md:pl-4"> {/* Đặt w-full trên màn hình nhỏ, w-1/2 trên màn hình lớn */}
+    <h3 className="text-lg font-semibold mb-2 text-gray-500">Category</h3>
+    <ul>
+      {data.casecategory.map((category, index) => (
+        <li key={index} className="flex justify-between mb-2">
+          <div className="flex items-center">
+            <div
+              className="w-4 h-4 rounded-full mr-2"
+              style={{ backgroundColor: colors[index % colors.length] }}
+            ></div>
+            <span className="text-sm">{category.categoryname}</span> {/* Giảm kích thước font */}
+          </div>
+          <span className="text-sm ml-2">
+            {data.studentcases.filter((studentcase) => studentcase.categoryid === category.categoryid).length}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
       </div>
       
 
