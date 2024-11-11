@@ -139,11 +139,12 @@ def upload_grades(request):
         #Trimester = Section.split(' ')[0] Issue does not match with the other csv file
         CourseId = Section.split(' ')[0]
 
+        student = Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).first()
         # check if student already exists
         if Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).exists():
             try:
                 # add the grades
-                if CurrentScore and int(CurrentScore) <= 50 :
+                if CurrentScore and int(CurrentScore) <= 50 and student.flagstatus == 0:
                     Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
                         journal1=float(Journal1) if Journal1 else None,
                         journal2=float(Journal2) if Journal2 else None,
@@ -156,7 +157,7 @@ def upload_grades(request):
                         flagstatus=2
                 )
                     
-                else:
+                elif CurrentScore and int(CurrentScore) and student.flagstatus == 0:
                     Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
                         journal1=float(Journal1) if Journal1 else None,
                         journal2=float(Journal2) if Journal2 else None,
@@ -168,6 +169,18 @@ def upload_grades(request):
                         #trimester=Trimester,
                         flagstatus=0
                 )
+                    
+                else:
+                    Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
+                        journal1=float(Journal1) if Journal1 else None,
+                        journal2=float(Journal2) if Journal2 else None,
+                        assessment1=float(Assessment1) if Assessment1 else None,
+                        assessment2=float(Assessment2) if Assessment2 else None,
+                        assessment3=float(Assessment3) if Assessment3 else None,
+                        currentscore=float(CurrentScore) if CurrentScore else None,
+                        finalgrade=float(FinalGrade) if FinalGrade else None
+                    )
+
                     
             except IntegrityError:
                 return Response({"error": f"Error inserting student {StudentId}. Does not exist."}, 

@@ -31,12 +31,12 @@ function SearchPage() {
                         <li key={student.studentid}>
                             <Link
                                 to={`/managestudents/studentprofile/${student.studentid}`}
-                                className="block bg-white rounded-lg shadow-lg p-4 hover:bg-gray-50 transition-all flex flex-col items-start space-y-2 max-w-md"
+                                className="no-underline block bg-[#f0f0f0] rounded-lg shadow-md p-6 hover:bg-gray-100 hover:shadow-lg transition-all flex flex-col items-start space-y-2 w-full max-w-lg"
                             >
-                                <div className="text-xl font-semibold text-blue-600">
+                                <div className="text-2xl font-semibold text-blue-600">
                                     {student.firstname} {student.lastname}
                                 </div>
-                                <div className="text-gray-700 text-sm flex gap-4"> {/* Removed mt-2 for closer alignment */}
+                                <div className="text-gray-700 text-x1 flex gap-4"> 
                                     <span><strong>ID:</strong> {student.studentid}</span>
                                     <span><strong>Program:</strong> {student.acadprogdesc}</span>
                                 </div>
