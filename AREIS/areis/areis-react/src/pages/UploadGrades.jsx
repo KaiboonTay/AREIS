@@ -60,7 +60,13 @@ const UploadGrades = () => {
     };
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center">
+            {/* Header Section */}
+            <div className="mt-6 mb-6 text-left">
+      <h1 className="text-2xl font-bold">Upload Grades Portal</h1>
+      <p className="text-gray-600 mt-2">Use this page to upload CSV files containing grades. Make sure your file format is .csv before uploading.</p>
+      <hr className="mt-4 mb-6" />
+    </div>
             <div className="bg-white p-10 rounded-lg shadow-md w-full max-w-2xl">
                 <h1 className="text-3xl font-bold mb-6 text-center">Upload Grades CSV</h1>
 
