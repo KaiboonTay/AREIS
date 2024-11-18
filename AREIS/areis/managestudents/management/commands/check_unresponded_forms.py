@@ -18,7 +18,7 @@ class Command(BaseCommand):
         # Calculate the cutoff time (2 days ago)
         cutoff_time = timezone.now() - timedelta(days = 2)
         # Query forms that have not been responded to and are older than 2 days
-        unresponded_forms = Forms.objects.filter(responded=False, created_at__lt=cutoff_time)
+        unresponded_forms = Forms.objects.filter(responded= 0, created_at__lt=cutoff_time)
 
         for form in unresponded_forms:
             student = form.studentid

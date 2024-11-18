@@ -26,7 +26,7 @@ class Forms(models.Model):
     content9 = models.IntegerField(db_column='Content9', blank=True, null=True)  # Field name made lowercase.
     #content10 = models.TextField(db_column='Content10', blank=True, null=True)  # Field name made lowercase.
     checkbox_options = models.TextField(blank=True, null=True) # Checkbox field for content 10
-    responded = models.BooleanField(default=False) #Track if it's submitted 
+    responded = models.IntegerField(default=0)  # Using TINYINT to represent boolean (0 = False, 1 = True)
     recommendation = models.CharField(max_length=255, blank=True, null=True)  # Recommendation field
     created_at = models.DateTimeField()  # Timestamp when email is first sent
     flagged_course = models.CharField(max_length=15, db_column = 'flagged_course', blank =True, null =True) 

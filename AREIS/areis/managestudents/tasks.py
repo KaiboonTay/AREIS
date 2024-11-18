@@ -19,7 +19,7 @@ def check_unresponded_forms():
     cutoff_time = current_time - timedelta(days=2)  # For production, use days=2
 
     # Query unresponded forms where created_at is older than the cutoff time
-    unresponded_forms = Forms.objects.filter(responded=False, created_at__lt=cutoff_time)
+    unresponded_forms = Forms.objects.filter(responded= 0, created_at__lt=cutoff_time)
 
     for form in unresponded_forms:
         email = form.studentid.email

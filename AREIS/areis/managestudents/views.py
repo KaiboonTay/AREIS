@@ -308,7 +308,7 @@ def send_email_to_student(request):
                 flagged_course=flagged_course,
                 defaults={
                     'formid': form_uuid,
-                    'responded': False,
+                    'responded': 0,  # Set to 0 (False) initiallyform_response.responded = 1  # Set to 1 (True) after submission
                     'created_at': created_at_naive,
                     'intervention_form_checkbox': ', '.join(selected_options),  # Save selected checkboxes
                     'intervention_form_issues': issues,  # Save issues
@@ -439,7 +439,7 @@ def submit_form(request):
                 return JsonResponse({'error': 'Student not found'}, status=404)
 
             # Retrieve the form entry using studentId and flagged_course
-            form_response = Forms.objects.filter(studentid=student, flagged_course=flagged_course, responded=False).first()
+            form_response = Forms.objects.filter(studentid=student, flagged_course=flagged_course, responded= 0).first()
             if not form_response:
                 return JsonResponse({'error': 'No form entry found for the given student and course.'}, status=404)
 
@@ -461,7 +461,7 @@ def submit_form(request):
             form_response.content8 = data.get('content8', 0)
             form_response.content9 = data.get('content9', 0)
             form_response.checkbox_options = checkbox_options
-            form_response.responded = True
+            form_response.responded = 1  # Set to 1 (True) after submission
 
             # Set the submission date and time in Singapore timezone
             singapore_timezone = pytz.timezone('Asia/Singapore')
