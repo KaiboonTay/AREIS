@@ -1,6 +1,9 @@
 from datetime import timedelta
 from django.utils import timezone
 from background_task import background
+from celery import shared_task
+
+
 
 @background(schedule=60 * 60 * 24 * 2)  # Schedule to run every 2 days
 def check_unresponded_forms():
@@ -24,3 +27,5 @@ def check_unresponded_forms():
             send_email_to_student_by_email(email)
         except Exception as e:
             print(f"Failed to resend email to {email}: {str(e)}")
+
+
