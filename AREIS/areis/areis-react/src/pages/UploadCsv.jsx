@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { ArrowUpCircleIcon, ChevronDownIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion} from 'framer-motion';
 
 const UploadCsv = () => {
     const [file, setFile] = useState(null);
@@ -128,11 +128,18 @@ const UploadCsv = () => {
                 animate="visible"
                 variants={containerVariants}
             >
-                <h1 className="text-2xl font-bold">Upload Student Portal</h1>
-                <p className="text-gray-600 mt-2">
-                    Use this page to upload CSV files containing students. Make sure your file format is .csv before uploading.
-                </p>
-                <hr className="mt-4 mb-6" />
+               <h1 className="text-2xl font-bold">Upload Student Portal</h1>
+<p className="text-gray-600 mt-2">
+  Use this page to upload CSV files containing students. Make sure your file format is .csv before uploading.
+</p>
+<p className="text-gray-600 mt-2">
+  This will:
+</p>
+<ul className="text-gray-600 list-disc list-inside ml-4">
+  <li>Upload students</li>
+  <li>Initialize grades</li>
+</ul>
+<hr className="mt-4 mb-6" />
             </motion.div>
 
     {/* Main Upload Box */}

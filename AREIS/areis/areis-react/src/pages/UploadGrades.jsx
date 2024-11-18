@@ -84,6 +84,12 @@ const UploadGrades = () => {
                 <p className="text-gray-600 mt-2">
                     Use this page to upload CSV files containing grades. Make sure your file format is .csv before uploading.
                 </p>
+                <p className="text-gray-600 mt-2">
+  This will:
+</p>
+<ul className="text-gray-600 list-disc list-inside ml-4">
+  <li>Update the grades</li>
+</ul>
                 <hr className="mt-4 mb-6" />
             </div>
 
