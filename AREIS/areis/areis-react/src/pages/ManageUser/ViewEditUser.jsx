@@ -50,8 +50,8 @@ const ViewEditUser = () => {
     };
 
     return (
-        <div className="p-8 bg-gray-50 min-h-screen flex flex-col items-center">
-            <h2 className="text-2xl font-semibold mb-6">View and Edit User</h2>
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center">
+            <h2 className="text-2xl font-semibold mb-4">View and Edit User</h2>
             <div className="overflow-x-auto w-full max-w-4xl">
                 <table className="min-w-full bg-white shadow-lg rounded-lg border border-gray-200">
                     <thead>

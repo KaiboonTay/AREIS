@@ -61,6 +61,49 @@ const AtRiskStudents = () => {
         <hr className="mt-4 mb-6" />
       </div>
 
+    {/* Legend Header */}
+    <div className="mb-6 text-center">
+      <h2 className="text-xl font-semibold">Legend</h2>
+    </div>
+
+{/* Legend for Flag Status (only when expanded) */}
+            <div className="text-center mt-4 mb-4">
+              <div className="flex justify-center space-x-4 items-center">
+                <div className="flex items-center">
+                  {/* Flagpole and flag icon for Moderate Risk */}
+                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                    <polygon points="10,5 40,15 10,25" fill="blue" />
+                  </svg>
+                  <span>Auto flagged</span>
+                </div>
+                <div className="flex items-center">
+                  {/* Flagpole and flag icon for Moderate Risk */}
+                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                    <polygon points="10,5 40,15 10,25" fill="orange" />
+                  </svg>
+                  <span>Manually flagged</span>
+                </div>
+                <div className="flex items-center">
+                  {/* Flagpole and flag icon for Low Risk */}
+                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                    <polygon points="10,5 40,15 10,25" fill="#ef4444" />
+                  </svg>
+                  <span>Responded</span>
+                </div>
+                <div className="flex items-center">
+                  {/* Flagpole and flag icon for Low Risk */}
+                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                    <polygon points="10,5 40,15 10,25" fill="green" />
+                  </svg>
+                  <span>Acknowledged</span>
+                </div>
+              </div>
+            </div>
+
       {/* Main Content */}
       <div className="space-y-4">
         {flagCategory.map((category, index) => (

@@ -36,7 +36,7 @@ const AddUser = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-white-50">
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center">
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg border border-black">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Add New User Form</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">

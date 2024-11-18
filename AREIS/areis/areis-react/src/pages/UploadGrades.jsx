@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowUpCircleIcon } from '@heroicons/react/24/outline'; 
+import { ArrowUpCircleIcon } from '@heroicons/react/24/outline';
+import { motion } from 'framer-motion';
 
 const UploadGrades = () => {
     const [file, setFile] = useState(null);
@@ -59,15 +60,39 @@ const UploadGrades = () => {
         setFile(null); // Optionally reset file after success
     };
 
+    const buttonVariants = {
+        hover: { scale: 1.05, transition: { duration: 0.3 } },
+        tap: { scale: 0.95 },
+    };
+
+    const containerVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+      };
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center">
+            <motion.div
+            className="min-h-screen bg-gray-50 flex flex-col items-center"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
             {/* Header Section */}
             <div className="mt-6 mb-6 text-left">
-      <h1 className="text-2xl font-bold">Upload Grades Portal</h1>
-      <p className="text-gray-600 mt-2">Use this page to upload CSV files containing grades. Make sure your file format is .csv before uploading.</p>
-      <hr className="mt-4 mb-6" />
-    </div>
-            <div className="bg-white p-10 rounded-lg shadow-md w-full max-w-2xl">
+                <h1 className="text-2xl font-bold">Upload Grades Portal</h1>
+                <p className="text-gray-600 mt-2">
+                    Use this page to upload CSV files containing grades. Make sure your file format is .csv before uploading.
+                </p>
+                <hr className="mt-4 mb-6" />
+            </div>
+
+            <motion.div
+                className="bg-white p-10 rounded-lg shadow-md w-full max-w-2xl"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
                 <h1 className="text-3xl font-bold mb-6 text-center">Upload Grades CSV</h1>
 
                 <form encType="multipart/form-data" className="space-y-6">
@@ -76,7 +101,9 @@ const UploadGrades = () => {
                         {file ? (
                             <p className="text-gray-600">{file.name}</p>
                         ) : (
-                            <p className="text-gray-400">Drag a file here, or <span className="text-blue-500 underline cursor-pointer">choose a file</span> to upload</p>
+                            <p className="text-gray-400">
+                                Drag a file here, or <span className="text-blue-500 underline cursor-pointer">choose a file</span> to upload
+                            </p>
                         )}
                         <input
                             type="file"
@@ -86,13 +113,18 @@ const UploadGrades = () => {
                         />
                     </div>
 
-                    <button
+                    <motion.button
                         onClick={triggerConfirmation}
                         className="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
+                        variants={buttonVariants}
+                        whileHover="hover"
+                        whileTap="tap"
                     >
                         Upload File
-                    </button>
+                    </motion.button>
                 </form>
+            </motion.div>
+        </motion.div>
 
                 {/* Confirmation Modal */}
                 {showConfirmation && (
@@ -140,7 +172,6 @@ const UploadGrades = () => {
                     </div>
                 )}
             </div>
-        </div>
     );
 };
 

@@ -130,7 +130,14 @@ const Dashboard = () => {
   };
 
   return (
-    <div>
+    <div className="px-20 mx-auto mt-8">
+      {/* Page Header */}
+      <div className="mb-6 text-left">
+        <h1 className="text-2xl font-bold">Home - Dashboard</h1>
+        <hr className="mt-4 mb-6" />
+      </div>
+
+
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
       {/* Main Dashboard Container - Flagged Students */}
       <div className="w-full h-auto bg-[#D9D9D9] rounded-xl p-6 flex flex-wrap">
@@ -256,8 +263,36 @@ const Dashboard = () => {
     </ul>
   </div>
 </div>
-
       </div>
+
+
+      {/* Buttons Above Pie Charts (Shown Only When a Card is Expanded) */}
+      {expandedSection && (
+  <div className="w-full mt-6">
+    {/* Quick Navigation Header */}
+    <div className="mb-6 text-center">
+      <h2 className="text-xl font-semibold">Quick Navigation</h2>
+    </div>
+
+    {/* Navigation Buttons */}
+    <div className="flex justify-center space-x-4">
+      {["Course Content", "Learning Issues", "Personal"].map((buttonLabel, index) => (
+        <button
+          key={index}
+          className={`py-2 px-4 rounded-md text-white ${
+            expandedSection === buttonLabel
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+          onClick={() => handleExpand(buttonLabel)}
+          disabled={expandedSection === buttonLabel} // Disable the button for the current card
+        >
+          {buttonLabel}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
       
 
   
@@ -431,6 +466,8 @@ const Dashboard = () => {
       </div>
     </div>
   ))}
+
+
 </div>
 </div>
 

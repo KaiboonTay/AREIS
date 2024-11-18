@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { ArrowUpCircleIcon, ChevronDownIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const UploadCsv = () => {
     const [file, setFile] = useState(null);
@@ -108,21 +109,48 @@ const UploadCsv = () => {
         }));
     };
 
+    const buttonVariants = {
+        hover: { scale: 1.05, transition: { duration: 0.3 } },
+        tap: { scale: 0.95 },
+    };
+
+    const containerVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+      };
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center">
             {/* Header Section */}
-            <div className="mt-6 mb-6 text-left">
-      <h1 className="text-2xl font-bold">Upload Student Portal</h1>
-      <p className="text-gray-600 mt-2">Use this page to upload CSV files containing students. Make sure your file format is .csv before uploading.</p>
-      <hr className="mt-4 mb-6" />
-    </div>
+            <motion.div
+                className="mt-6 mb-6 text-left"
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+            >
+                <h1 className="text-2xl font-bold">Upload Student Portal</h1>
+                <p className="text-gray-600 mt-2">
+                    Use this page to upload CSV files containing students. Make sure your file format is .csv before uploading.
+                </p>
+                <hr className="mt-4 mb-6" />
+            </motion.div>
 
     {/* Main Upload Box */}
-            <div className="bg-white p-10 rounded-lg shadow-md w-full max-w-2xl">
+    <motion.div
+                className="bg-white p-10 rounded-lg shadow-md w-full max-w-2xl"
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+            >
                 <h1 className="text-3xl font-bold mb-6 text-center">Upload CSV Files</h1>
 
                 <form encType="multipart/form-data" className="space-y-6">
-                    <div className="border-2 border-dashed border-gray-300 p-8 text-center relative">
+                    <motion.div
+                        className="border-2 border-dashed border-gray-300 p-8 text-center relative"
+                        variants={buttonVariants}
+                        whileHover="hover"
+                        whileTap="tap"
+                    >
                         <ArrowUpCircleIcon className="w-20 h-20 text-blue-500 mx-auto mb-4" />
                         {file ? (
                             <p className="text-gray-600">{file.name}</p>
@@ -139,15 +167,19 @@ const UploadCsv = () => {
                             onChange={handleFileChange}
                             className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
                         />
-                    </div>
+                    </motion.div>
 
-                    <button
+                    <motion.button
                         onClick={triggerConfirmation}
                         className="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
+                        variants={buttonVariants}
+                        whileHover="hover"
+                        whileTap="tap"
                     >
                         Upload File
-                    </button>
+                    </motion.button>
                 </form>
+            </motion.div>
 
                 {showConfirmation && (
                     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
@@ -340,7 +372,6 @@ const UploadCsv = () => {
                     </div>
                 )}
             </div>
-        </div>
     );
 };
 
