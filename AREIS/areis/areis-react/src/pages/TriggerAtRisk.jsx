@@ -1,18 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 
 const TriggerAtRisk = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState({ courses: [], students: [], studentsgrades: [] });
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [emailStatus, setEmailStatus] = useState(''); // For displaying email success or failure message
+  const [emailStatus, setEmailStatus] = useState(""); // For displaying email success or failure message
   const modalRef = useRef(null);
 
   const colors = [
-    "bg-yellow-100", "bg-blue-100", "bg-green-100",
-    "bg-red-100", "bg-purple-100", "bg-orange-100",
-    "bg-indigo-100"
+    "bg-yellow-100",
+    "bg-blue-100",
+    "bg-green-100",
+    "bg-red-100",
+    "bg-purple-100",
+    "bg-orange-100",
+    "bg-indigo-100",
   ];
 
   const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"]; // Gray, Orange, Blue, Red
@@ -22,8 +26,9 @@ const TriggerAtRisk = () => {
   };
 
   const openModal = (student, courseid) => {
-    console.log('Student:', student, 'Course ID:', courseid); // Debugging
-    setSelectedStudent({ ...student, courseid }); // Pass both student and course ID
+    console.log("Student object passed to modal:", student);
+    console.log("Course ID passed to modal:", courseid);
+    setSelectedStudent({ ...student, courseid }); // Set both student and course ID
     setIsModalOpen(true);
   };
 
@@ -32,37 +37,37 @@ const TriggerAtRisk = () => {
     setSelectedStudent(null);
   };
 
-  function getCSRFToken() {
+  const getCSRFToken = () => {
     let csrfToken = null;
-    if (document.cookie && document.cookie !== '') {
-      document.cookie.split(';').forEach(cookie => {
-        const [name, value] = cookie.trim().split('=');
-        if (name === 'csrftoken') {
+    if (document.cookie && document.cookie !== "") {
+      document.cookie.split(";").forEach((cookie) => {
+        const [name, value] = cookie.trim().split("=");
+        if (name === "csrftoken") {
           csrfToken = decodeURIComponent(value);
         }
       });
     }
     return csrfToken;
-  }
+  };
 
   const handleFlagClick = async () => {
     try {
       const csrfToken = getCSRFToken();
 
       const selectedOptions = Array.from(
-        document.querySelectorAll('.intervention-form input[type="checkbox"]:checked')
+        document.querySelectorAll(".intervention-form input[type='checkbox']:checked")
       ).map((checkbox) => checkbox.nextSibling.textContent.trim());
 
-      const issues = document.querySelector('.intervention-form textarea').value.trim();
+      const issues = document.querySelector(".intervention-form textarea").value.trim();
 
-      console.log('Selected Options:', selectedOptions);
-      console.log('Issues:', issues);
+      console.log("Selected Options:", selectedOptions);
+      console.log("Issues:", issues);
 
-      const response = await fetch('/managestudents/trigger-at-risk/send-email/', {
-        method: 'POST',
+      const response = await fetch("/managestudents/trigger-at-risk/send-email/", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
         },
         body: JSON.stringify({
           email: selectedStudent.email,
@@ -75,22 +80,22 @@ const TriggerAtRisk = () => {
 
       const result = await response.json();
       if (response.ok) {
-        console.log('Email sent successfully:', result);
-        setEmailStatus('Email sent successfully');
+        console.log("Email sent successfully:", result);
+        setEmailStatus("Email sent successfully");
       } else {
-        console.error('Failed to send email:', result.error);
+        console.error("Failed to send email:", result.error);
         setEmailStatus(`Failed to send email: ${result.error}`);
       }
     } catch (error) {
-      console.error('Error sending email:', error);
-      setEmailStatus('An error occurred while sending the email.');
+      console.error("Error sending email:", error);
+      setEmailStatus("An error occurred while sending the email.");
     }
   };
 
   useEffect(() => {
-    fetch('/managestudents/api/trigger-at-risk/')
-      .then(response => response.json())
-      .then(data => setData(data));
+    fetch("/managestudents/api/trigger-at-risk/")
+      .then((response) => response.json())
+      .then((data) => setData(data));
   }, []);
 
   useEffect(() => {
@@ -101,13 +106,13 @@ const TriggerAtRisk = () => {
     };
 
     if (isModalOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     } else {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isModalOpen]);
 
@@ -116,7 +121,10 @@ const TriggerAtRisk = () => {
       {/* Page Header */}
       <div className="mb-6 text-left">
         <h1 className="text-2xl font-bold">Manual Trigger At-Risk</h1>
-        <p className="text-gray-600 mt-2">Identify and flag students needing attention. Review the master list or select a course to see enrolled students and manually trigger at-risk flags.</p>
+        <p className="text-gray-600 mt-2">
+          Identify and flag students needing attention. Review the master list or select a course to
+          see enrolled students and manually trigger at-risk flags.
+        </p>
         <hr className="mt-4 mb-6" />
       </div>
 
@@ -138,7 +146,7 @@ const TriggerAtRisk = () => {
           onClick={() => handleToggle(-1)}
         >
           <h3 className="font-medium text-lg">UON Students: Master List</h3>
-          <span className="text-lg">{activeIndex === -1 ? '-' : '>'}</span>
+          <span className="text-lg">{activeIndex === -1 ? "-" : ">"}</span>
         </div>
         <motion.div
           initial={{ maxHeight: 0 }}
@@ -159,12 +167,21 @@ const TriggerAtRisk = () => {
                       <th className="border p-2">Phone No.</th>
                       <th className="border p-2">Email Address</th>
                       <th className="border p-2">Course ID</th>
-                      <th className="border p-2">Flag</th>
+                      <th className="border p-2">Course Description</th>
+                      <th className="border p-2">Flag Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.studentsgrades.map((grade, studentIndex) => {
-                      const student = data.students.find(student => student.studentid === grade.studentid);
+                      const student = data.students.find(
+                        (student) => student.studentid === grade.studentid
+                      );
+                      const course = data.courses.find(
+                        (course) => course.courseid === grade.courseid
+                      );
+
+                      if (!student || !course) return null;
+
                       return (
                         <tr key={studentIndex} className="text-center">
                           <td className="border p-2">{student.studentid}</td>
@@ -173,13 +190,54 @@ const TriggerAtRisk = () => {
                           <td className="border p-2">{student.phoneno}</td>
                           <td className="border p-2">{student.email}</td>
                           <td className="border p-2">{grade.courseid}</td>
+                          <td className="border p-2">{course.classdescription}</td>
                           <td className="border p-2">
-                            <button
-                              onClick={() => openModal(student, grade.courseid)}
-                              className="bg-blue-500 text-white px-3 py-2 rounded"
-                            >
-                              Flag
-                            </button>
+                            <div className="flex justify-center items-center h-full">
+                              {(grade.flagstatus === 1 || grade.flagstatus === 3) ? (
+                                <svg
+                                  className="w-8 h-8"
+                                  viewBox="0 0 64 64"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <line
+                                    x1="10"
+                                    y1="5"
+                                    x2="10"
+                                    y2="60"
+                                    stroke="black"
+                                    strokeWidth="2"
+                                  />
+                                  <polygon
+                                    points="10,5 40,15 10,25"
+                                    fill={flagColors[grade.flagstatus]}
+                                  />
+                                </svg>
+                              ) : (
+                                <button
+                                  onClick={() => openModal(student, grade.courseid)}
+                                  className="flex items-center justify-center"
+                                >
+                                  <svg
+                                    className="w-8 h-8"
+                                    viewBox="0 0 64 64"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <line
+                                      x1="10"
+                                      y1="5"
+                                      x2="10"
+                                      y2="60"
+                                      stroke="black"
+                                      strokeWidth="2"
+                                    />
+                                    <polygon
+                                      points="10,5 40,15 10,25"
+                                      fill={flagColors[grade.flagstatus]}
+                                    />
+                                  </svg>
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
@@ -195,7 +253,9 @@ const TriggerAtRisk = () => {
       {/* Courses Header */}
       <div className="mb-6 text-center mt-4">
         <h2 className="text-xl font-semibold">Courses</h2>
-        <p className="text-gray-600 mt-2">Select a course to view enrolled students and manually trigger at-risk flags.</p>
+        <p className="text-gray-600 mt-2">
+          Select a course to view enrolled students and manually trigger at-risk flags.
+        </p>
       </div>
 
       {/* Courses Section */}
@@ -213,7 +273,7 @@ const TriggerAtRisk = () => {
               onClick={() => handleToggle(index)}
             >
               <h3 className="font-medium text-lg">{course.courseid} : {course.classdescription}</h3>
-              <span className="text-lg">{activeIndex === index ? '-' : '>'}</span>
+              <span className="text-lg">{activeIndex === index ? "-" : ">"}</span>
             </div>
             <motion.div
               initial={{ maxHeight: 0 }}
@@ -223,7 +283,11 @@ const TriggerAtRisk = () => {
             >
               {activeIndex === index && (
                 <div className="p-4 text-gray-700 bg-white">
-                  <p>Total Students: {data.studentsgrades.filter(grade => grade.courseid === course.courseid).length}</p>
+                  <p>
+                    Total Students: {
+                      data.studentsgrades.filter((grade) => grade.courseid === course.courseid).length
+                    }
+                  </p>
                   <div className="overflow-y-auto max-h-96 mt-4">
                     <table className="table-auto w-full border-collapse">
                       <thead>
@@ -237,9 +301,11 @@ const TriggerAtRisk = () => {
                       </thead>
                       <tbody>
                         {data.studentsgrades
-                          .filter(grade => grade.courseid === course.courseid)
+                          .filter((grade) => grade.courseid === course.courseid)
                           .map((grade, studentIndex) => {
-                            const student = data.students.find(student => student.studentid === grade.studentid);
+                            const student = data.students.find(
+                              (student) => student.studentid === grade.studentid
+                            );
                             return (
                               <tr key={studentIndex} className="text-center">
                                 <td className="border p-2">{student.firstname}</td>
@@ -247,12 +313,52 @@ const TriggerAtRisk = () => {
                                 <td className="border p-2">{student.phoneno}</td>
                                 <td className="border p-2">{student.email}</td>
                                 <td className="border p-2">
-                                  <button
-                                    onClick={() => openModal(student, grade.courseid)}
-                                    className="bg-blue-500 text-white px-3 py-2 rounded"
-                                  >
-                                    Flag
-                                  </button>
+                                  <div className="flex justify-center items-center h-full">
+                                    {(grade.flagstatus === 1 || grade.flagstatus === 3) ? (
+                                      <svg
+                                        className="w-8 h-8"
+                                        viewBox="0 0 64 64"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <line
+                                          x1="10"
+                                          y1="5"
+                                          x2="10"
+                                          y2="60"
+                                          stroke="black"
+                                          strokeWidth="2"
+                                        />
+                                        <polygon
+                                          points="10,5 40,15 10,25"
+                                          fill={flagColors[grade.flagstatus]}
+                                        />
+                                      </svg>
+                                    ) : (
+                                      <button
+                                        onClick={() => openModal(student, grade.courseid)}
+                                        className="flex items-center justify-center"
+                                      >
+                                        <svg
+                                          className="w-8 h-8"
+                                          viewBox="0 0 64 64"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <line
+                                            x1="10"
+                                            y1="5"
+                                            x2="10"
+                                            y2="60"
+                                            stroke="black"
+                                            strokeWidth="2"
+                                          />
+                                          <polygon
+                                            points="10,5 40,15 10,25"
+                                            fill={flagColors[grade.flagstatus]}
+                                          />
+                                        </svg>
+                                      </button>
+                                    )}
+                                  </div>
                                 </td>
                               </tr>
                             );
@@ -280,21 +386,34 @@ const TriggerAtRisk = () => {
             <h2 className="text-xl font-bold text-center mb-4">"At Risk" Early Intervention Form</h2>
             <form>
               <div className="mb-4">
-                {['General English', 'Math', 'Time Management', 'Exam', 'Writing Skills', 'Research Skills'].map((skill, i) => (
+                {[
+                  "General English",
+                  "Math",
+                  "Time Management",
+                  "Exam",
+                  "Writing Skills",
+                  "Research Skills",
+                ].map((skill, i) => (
                   <div key={i} className="flex items-center">
-                    <input type="checkbox" id={skill.toLowerCase().replace(' ', '-')} className="mr-2" />
-                    <label htmlFor={skill.toLowerCase().replace(' ', '-')}>{skill}</label>
+                    <input
+                      type="checkbox"
+                      id={skill.toLowerCase().replace(" ", "-")}
+                      className="mr-2"
+                    />
+                    <label htmlFor={skill.toLowerCase().replace(" ", "-")}>{skill}</label>
                   </div>
                 ))}
               </div>
-
-              <textarea rows="4" placeholder="Issues" className="w-full border border-gray-300 p-2 rounded-lg mb-4"></textarea>
-
+              <textarea
+                rows="4"
+                placeholder="Issues"
+                className="w-full border border-gray-300 p-2 rounded-lg mb-4"
+              ></textarea>
               <div className="flex justify-center">
                 <button
                   type="button"
                   className="bg-black text-white py-2 px-4 rounded"
-                  onClick={handleFlagClick}
+                  onClick={() => handleFlagClick(selectedStudent, selectedStudent?.courseid)}
                 >
                   Save & Flag Student
                 </button>

@@ -159,4 +159,4 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'apikey'  # This is literal, not your username. It is the string 'apikey'
 EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')  # Your SendGrid API key
-DEFAULT_FROM_EMAIL = 'uonareis@gmail.com'  # The default email address that will appear as sender
+DEFAULT_FROM_EMAIL = 'officialuonareis@gmail.com'  # The default email address that will appear as sender
