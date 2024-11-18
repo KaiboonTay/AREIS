@@ -16,6 +16,7 @@ const StudentForm = () => {
 
   const checkboxOptions = ["Course Content", "Learning Issues", "Personal"];
   const [selectedOptions, setSelectedOptions] = useState([]); // Array to hold selected checkboxes
+  const [flaggedCourse, setFlaggedCourse] = useState(''); // State for flagged course
   const [error, setError] = useState(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -26,16 +27,19 @@ const StudentForm = () => {
   useEffect(() => {
     const fetchFormData = async () => {
       const studentIdParam = searchParams.get('studentId');
-      if (!studentIdParam) {
-        setError('Student ID is missing');
+      const flaggedCourseParam = searchParams.get('flaggedCourse'); // Fetch flaggedCourse from the query params
+      
+      if (!studentIdParam || !flaggedCourseParam) {
+        setError('Student ID or flagged course is missing');
         setLoading(false);
         return;
       }
 
       setStudentId(studentIdParam);
+      setFlaggedCourse(flaggedCourseParam);
 
       try {
-        const requestUrl = `/managestudents/api/student-form/?studentId=${studentIdParam}`;
+        const requestUrl = `/managestudents/api/student-form/?studentId=${studentIdParam}&flaggedCourse=${flaggedCourseParam}`;
         const response = await fetch(requestUrl);
 
         if (!response.ok) throw new Error('Failed to fetch form data');
@@ -58,7 +62,8 @@ const StudentForm = () => {
             content9: data.content9 || ''
           });
 
-          // If data has checkbox options saved, load them into selectedOptions
+          // Set flagged course and checkbox options from API response
+          setFlaggedCourse(data.flagged_course || '');
           if (data.checkbox_options) {
             setSelectedOptions(data.checkbox_options.split(', '));
           }
@@ -107,6 +112,7 @@ const StudentForm = () => {
         },
         body: JSON.stringify({
           student_id: studentId,
+          flagged_course: flaggedCourse, // Include flagged course in the POST request
           ...responses,
           checkbox_options: JSON.stringify(selectedOptions) // Send selected options as checkbox_options
         }),
@@ -173,6 +179,12 @@ const StudentForm = () => {
   return (
     <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-8">
       <h1 className="text-3xl font-semibold mb-6 text-center">Student Form</h1>
+
+      {flaggedCourse && (
+        <div className="mb-6 text-lg font-medium text-center text-gray-700">
+          <span className="font-bold">Flagged Course:</span> {flaggedCourse}
+        </div>
+      )}
       
       {questions.map((question, index) => (
         <div key={index} className="mb-6">
@@ -232,4 +244,3 @@ const StudentForm = () => {
 };
 
 export default StudentForm;
-
