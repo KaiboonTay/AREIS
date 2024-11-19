@@ -14,6 +14,9 @@ class FormsSerializer(serializers.ModelSerializer):
 
 
 class StudentcasesSerializer(serializers.ModelSerializer):
+    formid = serializers.CharField(source='formid_str', read_only=True)  # Use the string version of UUID
+    
     class Meta:
         model = Studentcases
         fields = '__all__'
+

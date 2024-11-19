@@ -58,5 +58,9 @@ class Studentcases(models.Model):
         self.caseid = f"{self.courseid_id}_{self.studentid_id}"
         super().save(*args, **kwargs)
 
+    @property
+    def formid_str(self):
+        return str(self.formid.formid) if self.formid else None
+
     class Meta:
         db_table = 'studentCases'
