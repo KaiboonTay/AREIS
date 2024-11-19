@@ -81,7 +81,18 @@ const TriggerAtRisk = () => {
       const result = await response.json();
       if (response.ok) {
         console.log("Email sent successfully:", result);
+
+        // Close the modal
+        setIsModalOpen(false);
+
+        // Display success message as a notification
         setEmailStatus("Email sent successfully");
+        setTimeout(() => setEmailStatus(""), 5000); // Automatically hide after 5 seconds
+
+        // Refresh the student grades data to update the flag status
+        const updatedDataResponse = await fetch("/managestudents/api/trigger-at-risk/");
+        const updatedData = await updatedDataResponse.json();
+        setData(updatedData); // Update the data state to reflect changes in the UI
       } else {
         console.error("Failed to send email:", result.error);
         setEmailStatus(`Failed to send email: ${result.error}`);
@@ -118,6 +129,24 @@ const TriggerAtRisk = () => {
 
   return (
     <div className="px-20 mx-auto mt-8">
+      {/* Notification for email status */}
+      {emailStatus && (
+        <div
+          className={`fixed top-4 right-4 ${
+            emailStatus.includes("successfully") ? "bg-green-500" : "bg-red-500"
+          } text-white p-4 rounded-lg shadow-md`}
+          role="alert"
+        >
+          <span>{emailStatus}</span>
+          <button
+            className="ml-4 text-lg font-bold"
+            onClick={() => setEmailStatus("")}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="mb-6 text-left">
         <h1 className="text-2xl font-bold">Manual Trigger At-Risk</h1>
@@ -444,6 +473,7 @@ const TriggerAtRisk = () => {
 };
 
 export default TriggerAtRisk;
+
 
 
 
