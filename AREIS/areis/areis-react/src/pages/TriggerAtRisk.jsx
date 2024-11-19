@@ -158,42 +158,7 @@ const TriggerAtRisk = () => {
             <div className="p-4 text-gray-700 bg-white">
               <div className="flex justify-between items-center">
                 <p>Total Students: {data.studentsgrades.length}</p>
-
-                {/* Legend for Flag Status*/}
-                <div className="text-center mt-2 mb-2">
-                  <div className="flex justify-right space-x-4 items-center">
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                        <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                        <polygon points="10,5 40,15 10,25" fill="blue" />
-                      </svg>
-                      <span>Auto flagged</span>
-                    </div>
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                        <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                        <polygon points="10,5 40,15 10,25" fill="orange" />
-                      </svg>
-                      <span>Manually flagged</span>
-                    </div>
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                        <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                        <polygon points="10,5 40,15 10,25" fill="#ef4444" />
-                      </svg>
-                      <span>Responded</span>
-                    </div>
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                        <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                        <polygon points="10,5 40,15 10,25" fill="green" />
-                      </svg>
-                      <span>Acknowledged</span>
-                    </div>
-                  </div>
-                </div>
               </div>
-
               <div className="overflow-y-auto max-h-96 mt-4">
                 <table className="table-auto w-full border-collapse">
                   <thead>
@@ -324,48 +289,6 @@ const TriggerAtRisk = () => {
             >
               {activeIndex === index && (
                 <div className="p-4 text-gray-700 bg-white">
-                  <div className="flex justify-between items-center">
-                    <p>
-                      Total Students: {
-                        data.studentsgrades.filter((grade) => grade.courseid === course.courseid).length
-                      }
-                    </p>
-
-                    {/* Legend for Flag Status*/}
-                    <div className="text-center mt-2 mb-2">
-                      <div className="flex justify-right space-x-4 items-center">
-                        <div className="flex items-center">
-                          <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                            <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                            <polygon points="10,5 40,15 10,25" fill="blue" />
-                          </svg>
-                          <span>Auto flagged</span>
-                        </div>
-                        <div className="flex items-center">
-                          <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                            <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                            <polygon points="10,5 40,15 10,25" fill="orange" />
-                          </svg>
-                          <span>Manually flagged</span>
-                        </div>
-                        <div className="flex items-center">
-                          <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                            <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                            <polygon points="10,5 40,15 10,25" fill="#ef4444" />
-                          </svg>
-                          <span>Responded</span>
-                        </div>
-                        <div className="flex items-center">
-                          <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                            <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                            <polygon points="10,5 40,15 10,25" fill="green" />
-                          </svg>
-                          <span>Acknowledged</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
                   <div className="overflow-y-auto max-h-96 mt-4">
                     <table className="table-auto w-full border-collapse">
                       <thead>
@@ -391,6 +314,7 @@ const TriggerAtRisk = () => {
                             const student = data.students.find(
                               (student) => student.studentid === grade.studentid
                             );
+
                             return (
                               <tr key={studentIndex} className="text-center">
                                 <td className="border p-2">{student.firstname}</td>
@@ -478,7 +402,7 @@ const TriggerAtRisk = () => {
             <h2 className="text-xl font-bold text-center mb-4">"At Risk" Early Intervention Form</h2>
             <form>
               <div className="mb-4">
-                [
+                {[
                   "General English",
                   "Math",
                   "Time Management",
@@ -494,7 +418,7 @@ const TriggerAtRisk = () => {
                     />
                     <label htmlFor={skill.toLowerCase().replace(" ", "-")}>{skill}</label>
                   </div>
-                ))
+                ))}
               </div>
               <textarea
                 rows="4"
@@ -520,5 +444,9 @@ const TriggerAtRisk = () => {
 };
 
 export default TriggerAtRisk;
+
+
+
+
 
 
