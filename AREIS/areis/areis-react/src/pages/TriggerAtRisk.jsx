@@ -157,46 +157,42 @@ const TriggerAtRisk = () => {
           {activeIndex === -1 && (
             <div className="p-4 text-gray-700 bg-white">
               <div className="flex justify-between items-center">
-              <p>Total Students: {data.studentsgrades.length}</p>
+                <p>Total Students: {data.studentsgrades.length}</p>
 
-                          {/* Legend for Flag Status*/}
-            <div className="text-center mt-2 mb-2">
-              <div className="flex justify-right space-x-4 items-center">
-                <div className="flex items-center">
-                  {/* Flagpole and flag icon for Moderate Risk */}
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                    <polygon points="10,5 40,15 10,25" fill="blue" />
-                  </svg>
-                  <span>Auto flagged</span>
-                </div>
-                <div className="flex items-center">
-                  {/* Flagpole and flag icon for Moderate Risk */}
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                    <polygon points="10,5 40,15 10,25" fill="orange" />
-                  </svg>
-                  <span>Manually flagged</span>
-                </div>
-                <div className="flex items-center">
-                  {/* Flagpole and flag icon for Low Risk */}
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                    <polygon points="10,5 40,15 10,25" fill="#ef4444" />
-                  </svg>
-                  <span>Responded</span>
-                </div>
-                <div className="flex items-center">
-                  {/* Flagpole and flag icon for Low Risk */}
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                    <polygon points="10,5 40,15 10,25" fill="green" />
-                  </svg>
-                  <span>Acknowledged</span>
+                {/* Legend for Flag Status*/}
+                <div className="text-center mt-2 mb-2">
+                  <div className="flex justify-right space-x-4 items-center">
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                        <polygon points="10,5 40,15 10,25" fill="blue" />
+                      </svg>
+                      <span>Auto flagged</span>
+                    </div>
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                        <polygon points="10,5 40,15 10,25" fill="orange" />
+                      </svg>
+                      <span>Manually flagged</span>
+                    </div>
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                        <polygon points="10,5 40,15 10,25" fill="#ef4444" />
+                      </svg>
+                      <span>Responded</span>
+                    </div>
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                        <polygon points="10,5 40,15 10,25" fill="green" />
+                      </svg>
+                      <span>Acknowledged</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            </div>
 
               <div className="overflow-y-auto max-h-96 mt-4">
                 <table className="table-auto w-full border-collapse">
@@ -209,6 +205,8 @@ const TriggerAtRisk = () => {
                       <th className="border p-2">Email Address</th>
                       <th className="border p-2">Course ID</th>
                       <th className="border p-2">Course Description</th>
+                      <th className="border p-2">Current Grade</th>
+                      <th className="border p-2">Final Grade</th>
                       <th className="border p-2">Flag Status</th>
                     </tr>
                   </thead>
@@ -232,6 +230,8 @@ const TriggerAtRisk = () => {
                           <td className="border p-2">{student.email}</td>
                           <td className="border p-2">{grade.courseid}</td>
                           <td className="border p-2">{course.classdescription}</td>
+                          <td className="border p-2">{grade.currentscore}</td>
+                          <td className="border p-2">{grade.finalgrade}</td>
                           <td className="border p-2">
                             <div className="flex justify-center items-center h-full">
                               {(grade.flagstatus === 1 || grade.flagstatus === 3) ? (
@@ -325,51 +325,46 @@ const TriggerAtRisk = () => {
               {activeIndex === index && (
                 <div className="p-4 text-gray-700 bg-white">
                   <div className="flex justify-between items-center">
-                  <p>
-                    Total Students: {
-                      data.studentsgrades.filter((grade) => grade.courseid === course.courseid).length
-                    }
-                  </p>
+                    <p>
+                      Total Students: {
+                        data.studentsgrades.filter((grade) => grade.courseid === course.courseid).length
+                      }
+                    </p>
 
-                  {/* Legend for Flag Status*/}
-            <div className="text-center mt-2 mb-2">
-              <div className="flex justify-right space-x-4 items-center">
-                <div className="flex items-center">
-                  {/* Flagpole and flag icon for Moderate Risk */}
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                    <polygon points="10,5 40,15 10,25" fill="blue" />
-                  </svg>
-                  <span>Auto flagged</span>
-                </div>
-                <div className="flex items-center">
-                  {/* Flagpole and flag icon for Moderate Risk */}
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                    <polygon points="10,5 40,15 10,25" fill="orange" />
-                  </svg>
-                  <span>Manually flagged</span>
-                </div>
-                <div className="flex items-center">
-                  {/* Flagpole and flag icon for Low Risk */}
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                    <polygon points="10,5 40,15 10,25" fill="#ef4444" />
-                  </svg>
-                  <span>Responded</span>
-                </div>
-                <div className="flex items-center">
-                  {/* Flagpole and flag icon for Low Risk */}
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
-                    <polygon points="10,5 40,15 10,25" fill="green" />
-                  </svg>
-                  <span>Acknowledged</span>
-                </div>
-              </div>
-            </div>
-            </div>
-
+                    {/* Legend for Flag Status*/}
+                    <div className="text-center mt-2 mb-2">
+                      <div className="flex justify-right space-x-4 items-center">
+                        <div className="flex items-center">
+                          <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                            <polygon points="10,5 40,15 10,25" fill="blue" />
+                          </svg>
+                          <span>Auto flagged</span>
+                        </div>
+                        <div className="flex items-center">
+                          <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                            <polygon points="10,5 40,15 10,25" fill="orange" />
+                          </svg>
+                          <span>Manually flagged</span>
+                        </div>
+                        <div className="flex items-center">
+                          <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                            <polygon points="10,5 40,15 10,25" fill="#ef4444" />
+                          </svg>
+                          <span>Responded</span>
+                        </div>
+                        <div className="flex items-center">
+                          <svg className="w-4 h-4 mr-1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="10" y1="5" x2="10" y2="60" stroke="black" strokeWidth="2" />
+                            <polygon points="10,5 40,15 10,25" fill="green" />
+                          </svg>
+                          <span>Acknowledged</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   <div className="overflow-y-auto max-h-96 mt-4">
                     <table className="table-auto w-full border-collapse">
@@ -379,7 +374,14 @@ const TriggerAtRisk = () => {
                           <th className="border p-2">Surname</th>
                           <th className="border p-2">Phone No.</th>
                           <th className="border p-2">Email Address</th>
-                          <th className="border p-2">Flag</th>
+                          <th className="border p-2">Journal 1</th>
+                          <th className="border p-2">Journal 2</th>
+                          <th className="border p-2">Assessment 1</th>
+                          <th className="border p-2">Assessment 2</th>
+                          <th className="border p-2">Assessment 3</th>
+                          <th className="border p-2">Current Grade</th>
+                          <th className="border p-2">Final Grade</th>
+                          <th className="border p-2">Flag Status</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -395,6 +397,13 @@ const TriggerAtRisk = () => {
                                 <td className="border p-2">{student.lastname}</td>
                                 <td className="border p-2">{student.phoneno}</td>
                                 <td className="border p-2">{student.email}</td>
+                                <td className="border p-2">{grade.journal1}</td>
+                                <td className="border p-2">{grade.journal2}</td>
+                                <td className="border p-2">{grade.assessment1}</td>
+                                <td className="border p-2">{grade.assessment2}</td>
+                                <td className="border p-2">{grade.assessment3}</td>
+                                <td className="border p-2">{grade.currentscore}</td>
+                                <td className="border p-2">{grade.finalgrade}</td>
                                 <td className="border p-2">
                                   <div className="flex justify-center items-center h-full">
                                     {(grade.flagstatus === 1 || grade.flagstatus === 3) ? (
@@ -469,7 +478,7 @@ const TriggerAtRisk = () => {
             <h2 className="text-xl font-bold text-center mb-4">"At Risk" Early Intervention Form</h2>
             <form>
               <div className="mb-4">
-                {[
+                [
                   "General English",
                   "Math",
                   "Time Management",
@@ -485,7 +494,7 @@ const TriggerAtRisk = () => {
                     />
                     <label htmlFor={skill.toLowerCase().replace(" ", "-")}>{skill}</label>
                   </div>
-                ))}
+                ))
               </div>
               <textarea
                 rows="4"
@@ -511,3 +520,5 @@ const TriggerAtRisk = () => {
 };
 
 export default TriggerAtRisk;
+
+
