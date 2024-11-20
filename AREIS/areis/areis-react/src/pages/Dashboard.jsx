@@ -607,11 +607,6 @@ const handleViewStudentCopy = async (studentId, formId) => {
               <table className="table-auto w-full border-collapse min-w-[700px]">
                 <thead>
                   <tr className="bg-gray-200">
-                    <th className="border p-2">Journal 1</th>
-                    <th className="border p-2">Journal 2</th>
-                    <th className="border p-2">Assessment 1</th>
-                    <th className="border p-2">Assessment 2</th>
-                    <th className="border p-2">Assessment 3</th>
                     <th className="border p-2">Current Grade</th>
                     <th className="border p-2">Final Grade</th>
                   </tr>
@@ -622,11 +617,6 @@ const handleViewStudentCopy = async (studentId, formId) => {
                     const grade = data.studentgrades.find(grade => grade.studentid === selectedStudent.studentid && grade.courseid === studentcase.courseid);
                     return (
                       <tr className="text-center">
-                        <td className="border p-2">{grade.journal1}</td>
-                        <td className="border p-2">{grade.journal2}</td>
-                        <td className="border p-2">{grade.assessment1}</td>
-                        <td className="border p-2">{grade.assessment2}</td>
-                        <td className="border p-2">{grade.assessment3}</td>
                         <td className="border p-2">{grade.currentgrade}</td>
                         <td className="border p-2">{grade.finalgrade}</td>
                       </tr>

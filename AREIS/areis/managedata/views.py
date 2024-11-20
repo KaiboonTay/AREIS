@@ -84,15 +84,10 @@ def upload_csv(request):
             Studentgrades.objects.create(
                 studentid=Students.objects.get(studentid=StudentId),
                 courseid=Courses.objects.get(courseid=CourseId),
-                journal1=None,
-                journal2=None,
-                assessment1=None,
-                assessment2=None,
-                assessment3=None,
-                currentscore=None,
                 finalgrade=None,
                 trimester=Trimester,
-                flagstatus=0
+                flagstatus=0,
+                assessments=None
             )
             new_grades.add(f"{StudentId}-{CourseId}")
 
@@ -123,16 +118,22 @@ def upload_grades(request):
     io_string = io.StringIO(data_set)
 
     csv_reader = csv.DictReader(io_string)
+    headers = csv_reader.fieldnames  # Extract headers dynamically
     next(csv_reader)
     next(csv_reader)
+
+    # Identify dynamic columns for journals and assessments
+    journal_columns = [col for col in headers if "Journal" in col]
+    assessment_columns = [col for col in headers if col.startswith("Assessment") and col.endswith("Final Score")]
+
     for row in csv_reader:
         
         StudentId = row.get('SIS User ID', '').strip().lower()
-        Journal1 = row.get('Journal 1 (251237)', '').strip()
-        Journal2 = row.get('Journal 2 (251238)', '').strip()
-        Assessment1 = row.get('Assessment 1 Final Score', '').strip()
-        Assessment2 = row.get('Assessment 2 Final Score', '').strip()
-        Assessment3 = row.get('Assessment 3 Final Score', '').strip()
+        # Journal1 = row.get('Journal 1 (251237)', '').strip()
+        # Journal2 = row.get('Journal 2 (251238)', '').strip()
+        # Assessment1 = row.get('Assessment 1 Final Score', '').strip()
+        # Assessment2 = row.get('Assessment 2 Final Score', '').strip()
+        # Assessment3 = row.get('Assessment 3 Final Score', '').strip()
         CurrentScore = row.get('Current Score', '').strip()
         FinalGrade = row.get('Final Score', '').strip()
         Section = row.get('Section', '').strip()
@@ -141,45 +142,27 @@ def upload_grades(request):
 
         student = Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).first()
         # check if student already exists
-        if Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).exists():
+        if student:
             try:
-                # add the grades
-                if CurrentScore and int(CurrentScore) <= 50 and student.flagstatus == 0:
-                    Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
-                        journal1=float(Journal1) if Journal1 else None,
-                        journal2=float(Journal2) if Journal2 else None,
-                        assessment1=float(Assessment1) if Assessment1 else None,
-                        assessment2=float(Assessment2) if Assessment2 else None,
-                        assessment3=float(Assessment3) if Assessment3 else None,
-                        currentscore=float(CurrentScore) if CurrentScore else None,
-                        finalgrade=float(FinalGrade) if FinalGrade else None,
-                        #trimester=Trimester,
-                        flagstatus=2
-                )
-                    
-                elif CurrentScore and int(CurrentScore) and student.flagstatus == 0:
-                    Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
-                        journal1=float(Journal1) if Journal1 else None,
-                        journal2=float(Journal2) if Journal2 else None,
-                        assessment1=float(Assessment1) if Assessment1 else None,
-                        assessment2=float(Assessment2) if Assessment2 else None,
-                        assessment3=float(Assessment3) if Assessment3 else None,
-                        currentscore=float(CurrentScore) if CurrentScore else None,
-                        finalgrade=float(FinalGrade) if FinalGrade else None,
-                        #trimester=Trimester,
-                        flagstatus=0
-                )
-                    
+                # Dynamically build JSON for journals and assessments
+                assessments = {
+                    col: float(row.get(col, 0)) if row.get(col) else None
+                    for col in journal_columns + assessment_columns
+                }
+
+                if CurrentScore and float(CurrentScore) <= 50 and student.flagstatus == 0:
+                    flag_status = 2
+                elif CurrentScore and float(CurrentScore) > 50 and student.flagstatus == 0:
+                    flag_status = 0
                 else:
-                    Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
-                        journal1=float(Journal1) if Journal1 else None,
-                        journal2=float(Journal2) if Journal2 else None,
-                        assessment1=float(Assessment1) if Assessment1 else None,
-                        assessment2=float(Assessment2) if Assessment2 else None,
-                        assessment3=float(Assessment3) if Assessment3 else None,
-                        currentscore=float(CurrentScore) if CurrentScore else None,
-                        finalgrade=float(FinalGrade) if FinalGrade else None
-                    )
+                    flag_status = student.flagstatus
+
+                Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
+                    assessments=assessments,  # Store dynamic data
+                    currentscore=float(CurrentScore) if CurrentScore else None,
+                    finalgrade=float(FinalGrade) if FinalGrade else None,
+                    flagstatus=flag_status
+                )
 
                     
             except IntegrityError:

@@ -326,11 +326,6 @@ const TriggerAtRisk = () => {
                           <th className="border p-2">Surname</th>
                           <th className="border p-2">Phone No.</th>
                           <th className="border p-2">Email Address</th>
-                          <th className="border p-2">Journal 1</th>
-                          <th className="border p-2">Journal 2</th>
-                          <th className="border p-2">Assessment 1</th>
-                          <th className="border p-2">Assessment 2</th>
-                          <th className="border p-2">Assessment 3</th>
                           <th className="border p-2">Current Grade</th>
                           <th className="border p-2">Final Grade</th>
                           <th className="border p-2">Flag Status</th>
@@ -350,11 +345,6 @@ const TriggerAtRisk = () => {
                                 <td className="border p-2">{student.lastname}</td>
                                 <td className="border p-2">{student.phoneno}</td>
                                 <td className="border p-2">{student.email}</td>
-                                <td className="border p-2">{grade.journal1}</td>
-                                <td className="border p-2">{grade.journal2}</td>
-                                <td className="border p-2">{grade.assessment1}</td>
-                                <td className="border p-2">{grade.assessment2}</td>
-                                <td className="border p-2">{grade.assessment3}</td>
                                 <td className="border p-2">{grade.currentscore}</td>
                                 <td className="border p-2">{grade.finalgrade}</td>
                                 <td className="border p-2">
