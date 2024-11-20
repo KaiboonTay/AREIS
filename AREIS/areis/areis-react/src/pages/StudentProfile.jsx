@@ -11,6 +11,10 @@ function StudentProfile() {
     const modalRef = useRef(null); // Create a ref to track the modal element
     const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"];
 
+    const cleanHeader = (header) => {
+        return header.replace(/\s*\(.*?\)/, "").trim();
+      };
+
     useEffect(() => {
         const fetchStudentProfile = async () => {
             try {
