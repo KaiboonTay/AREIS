@@ -88,7 +88,8 @@ const Dashboard = () => {
 
   // Function to handle opening the modal
   const handleModalOpen = (student, cardTitle) => {
-    setSelectedStudent(student);
+    const studentcase = data.studentcases.find(sc => sc.studentid === student.studentid);
+    setSelectedStudent({ ...student, formid: studentcase.formid });
     setIsModalOpen(true);
     setSelectedAction("");
 
@@ -102,14 +103,94 @@ const Dashboard = () => {
     setSelectedStudent(null);
   };
 
-  const handleViewStudentCopy = () => {
-    const newWindow = window.open("", "_blank"); // Open a blank page first
-    if (newWindow) {
-      newWindow.document.write("<h1>Student Copy Page</h1>"); // Display temporary content if desired
-    } else {
-      console.error("Failed to open new tab/window, possibly blocked by the browser.");
+  // Function to handle the studentviewcopy
+const handleViewStudentCopy = async (studentId, formId) => {
+  try {
+    console.log(`Attempting to fetch form data for studentId: ${studentId}, formId: ${formId}`);
+
+    // Make the fetch request
+    const response = await fetch(`/api/student-form-view/?studentId=${studentId}&formId=${formId}`);
+    console.log("Fetch request made. Checking response status...");
+
+    // Check response status
+    if (!response.ok) {
+      throw new Error(`Failed to fetch form data: ${response.status} - ${response.statusText}`);
     }
-  };
+
+    // Check Content-Type header
+    const contentType = response.headers.get("content-type");
+    console.log("Content-Type received:", contentType);
+    if (!contentType || !contentType.includes("application/json")) {
+      console.error("Invalid JSON response. Expected application/json but received something else.");
+      const rawResponseText = await response.text();  // Get the raw text of the response for debugging
+      console.error("Raw response text:", rawResponseText);
+      throw new Error("Invalid JSON response.");
+    }
+
+    // Parse JSON response
+    const formData = await response.json();
+    console.log("Received Form Data:", formData);
+
+    // Open a new window and write the form data
+    const newWindow = window.open("", "_blank");
+    if (!newWindow) {
+      console.error("Failed to open new tab/window, possibly blocked by the browser.");
+      return;
+    }
+
+    // Write the HTML content to the new window
+    newWindow.document.write(`
+      <html>
+        <head>
+          <title>Student Form</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { color: #333; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f4f4f4; }
+          </style>
+        </head>
+        <body>
+          <h1>Student Form for ${formData.student_name}</h1>
+          <p><strong>Flagged Course:</strong> ${formData.flagged_course}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Response</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${Object.entries(formData.responses)
+                .map(([question, response]) => `<tr><td>${question}</td><td>${response}</td></tr>`)
+                .join("")}
+            </tbody>
+          </table>
+          <h2>Student's Selected Main Issue</h2>
+          <ul>
+            ${formData.checkbox_options.map((option) => `<li>${option}</li>`).join("")}
+          </ul>
+           <h2>System's recommended Action</h2>
+          <ul>
+            ${formData.checkbox_options.map((option) => `<li>${option}</li>`).join("")}
+          </ul>
+        </body>
+      </html>
+    `);
+    newWindow.document.close();
+  } catch (error) {
+    // Log additional debugging information
+    console.error("Error displaying student form:", error);
+
+    if (error instanceof SyntaxError) {
+      console.error("This error is likely due to a malformed JSON response.");
+    } else {
+      console.error("This error might be due to a network issue or incorrect response format.");
+    }
+  }
+};
+  
   
 
   const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"]; // Gray, Yellow, Orange, Red
@@ -448,7 +529,9 @@ const Dashboard = () => {
                               </div>
                             </td>
                             <td className="border p-2">Not in DB table</td>
-                            <td className="border p-2">Not in DB table</td>
+                            <td className="border p-2"> 
+                            {studentcase.responded === 1 ? "✅" : "❌"} {/* Display 'Yes' or 'No' based on the responded value */}
+                            </td>
                             <td className="border p-2">
                               <button onClick={() => handleModalOpen(student)} className="text-lg font-bold">
                                 ...
@@ -492,7 +575,7 @@ const Dashboard = () => {
     </p>
     <button 
       className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 ml-auto"
-      onClick={handleViewStudentCopy}
+      onClick={() => handleViewStudentCopy(selectedStudent.studentid, selectedStudent.formid)}
     >
       <span role="img" aria-label="document" className="mb-1">📄 Student Response</span> 
     </button>

@@ -15,5 +15,6 @@ urlpatterns = [
     path('api/students/', views.StudentSearchPage.as_view(), name="search-student"),
     path('api/studentprofile/<str:studentid>/', views.student_profile, name="student-profile"),
     re_path(r'^.*$', views.index), # This will catch any route and serve the index.html
+    
 
 ]
