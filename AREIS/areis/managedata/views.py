@@ -5,7 +5,7 @@ from django.shortcuts import render
 from .models import Students, Courses, Studentgrades
 from django.contrib import messages
 from tablib import Dataset
-import csv, io
+import csv, io, re
 from django.db import IntegrityError
 
 
@@ -123,17 +123,14 @@ def upload_grades(request):
     next(csv_reader)
 
     # Identify dynamic columns for journals and assessments
-    journal_columns = [col for col in headers if "Journal" in col]
-    assessment_columns = [col for col in headers if col.startswith("Assessment") and col.endswith("Final Score")]
+    journal_columns = [col for col in headers if col.startswith("Journal")]
+    assessment_columns = [col for col in headers if col.startswith("Assessment") and col.endswith("Unposted Final Score")]
+    quiz_columns = [col for col in headers if col.startswith("Quiz")]
+    test_columns = [col for col in headers if col.startswith("Test")]
 
     for row in csv_reader:
         
         StudentId = row.get('SIS User ID', '').strip().lower()
-        # Journal1 = row.get('Journal 1 (251237)', '').strip()
-        # Journal2 = row.get('Journal 2 (251238)', '').strip()
-        # Assessment1 = row.get('Assessment 1 Final Score', '').strip()
-        # Assessment2 = row.get('Assessment 2 Final Score', '').strip()
-        # Assessment3 = row.get('Assessment 3 Final Score', '').strip()
         CurrentScore = row.get('Current Score', '').strip()
         FinalGrade = row.get('Final Score', '').strip()
         Section = row.get('Section', '').strip()
@@ -147,7 +144,7 @@ def upload_grades(request):
                 # Dynamically build JSON for journals and assessments
                 assessments = {
                     col: float(row.get(col, 0)) if row.get(col) else None
-                    for col in journal_columns + assessment_columns
+                    for col in journal_columns + assessment_columns + quiz_columns + test_columns
                 }
 
                 if CurrentScore and float(CurrentScore) <= 50 and student.flagstatus == 0:

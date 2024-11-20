@@ -21,6 +21,7 @@ const TriggerAtRisk = () => {
 
   const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"]; // Gray, Orange, Blue, Red
 
+
   const handleToggle = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
@@ -126,6 +127,14 @@ const TriggerAtRisk = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isModalOpen]);
+
+  const cleanHeader = (header) => {
+    return header.replace(/\s*\(.*?\)/, "").trim();
+  };
+  
+  
+
+  
 
   return (
     <div className="px-20 mx-auto mt-8">
@@ -295,7 +304,19 @@ const TriggerAtRisk = () => {
 
       {/* Courses Section */}
       <div className="space-y-4">
-        {data.courses.map((course, index) => (
+        {data.courses.map((course, index) => {
+          // Calculate dynamic headers for the current course
+          const dynamicHeaders = data.studentsgrades.reduce((headers, grade) => {
+            if (grade.courseid === course.courseid) {
+              const keys = Object.keys(grade.assessments || {});
+              keys.forEach((key) => {
+                if (!headers.includes(key)) headers.push(key);
+              });
+            }
+            return headers;
+          }, []);
+
+        return (
           <motion.div
             key={index}
             className="border border-gray-300 rounded-lg"
@@ -326,6 +347,10 @@ const TriggerAtRisk = () => {
                           <th className="border p-2">Surname</th>
                           <th className="border p-2">Phone No.</th>
                           <th className="border p-2">Email Address</th>
+                          {/* Clean and render headers dynamically */}
+                          {dynamicHeaders.map((header, i) => (
+                            <th key={i} className="border p-2">{cleanHeader(header)}</th>
+                          ))}
                           <th className="border p-2">Current Grade</th>
                           <th className="border p-2">Final Grade</th>
                           <th className="border p-2">Flag Status</th>
@@ -339,12 +364,22 @@ const TriggerAtRisk = () => {
                               (student) => student.studentid === grade.studentid
                             );
 
+                            const assessments = grade?.assessments || {};
+                            
+                            
+
                             return (
                               <tr key={studentIndex} className="text-center">
                                 <td className="border p-2">{student.firstname}</td>
                                 <td className="border p-2">{student.lastname}</td>
                                 <td className="border p-2">{student.phoneno}</td>
                                 <td className="border p-2">{student.email}</td>
+                                {/* Render dynamic assessment values */}
+                                {dynamicHeaders.map((header, i) => (
+                                  <td key={i} className="border p-2">
+                                    {assessments[header] !== undefined ? assessments[header] : null}
+                                  </td>
+                                ))}
                                 <td className="border p-2">{grade.currentscore}</td>
                                 <td className="border p-2">{grade.finalgrade}</td>
                                 <td className="border p-2">
@@ -405,7 +440,8 @@ const TriggerAtRisk = () => {
               )}
             </motion.div>
           </motion.div>
-        ))}
+          );
+      })}
       </div>
 
       {/* Modal Section */}
