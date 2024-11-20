@@ -29,6 +29,7 @@ urlpatterns = [
     path('about/', views.index, name='about'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('api/student-form-view/', views.student_form_view, name='student_form_view'),
+    path('api/update-studentcase-referred/', views.update_studentcase_referred, name='update_studentcase_referred'),
     #register the urls inside the posts app
     #telling django to look inside posts app and look at the URLs file inside of that 
     #posts application created inside of project

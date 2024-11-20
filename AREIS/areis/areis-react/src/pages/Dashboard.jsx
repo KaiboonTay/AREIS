@@ -89,7 +89,7 @@ const Dashboard = () => {
   // Function to handle opening the modal
   const handleModalOpen = (student, cardTitle) => {
     const studentcase = data.studentcases.find(sc => sc.studentid === student.studentid);
-    setSelectedStudent({ ...student, formid: studentcase.formid });
+    setSelectedStudent({ ...student, formid: studentcase.formid, caseid: studentcase.caseid});
     setIsModalOpen(true);
     setSelectedAction("");
 
@@ -190,7 +190,40 @@ const handleViewStudentCopy = async (studentId, formId) => {
     }
   }
 };
-  
+
+const saveReferredAction = async () => {
+  if (!selectedStudent || !selectedAction) {
+    console.error("Student ID or selected action is missing.");
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/update-studentcase-referred/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        case_id: selectedStudent.caseid, // Assuming selectedStudent has caseid
+        referred: selectedAction,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log(data.message);
+    // Optionally, add logic to update the UI to show that the action has been saved.
+    alert("Refer to action has been set")
+    setIsModalOpen(false);
+    
+  } catch (error) {
+    console.error("Failed to save referred action:", error);
+  }
+};
+
   
 
   const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"]; // Gray, Yellow, Orange, Red
@@ -528,7 +561,7 @@ const handleViewStudentCopy = async (studentId, formId) => {
                                 </button>
                               </div>
                             </td>
-                            <td className="border p-2">Not in DB table</td>
+                            <td className="border p-2">{studentcase.referred}</td>
                             <td className="border p-2"> 
                             {studentcase.responded === 1 ? "✅" : "❌"} {/* Display 'Yes' or 'No' based on the responded value */}
                             </td>
@@ -663,7 +696,7 @@ const handleViewStudentCopy = async (studentId, formId) => {
 
           {/* Save & Flag Button */}
           <div className="mt-6">
-            <button onClick={handleModalClose} className="w-full px-4 py-2 bg-blue-500 text-white rounded">Save & Update</button>
+            <button onClick={saveReferredAction} className="w-full px-4 py-2 bg-blue-500 text-white rounded">Save & Update</button>
           </div>
         </div>
 

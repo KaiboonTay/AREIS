@@ -49,6 +49,8 @@ class Studentcases(models.Model):
     categoryid = models.ForeignKey(Casecategory, models.DO_NOTHING, db_column='CategoryId', blank=True, null=True)  # Field name made lowercase.
     employeeid = models.ForeignKey(User, models.DO_NOTHING, db_column='EmployeeID', blank=True, null=True)  # Field name made lowercase.
     formid = models.ForeignKey(Forms, models.DO_NOTHING, db_column='FormID', blank=True, null=True)  # Field name made lowercase.
+    referred = models.TextField(db_column='referred', null=True, blank=True, max_length= 30)
+
     
 
     def save(self, *args, **kwargs):

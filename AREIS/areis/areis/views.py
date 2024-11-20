@@ -89,3 +89,21 @@ def student_form_view(request):
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}")
         return JsonResponse({'error': 'An unexpected error occurred'}, status=500)
+    
+
+
+@api_view(['POST'])
+def update_studentcase_referred(request):
+    case_id = request.data.get('case_id')
+    referred_action = request.data.get('referred')
+
+    if not case_id or not referred_action:
+        return Response({'error': 'Missing case ID or referred action'}, status=400)
+
+    try:
+        student_case = Studentcases.objects.get(caseid=case_id)
+        student_case.referred = referred_action.split("-", 1)[1] 
+        student_case.save()
+        return Response({'message': 'Referred action updated successfully'})
+    except Studentcases.DoesNotExist:
+        return Response({'error': 'Student case not found'}, status=404)
