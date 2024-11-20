@@ -129,18 +129,8 @@ const TriggerAtRisk = () => {
   }, [isModalOpen]);
 
   const cleanHeader = (header) => {
-    // Remove everything in parentheses and trim
-    let cleanedHeader = header.replace(/\s*\(.*?\)/, "").trim();
-  
-    // If the header starts with "Assessment", truncate after "Assessment X"
-    const assessmentMatch = cleanedHeader.match(/^(Assessment \d+)/);
-    if (assessmentMatch) {
-      cleanedHeader = assessmentMatch[1];
-    }
-  
-    return cleanedHeader;
+    return header.replace(/\s*\(.*?\)/, "").trim();
   };
-
   
   
 
