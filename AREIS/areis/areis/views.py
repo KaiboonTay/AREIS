@@ -102,7 +102,11 @@ def update_studentcase_referred(request):
 
     try:
         student_case = Studentcases.objects.get(caseid=case_id)
-        student_case.referred = referred_action.split("-", 1)[1] 
+        if referred_action.split("-", 1)[1].lower() == "uoncounsellor":
+            formatted_action = "Uon Counsellor"
+        else:
+            formatted_action = referred_action.split("-", 1)[1].replace("-", " ").capitalize()
+        student_case.referred = formatted_action
         student_case.save()
         return Response({'message': 'Referred action updated successfully'})
     except Studentcases.DoesNotExist:
