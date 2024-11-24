@@ -423,14 +423,14 @@ const TriggerAtRisk = () => {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
           <motion.div
             ref={modalRef}
-            className="bg-white p-6 rounded-lg w-96 intervention-form"
+            className="bg-white p-8 rounded-lg w-full max-w-3xl intervention-form"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            <h2 className="text-xl font-bold text-center mb-4">"At Risk" Early Intervention Form</h2>
+            <h2 className="text-2xl font-bold text-center mb-6">"At Risk" Early Intervention Form</h2>
             <form>
-              <div className="mb-4">
+              <div className="mb-6 grid grid-cols-2 gap-4">
                 {[
                   "General English",
                   "Math",
@@ -452,19 +452,19 @@ const TriggerAtRisk = () => {
               <textarea
                 rows="4"
                 placeholder="Issues"
-                className="w-full border border-gray-300 p-2 rounded-lg mb-4"
+                className="w-full border border-gray-300 p-3 rounded-lg mb-6"
               ></textarea>
               <div className="flex justify-center">
                 <button
                   type="button"
-                  className="bg-black text-white py-2 px-4 rounded"
+                  className="bg-black text-white py-3 px-6 rounded-lg text-lg"
                   onClick={() => handleFlagClick(selectedStudent, selectedStudent?.courseid)}
                 >
                   Save & Flag Student
                 </button>
               </div>
             </form>
-            {emailStatus && <p className="mt-4 text-center">{emailStatus}</p>}
+            {emailStatus && <p className="mt-6 text-center text-lg">{emailStatus}</p>}
           </motion.div>
         </div>
       )}

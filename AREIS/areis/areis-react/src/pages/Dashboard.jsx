@@ -417,15 +417,15 @@ const saveReferredAction = async () => {
     <div
       key={index}
       className={`bg-[#D9D9D9] p-4 rounded-xl shadow-md transition-all duration-300 ease-in-out ${
-        expandedSection === card.title ? 'col-span-3 h-auto' : 'h-[316px]'
-      }`}
+        expandedSection === card.title ? 'col-span-3 h-auto' : 'min-h-[316px]'
+      }flex flex-col`}
       onClick={() => handleExpand(card.title)}
     >
       <h4 className="text-lg font-bold mb-4">{card.title}</h4>
 
       <div
         className={`${
-          expandedSection === card.title ? 'flex flex-row' : 'flex flex-col items-center justify-center'
+          expandedSection === card.title ? 'flex flex-row gap-4' : 'flex flex-col items-center justify-center gap-2'
         }`}
       >
         {/* Donut Chart Section on the Left */}
