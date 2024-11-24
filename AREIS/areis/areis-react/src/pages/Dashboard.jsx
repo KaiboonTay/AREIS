@@ -561,7 +561,7 @@ const saveReferredAction = async () => {
                                 </button>
                               </div>
                             </td>
-                            <td className="border p-2">{studentcase.referred}</td>
+                            <td className="border p-2">{studentcase.referred .split(" ") .map(word => { if (word.toLowerCase() === "uoncounsellor") { return "Uon Counsellor";} return word.charAt(0).toUpperCase() + word.slice(1); }) .join(" ")} </td>
                             <td className="border p-2"> 
                             {studentcase.responded === 1 ? "✅" : "❌"} {/* Display 'Yes' or 'No' based on the responded value */}
                             </td>
