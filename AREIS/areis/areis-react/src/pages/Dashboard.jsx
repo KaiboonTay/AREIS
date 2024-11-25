@@ -47,7 +47,7 @@ const Dashboard = () => {
   const [expandedSection, setExpandedSection] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  
+  const [studentHistory, setStudentHistory] = useState([]); // State for student history
   const onPieEnter1 = (_, index) => setActiveIndex1(index);
   const onPieEnter2 = (_, index) => setActiveIndex2(index);
 
@@ -86,21 +86,62 @@ const Dashboard = () => {
     setExpandedSection((prevSection) => (prevSection === section ? null : section));
   };
 
+
   // Function to handle opening the modal
   const handleModalOpen = (student, cardTitle) => {
+    // Find the relevant student case
     const studentcase = data.studentcases.find(sc => sc.studentid === student.studentid);
-    setSelectedStudent({ ...student, formid: studentcase.formid, caseid: studentcase.caseid});
+  
+    // Handle missing studentcase
+    if (!studentcase) {
+      console.error(`No student case found for student ID: ${student.studentid}`);
+      return;
+    }
+  
+    // Get the course ID from studentcase
+    const courseId = studentcase.courseid; // Correct property name
+  
+    setSelectedStudent({ ...student, formid: studentcase.formid, caseid: studentcase.caseid });
     setIsModalOpen(true);
     setSelectedAction("");
-
-    //Ensure that the card stays expanded when the modal is opened
-  setExpandedSection(cardTitle); 
+    setExpandedSection(cardTitle);
+  
+    console.log('Fetching history for student:', student.studentid, 'course:', courseId);
+  
+    // Fetch student history if both IDs are available
+    if (student.studentid && courseId) {
+      fetch(`/api/student-history/${student.studentid}/${courseId}/`)
+        .then((response) => {
+          console.log('Raw response:', response);
+          return response.json();
+        })
+        .then((data) => {
+          console.log('Received history data:', data);
+          if (data.student_history) {
+            setStudentHistory(data.student_history);
+          } else {
+            console.error('No student_history found in response:', data);
+            setStudentHistory([]);
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to fetch student history:', error);
+          setStudentHistory([]);
+        });
+    } else {
+      console.error('Missing student ID or course ID', { 
+        studentId: student.studentid, 
+        courseId: courseId 
+      });
+      setStudentHistory([]);
+    }
   };
 
   // Function to handle closing the modal
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedStudent(null);
+    setStudentHistory([]); // Clear student history on close
   };
 
   // Function to handle the studentviewcopy
@@ -700,51 +741,64 @@ const saveReferredAction = async () => {
           </div>
         </div>
 
-        {/* Right Section - Student History */}
-        <div className="w-1/2 border-l pl-6">
+      {/* Right Section - Student History */}
+<div className="w-1/2 border-l pl-6">
   <h2 className="text-xl font-bold text-center mb-4">Student History</h2>
 
   {/* Adjusted Scrollable Text Log */}
   <div className="mt-4 max-h-[30rem] overflow-y-auto bg-gray-100 p-6 rounded-lg shadow-inner">
-    {/* Hardcoded sample log entries */}
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-01 10:30 AM</p>
-      <p>Student submitted Assignment 1 late but with valid reason. Allowed partial credit.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-05 3:15 PM</p>
-      <p>Attended counseling session to discuss progress and received positive feedback.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-08 9:00 AM</p>
-      <p>Missed Quiz 2 without prior notice. Notified student of potential impact on grades.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-09 1:45 PM</p>
-      <p>Student requested extra credit opportunities for additional points.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-10 2:30 PM</p>
-      <p>Met with course coordinator to discuss intervention plan for improvement.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-11 2:30 PM</p>
-      <p>Missed meeting with course coordinator to discuss intervention plan for improvement.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-12 2:30 PM</p>
-      <p>Met with course coordinator to discuss intervention plan for improvement.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
+    {Array.isArray(studentHistory) && studentHistory.length > 0 ? (
+      studentHistory.map((entry, index) => (
+        <div className="mb-4" key={index}>
+          {/* Student Form Sent Date */}
+          <p className="text-sm text-gray-500">
+            <strong>Form Sent:</strong> {entry.created_at || 'N/A'}
+          </p>
+
+          {/* Student Form Submitted Date */}
+          <p className="text-sm text-gray-500">
+            <strong>Form Submitted:</strong> {entry.submitted_date || 'N/A'}
+          </p>
+
+          {/* Student Selected Issues (checkbox_options) */}
+          <p className="text-sm text-gray-500">
+            <strong>Student Selected Issues:</strong>{' '}
+            {(() => {
+              const options = entry.checkbox_options;
+              if (Array.isArray(options) && options.length > 0) {
+                return options.join(', ');
+              } else if (typeof options === 'string' && options.trim()) {
+                return options;
+              }
+              return 'N/A';
+            })()}
+          </p>
+
+          {/* System Recommendation */}
+          <p className="text-sm text-gray-500">
+            <strong>System Recommendation:</strong> {entry.recommendation || 'N/A'}
+          </p>
+
+          {/* Early at Risk Form Selections */}
+          <p className="text-sm text-gray-500">
+            <strong>Early at Risk Form Issues:</strong>{' '}
+            {entry.intervention_form_checkbox || 'N/A'}
+          </p>
+
+          {/* Early at Risk Form Comments */}
+          <p className="text-sm text-gray-500">
+            <strong>Early at Risk Form Comments:</strong>{' '}
+            {entry.intervention_form_issues || 'N/A'}
+          </p>
+
+          <hr className="my-2 border-gray-300" />
+        </div>
+      ))
+    ) : (
+      <p className="text-gray-500">No history available for this student.</p>
+    )}
   </div>
 </div>
-
 
       </div>
     </div>
