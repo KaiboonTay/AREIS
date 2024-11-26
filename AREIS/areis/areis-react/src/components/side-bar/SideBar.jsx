@@ -30,7 +30,7 @@ const SideBar = () => {
           <span>Home</span>
         </NavLink>
 
-        <NavLink
+        {/*<NavLink
           to="/studentform"
           className={({ isActive }) =>
             `no-underline w-full px-6 py-3 flex items-center space-x-4 text-gray-700 font-semibold rounded-lg transition-all ${
@@ -40,7 +40,7 @@ const SideBar = () => {
         >
           <FaUserGraduate />
           <span>Student Form</span>
-        </NavLink>
+        </NavLink> */}
 
         <NavLink
           to="/managestudents/at-risk-students/"

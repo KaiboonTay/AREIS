@@ -47,7 +47,7 @@ const Dashboard = () => {
   const [expandedSection, setExpandedSection] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  
+  const [studentHistory, setStudentHistory] = useState([]); // State for student history
   const onPieEnter1 = (_, index) => setActiveIndex1(index);
   const onPieEnter2 = (_, index) => setActiveIndex2(index);
 
@@ -86,21 +86,62 @@ const Dashboard = () => {
     setExpandedSection((prevSection) => (prevSection === section ? null : section));
   };
 
-  // Function to handle opening the modal
-  const handleModalOpen = (student, cardTitle) => {
-    const studentcase = data.studentcases.find(sc => sc.studentid === student.studentid);
-    setSelectedStudent({ ...student, formid: studentcase.formid, caseid: studentcase.caseid});
-    setIsModalOpen(true);
-    setSelectedAction("");
 
-    //Ensure that the card stays expanded when the modal is opened
-  setExpandedSection(cardTitle); 
+  // Function to handle opening the modal
+  const handleModalOpen = (studentcase, cardTitle) => {
+    if (!studentcase) {
+      console.error("Student case is missing.");
+      return;
+    }
+  
+    // Find the matching student
+    const student = data.students.find(
+      student => student.studentid === studentcase.studentid
+    );
+  
+    setSelectedStudent({
+      studentid: studentcase.studentid,
+      courseid: studentcase.courseid,
+      formid: studentcase.formid,
+      caseid: studentcase.caseid,
+      lastname: student?.lastname || "N/A",
+      firstname: student?.firstname || "N/A",
+    });
+  
+    setIsModalOpen(true);
+    setExpandedSection(cardTitle);
+  
+    console.log(
+      "Fetching history for student:",
+      studentcase.studentid,
+      "course:",
+      studentcase.courseid
+    );
+  
+    // Fetch student history
+    fetch(`/api/student-history/${studentcase.studentid}/${studentcase.courseid}/`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Received history data:", data);
+        if (data.student_history) {
+          setStudentHistory(data.student_history);
+        } else {
+          console.error("No student_history found in response:", data);
+          setStudentHistory([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to fetch student history:", error);
+        setStudentHistory([]);
+      });
   };
+  
 
   // Function to handle closing the modal
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedStudent(null);
+    setStudentHistory([]); // Clear student history on close
   };
 
   // Function to handle the studentviewcopy
@@ -173,7 +214,7 @@ const handleViewStudentCopy = async (studentId, formId) => {
           </ul>
            <h2>System's recommended Action</h2>
           <ul>
-            ${formData.checkbox_options.map((option) => `<li>${option}</li>`).join("")}
+            ${formData.recommendation}
           </ul>
         </body>
       </html>
@@ -204,7 +245,7 @@ const saveReferredAction = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        case_id: selectedStudent.caseid, // Assuming selectedStudent has caseid
+        case_id: selectedStudent.caseid,
         referred: selectedAction,
       }),
     });
@@ -215,15 +256,19 @@ const saveReferredAction = async () => {
 
     const data = await response.json();
     console.log(data.message);
-    // Optionally, add logic to update the UI to show that the action has been saved.
-    alert("Refer to action has been set")
+
+    // Update the UI dynamically
+    setSelectedStudent((prev) => ({
+      ...prev,
+      referred: data.referred || "N/A", // Handle null values dynamically
+    }));
+
+    alert("Refer to action has been set");
     setIsModalOpen(false);
-    
   } catch (error) {
     console.error("Failed to save referred action:", error);
   }
 };
-
   
 
   const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"]; // Gray, Yellow, Orange, Red
@@ -533,7 +578,7 @@ const saveReferredAction = async () => {
                           <tr key={studentIndex} className="text-center bg-white">
                             <td className="border p-2">
                               <div className="flex justify-center items-center h-full">
-                                <span className="ml-2">{student?.lastname} {student?.firstname}</span>
+                                <span className="ml-2">{student? `${student.lastname} ${student.firstname}` : "N/A"}</span>
                               </div>
                             </td>
                             <td className="border p-2">{studentcase.courseid}</td>
@@ -561,12 +606,12 @@ const saveReferredAction = async () => {
                                 </button>
                               </div>
                             </td>
-                            <td className="border p-2">{studentcase.referred}</td>
+                            <td className="border p-2">{studentcase.referred ? studentcase.referred .split(" ") .map(word => { if (word.toLowerCase() === "uoncounsellor") { return "Uon Counsellor";} return word.charAt(0).toUpperCase() + word.slice(1); }) .join(" "): "N/A"} </td>
                             <td className="border p-2"> 
                             {studentcase.responded === 1 ? "✅" : "❌"} {/* Display 'Yes' or 'No' based on the responded value */}
                             </td>
                             <td className="border p-2">
-                              <button onClick={() => handleModalOpen(student)} className="text-lg font-bold">
+                              <button onClick={() => handleModalOpen(studentcase, card.title)} className="text-lg font-bold">
                                 ...
                               </button>
                             </td>
@@ -604,7 +649,12 @@ const saveReferredAction = async () => {
           <div className="mb-4">
           <div className="flex items-center justify-between">
     <p>
-      <strong>Student Name:</strong> {selectedStudent.lastname} {selectedStudent.firstname}
+    <strong>Student Name:</strong>{" "}
+      {selectedStudent
+        ? `${selectedStudent.lastname || "N/A"} ${
+            selectedStudent.firstname || "N/A"
+          }`
+        : "N/A"}
     </p>
     <button 
       className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 ml-auto"
@@ -613,10 +663,10 @@ const saveReferredAction = async () => {
       <span role="img" aria-label="document" className="mb-1">📄 Student Response</span> 
     </button>
   </div>
-            <p><strong>Student ID:</strong> {selectedStudent.studentid}</p>
+            <p><strong>Student ID:</strong> {selectedStudent.studentid || "N/A"}</p>
             <p><strong>Course:</strong> {
               (() => {
-                const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid);
+                const studentcase = data.studentcases.find(studentcase => studentcase.studentid === selectedStudent.studentid && studentcase.courseid === selectedStudent.courseid);
                 return (studentcase.courseid);
               })()
             }</p>
@@ -700,51 +750,64 @@ const saveReferredAction = async () => {
           </div>
         </div>
 
-        {/* Right Section - Student History */}
-        <div className="w-1/2 border-l pl-6">
+      {/* Right Section - Student History */}
+<div className="w-1/2 border-l pl-6">
   <h2 className="text-xl font-bold text-center mb-4">Student History</h2>
 
   {/* Adjusted Scrollable Text Log */}
   <div className="mt-4 max-h-[30rem] overflow-y-auto bg-gray-100 p-6 rounded-lg shadow-inner">
-    {/* Hardcoded sample log entries */}
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-01 10:30 AM</p>
-      <p>Student submitted Assignment 1 late but with valid reason. Allowed partial credit.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-05 3:15 PM</p>
-      <p>Attended counseling session to discuss progress and received positive feedback.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-08 9:00 AM</p>
-      <p>Missed Quiz 2 without prior notice. Notified student of potential impact on grades.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-09 1:45 PM</p>
-      <p>Student requested extra credit opportunities for additional points.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-10 2:30 PM</p>
-      <p>Met with course coordinator to discuss intervention plan for improvement.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-11 2:30 PM</p>
-      <p>Missed meeting with course coordinator to discuss intervention plan for improvement.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
-    <div className="mb-4">
-      <p className="text-sm text-gray-500">2024-11-12 2:30 PM</p>
-      <p>Met with course coordinator to discuss intervention plan for improvement.</p>
-      <hr className="my-2 border-gray-300" />
-    </div>
+    {Array.isArray(studentHistory) && studentHistory.length > 0 ? (
+      studentHistory.map((entry, index) => (
+        <div className="mb-4" key={index}>
+          {/* Student Form Sent Date */}
+          <p className="text-sm text-gray-500">
+            <strong>Form Sent:</strong> {entry.created_at || 'N/A'}
+          </p>
+
+          {/* Student Form Submitted Date */}
+          <p className="text-sm text-gray-500">
+            <strong>Form Submitted:</strong> {entry.submitted_date || 'N/A'}
+          </p>
+
+          {/* Student Selected Issues (checkbox_options) */}
+          <p className="text-sm text-gray-500">
+            <strong>Student Selected Issues:</strong>{' '}
+            {(() => {
+              const options = entry.checkbox_options;
+              if (Array.isArray(options) && options.length > 0) {
+                return options.join(', ');
+              } else if (typeof options === 'string' && options.trim()) {
+                return options;
+              }
+              return 'N/A';
+            })()}
+          </p>
+
+          {/* System Recommendation */}
+          <p className="text-sm text-gray-500">
+            <strong>System Recommendation:</strong> {entry.recommendation || 'N/A'}
+          </p>
+
+          {/* Early at Risk Form Selections */}
+          <p className="text-sm text-gray-500">
+            <strong>Early at Risk Form Issues:</strong>{' '}
+            {entry.intervention_form_checkbox || 'N/A'}
+          </p>
+
+          {/* Early at Risk Form Comments */}
+          <p className="text-sm text-gray-500">
+            <strong>Early at Risk Form Comments:</strong>{' '}
+            {entry.intervention_form_issues || 'N/A'}
+          </p>
+
+          <hr className="my-2 border-gray-300" />
+        </div>
+      ))
+    ) : (
+      <p className="text-gray-500">No history available for this student.</p>
+    )}
   </div>
 </div>
-
 
       </div>
     </div>

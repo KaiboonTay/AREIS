@@ -13,6 +13,10 @@ from managestudents.models import Forms
 from managestudents.serializers import FormsSerializer
 from managestudents import views 
 from django.http import JsonResponse
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 # def homepage(request):
@@ -102,8 +106,61 @@ def update_studentcase_referred(request):
 
     try:
         student_case = Studentcases.objects.get(caseid=case_id)
-        student_case.referred = referred_action.split("-", 1)[1] 
+        
+        if referred_action.split("-", 1)[1].lower() == "uoncounsellor":
+            formatted_action = "Uon Counsellor"
+        else:
+            formatted_action = referred_action.split("-", 1)[1].replace("-", " ").capitalize()
+        
+        student_case.referred = formatted_action if formatted_action else None
         student_case.save()
-        return Response({'message': 'Referred action updated successfully'})
+        
+        return Response({'message': 'Referred action updated successfully', 'referred': student_case.referred or "N/A"})
     except Studentcases.DoesNotExist:
         return Response({'error': 'Student case not found'}, status=404)
+    
+
+@api_view(['GET'])
+def get_student_history(request, student_id, course_id):
+    try:
+        logger.info(f"Fetching history for student_id: {student_id} and course_id: {course_id}")
+        
+        # Filter by both studentid and flagged_course
+        forms = Forms.objects.filter(
+            studentid=student_id,
+            flagged_course=course_id
+        ).order_by('-created_at')
+        
+        logger.info(f"Number of forms found: {forms.count()}")
+        
+        student_history = []
+        for form in forms:
+            try:
+                if form.checkbox_options:
+                    if isinstance(form.checkbox_options, str):
+                        checkbox_options = [opt.strip() for opt in form.checkbox_options.split(',')]
+                    else:
+                        checkbox_options = form.checkbox_options
+                else:
+                    checkbox_options = []
+            except Exception as e:
+                logger.error(f"Error parsing checkbox_options: {e}")
+                checkbox_options = []
+                
+            student_history.append({
+                'created_at': form.created_at.strftime('%Y-%m-%d %I:%M %p') if form.created_at else None,
+                'submitted_date': form.submitted_date.strftime('%Y-%m-%d %I:%M %p') if form.submitted_date else None,
+                'checkbox_options': checkbox_options,
+                'recommendation': form.recommendation,
+                'intervention_form_checkbox': form.intervention_form_checkbox,
+                'intervention_form_issues': form.intervention_form_issues,
+            })
+
+        logger.info(f"Serialized history data: {student_history}")
+        return Response({'student_history': student_history}, status=200)
+
+    except Exception as e:
+        logger.error(f"Error fetching history: {str(e)}")
+        return Response({'error': str(e)}, status=500)
+
+
