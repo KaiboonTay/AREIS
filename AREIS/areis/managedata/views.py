@@ -16,7 +16,7 @@ import os
 @api_view(['POST'])
 def upload_csv(request):
 
-    #Check for etiher 'csv_file' or 'excel_file' is in the request
+    #Check for either 'csv_file' or 'excel_file' is in the request
     uploaded_file_key = None
 
     if 'csv_file' in request.FILES:
@@ -40,20 +40,19 @@ def upload_csv(request):
             excel_data = pd.read_excel(uploaded_file)
             csv_data = excel_data.to_csv(index=False)
             io_string = io.StringIO(csv_data)
-            next(io_string)
         except Exception as e:
             return Response({"error": f"Failed to process Excel file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
         
     #If extension is csv read striaght away
     elif file_extension == '.csv':
-        data_set = uploaded_file().decode('UTF-8')
+        data_set = uploaded_file.read().decode('UTF-8')
         io_string = io.StringIO(data_set)
         next(io_string)  # skip one row to get the headers
 
     #File is not CSV or Excel
     else:
         return Response({"error": "Unsupported file format, Please upload either CSV or Excel in xls or xlsx"})
-   
+
     csv_reader = csv.DictReader(io_string)
 
     student_duplicates = set()
