@@ -412,7 +412,7 @@ const saveReferredAction = async () => {
   
       {/* Cards Section */}
       <div>
-<div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+<div className="p-3 grid grid-cols-1 md:grid-cols-3 gap-2 mt-6">
   {sortedCards.map((card, index) => (
     <div
       key={index}
@@ -429,7 +429,7 @@ const saveReferredAction = async () => {
         }`}
       >
         {/* Donut Chart Section on the Left */}
-<div className={`w-full md:w-1/3 mb-4 ${expandedSection === card.title ? 'mr-4' : ''}`}>
+<div className={`w-full md:w-1/2 mb-4 ${expandedSection === card.title ? 'mr-4' : ''}`}>
   <ResponsiveContainer width="100%" height={150}>
     <PieChart>
       <Pie

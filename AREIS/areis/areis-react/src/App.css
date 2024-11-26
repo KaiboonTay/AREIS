@@ -40,3 +40,29 @@ html {
     transform: rotate(360deg);
   }
 }
+
+/*tablet*/
+@media (min-width: 601px) and (max-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+
+  .App-header {
+    font-size: calc(9px + 2vmin);
+    padding: 20px;
+  }
+}
+
+/* desktop */
+@media (min-width: 1025px) {
+  html {
+    font-size: 18px;
+  }
+
+  .App-header {
+    font-size: calc(10px + 2vmin);
+    padding: 30px;
+  }
+}
+
+
