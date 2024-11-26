@@ -214,7 +214,7 @@ const handleViewStudentCopy = async (studentId, formId) => {
           </ul>
            <h2>System's recommended Action</h2>
           <ul>
-            ${formData.checkbox_options.map((option) => `<li>${option}</li>`).join("")}
+            ${formData.recommendation}
           </ul>
         </body>
       </html>
