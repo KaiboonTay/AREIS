@@ -7,30 +7,58 @@ from django.contrib import messages
 from tablib import Dataset
 import csv, io
 from django.db import IntegrityError
+import pandas as pd 
+import os 
 
 
 # Create your views here.
 
 @api_view(['POST'])
 def upload_csv(request):
-    if 'csv_file' not in request.FILES:
-        return Response({"error": "CSV file not provided."}, status=status.HTTP_400_BAD_REQUEST)
 
-    csv_file = request.FILES['csv_file']
+    #Check for etiher 'csv_file' or 'excel_file' is in the request
+    uploaded_file_key = None
 
-    if not csv_file.name.endswith('.csv'):
-        return Response({"error": "Please upload a CSV file only."}, status=status.HTTP_400_BAD_REQUEST)
+    if 'csv_file' in request.FILES:
+        uploaded_file_key = 'csv_file'
+    elif 'excel_file' in request.FILES:
+        uploaded_file_key = 'excel_file'
+    else:
+        return Response({"error": "No file is provided."}, status=status.HTTP_400_BAD_REQUEST)
+    
 
-    data_set = csv_file.read().decode('UTF-8')
-    io_string = io.StringIO(data_set)
-    next(io_string)  # skip one row to get the headers
+    #Get the uploaded file
+    uploaded_file = request.FILES[uploaded_file_key]
 
+    #Determine the uploaded extension
+    file_extension = os.path.splitext(uploaded_file.name)[-1].lower()
+
+    #Converts Excel to CSV
+    if file_extension in ['.xls', '.xlsx']:
+        try:
+            #Using pandas to convert
+            excel_data = pd.read_excel(uploaded_file)
+            csv_data = excel_data.to_csv(index=False)
+            io_string = io.StringIO(csv_data)
+            next(io_string)
+        except Exception as e:
+            return Response({"error": f"Failed to process Excel file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+    #If extension is csv read striaght away
+    elif file_extension == '.csv':
+        data_set = uploaded_file().decode('UTF-8')
+        io_string = io.StringIO(data_set)
+        next(io_string)  # skip one row to get the headers
+
+    #File is not CSV or Excel
+    else:
+        return Response({"error": "Unsupported file format, Please upload either CSV or Excel in xls or xlsx"})
+   
     csv_reader = csv.DictReader(io_string)
 
     student_duplicates = set()
     course_duplicates = set()
     grade_duplicates = set()
-
     new_students = set()
     new_courses = set()
     new_grades = set()
@@ -109,18 +137,46 @@ def upload_csv(request):
 
 
 
+
+
 @api_view(['POST'])
 def upload_grades(request):
-    if 'csv_file' not in request.FILES:
-        return Response({"error": "CSV file not provided."}, status=status.HTTP_400_BAD_REQUEST)
 
-    csv_file = request.FILES['csv_file']
+    #Check for 'csv_file' or 'excel_file' is in the request
+    uploaded_file_key = None
 
-    if not csv_file.name.endswith('.csv'):
-        return Response({"error": "Please upload a CSV file only."}, status=status.HTTP_400_BAD_REQUEST)
+    if 'csv_file' in request.FILES:
+        uploaded_file_key = 'csv_file'
 
-    data_set = csv_file.read().decode('UTF-8')
-    io_string = io.StringIO(data_set)
+    elif 'excel_file' in request.FILES:
+        uploaded_file_key = 'excel_file'
+
+    else:
+        return Response({"error": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    uploaded_file = request.FILES[uploaded_file_key]
+
+    #Check for file extension in uploaded file
+    file_extension = os.path.splitext(uploaded_file.name)[1].lower()
+    
+    #Converting Excel to CSV 
+    if file_extension in ['.xls', '.xlsx']:
+        try:
+            # Use pandas to read the Excel file and convert it to CSV format
+            excel_data = pd.read_excel(uploaded_file)
+            csv_data = excel_data.to_csv(index=False)
+            io_string = io.StringIO(csv_data)
+        except Exception as e:
+            return Response({"error": f"Failed to process Excel file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+     #If uploaded file is csv read straight away   
+    elif file_extension == '.csv':
+        data_set = uploaded_file.read().decode('UTF-8')
+        io_string = io.StringIO(data_set)
+ 
+    else:
+        return Response({"Error": "Uploaded file type is wrong, plese upload only CSV or Excel files "})
 
     csv_reader = csv.DictReader(io_string)
     next(csv_reader)
@@ -187,6 +243,10 @@ def upload_grades(request):
                                 status=status.HTTP_409_CONFLICT)
 
     return Response({"message": "CSV file successfully uploaded and processed."}, status=status.HTTP_201_CREATED)
+
+
+
+
 
 
 def index(request):
