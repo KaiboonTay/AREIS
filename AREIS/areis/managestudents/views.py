@@ -117,6 +117,7 @@ def student_profile(request, studentid):
         'student': StudentSerializer(student).data,
         'studentgrades': StudentGradeSerializer(studentgrades, many=True).data,
         'courses': CourseSerializer(courses, many=True).data
+        
     }
 
     json_data = json.dumps(data, indent=4)
