@@ -48,18 +48,18 @@ const Header = () => {
         </div>
 
         {/* Settings Icon */}
-        <FaCog className="text-2xl cursor-pointer" />
+        {/* <FaCog className="text-2xl cursor-pointer" /> */}
 
         {/* User Profile */}
-        <div className="flex items-center space-x-2">
+        {/* <div className="flex items-center space-x-2">
           <img
             src="https://via.placeholder.com/40"
             alt="User Profile"
             className="w-10 h-10 rounded-full object-cover"
-          />
+          /> */}
           {/* Dropdown Arrow */}
-          <MdKeyboardArrowDown className="text-xl cursor-pointer" />
-        </div>
+          {/* <MdKeyboardArrowDown className="text-xl cursor-pointer" />
+        </div> */}
       </div>
     </div>
   );
