@@ -37,7 +37,8 @@ def upload_csv(request):
     if file_extension in ['.xls', '.xlsx']:
         try:
             #Using pandas to convert
-            excel_data = pd.read_excel(uploaded_file)
+            excel_data = pd.read_excel(uploaded_file, skiprows=1)
+            print("Excel data preview after skipping title row:", excel_data.head())  # Debugging: check data after skipping rows
             csv_data = excel_data.to_csv(index=False)
             io_string = io.StringIO(csv_data)
         except Exception as e:
@@ -158,28 +159,44 @@ def upload_grades(request):
 
     #Check for file extension in uploaded file
     file_extension = os.path.splitext(uploaded_file.name)[1].lower()
+    print(f"Uploaded file name: {uploaded_file.name}")
+    io_string = None  # Initialize io_string for CSV processing
     
-    #Converting Excel to CSV 
+   
+
+    # Process Excel file
     if file_extension in ['.xls', '.xlsx']:
-        try:
-            # Use pandas to read the Excel file and convert it to CSV format
-            excel_data = pd.read_excel(uploaded_file)
-            csv_data = excel_data.to_csv(index=False)
-            io_string = io.StringIO(csv_data)
-        except Exception as e:
-            return Response({"error": f"Failed to process Excel file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
-        
-     #If uploaded file is csv read straight away   
+     try:
+        excel_data = pd.read_excel(uploaded_file,header=0, skiprows=[1, 2])
+        print("Excel data after reading:", excel_data.head())  # Debugging step
+
+        csv_data = excel_data.to_csv(index=False)
+        io_string = io.StringIO(csv_data)
+        csv_reader = csv.DictReader(io_string)
+
+     except Exception as e:
+        print(f"Error processing Excel file: {e}")
+        return Response({"error": f"Failed to process Excel file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+     
     elif file_extension == '.csv':
+     try:
         data_set = uploaded_file.read().decode('UTF-8')
         io_string = io.StringIO(data_set)
- 
+
+        csv_data = pd.read_csv(io_string, header=0, skiprows=[0, 1])
+        print("CSV data after reading:", csv_data.head())  # Debugging step
+
+        csv_string = csv_data.to_csv(index=False)
+        io_string = io.StringIO(csv_string)
+        csv_reader = csv.DictReader(io_string)
+        
+     except Exception as e:
+        print(f"Error processing CSV file: {e}")
+        return Response({"error": f"Failed to process CSV file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
     else:
         return Response({"Error": "Uploaded file type is wrong, plese upload only CSV or Excel files "})
 
-    csv_reader = csv.DictReader(io_string)
-    next(csv_reader)
-    next(csv_reader)
     for row in csv_reader:
         
         StudentId = row.get('SIS User ID', '').strip().lower()
@@ -193,6 +210,8 @@ def upload_grades(request):
         Section = row.get('Section', '').strip()
         #Trimester = Section.split(' ')[0] Issue does not match with the other csv file
         CourseId = Section.split(' ')[0]
+
+        print(f"Processing StudentId: {StudentId}, CourseId: {CourseId}")
 
         student = Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).first()
         # check if student already exists
