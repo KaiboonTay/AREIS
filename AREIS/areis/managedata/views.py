@@ -64,7 +64,7 @@ def upload_csv(request):
     new_grades = set()
 
     for row in csv_reader:
-        StudentId = row.get('Empl ID', '').strip()
+        StudentId = row.get('Empl ID', '').strip().lower
         Lastname = row.get('Surname', '').strip()
         FirstName = row.get('First Name', '').strip()
         AcadProgDesc = row.get('Academic Program Descr', '').strip()
@@ -162,13 +162,14 @@ def upload_grades(request):
     print(f"Uploaded file name: {uploaded_file.name}")
     io_string = None  # Initialize io_string for CSV processing
     
+    
    
 
     # Process Excel file
     if file_extension in ['.xls', '.xlsx']:
      try:
         excel_data = pd.read_excel(uploaded_file,header=0, skiprows=[1, 2])
-        print("Excel data after reading:", excel_data.head())  # Debugging step
+        print("Excel data after reading:", excel_data)  # Debugging step
 
         csv_data = excel_data.to_csv(index=False)
         io_string = io.StringIO(csv_data)
@@ -182,13 +183,11 @@ def upload_grades(request):
      try:
         data_set = uploaded_file.read().decode('UTF-8')
         io_string = io.StringIO(data_set)
-
-        csv_data = pd.read_csv(io_string, header=0, skiprows=[0, 1])
-        print("CSV data after reading:", csv_data.head())  # Debugging step
-
-        csv_string = csv_data.to_csv(index=False)
-        io_string = io.StringIO(csv_string)
         csv_reader = csv.DictReader(io_string)
+        next(csv_reader)
+        next(csv_reader)
+       
+
         
      except Exception as e:
         print(f"Error processing CSV file: {e}")
@@ -209,13 +208,32 @@ def upload_grades(request):
         FinalGrade = row.get('Final Score', '').strip()
         Section = row.get('Section', '').strip()
         #Trimester = Section.split(' ')[0] Issue does not match with the other csv file
-        CourseId = Section.split(' ')[0]
+        CourseId = Section.split(' ')[0] 
+
+
+        print(f"""
+        Extracted values:
+        StudentId: {StudentId}
+        Journal1: {Journal1}    
+        Journal2: {Journal2}
+        Assessment1: {Assessment1}
+        Assessment2: {Assessment2}
+        Assessment3: {Assessment3}
+        CurrentScore: {CurrentScore}
+        FinalGrade: {FinalGrade}
+        CourseId: {CourseId}
+        """)
+
+        
 
         print(f"Processing StudentId: {StudentId}, CourseId: {CourseId}")
 
         student = Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).first()
+        print(f"Student found for StudentId: {StudentId}, CourseId: {CourseId}")
+
         # check if student already exists
         if Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).exists():
+            print(f"Student found for StudentId: {StudentId}, CourseId: {CourseId}")
             try:
                 # add the grades
                 if CurrentScore and int(CurrentScore) <= 50 and student.flagstatus == 0:
