@@ -298,9 +298,9 @@ const saveReferredAction = async () => {
 
 
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-      {/* Main Dashboard Container - Flagged Students */}
-      <div className="w-full h-auto bg-[#D9D9D9] rounded-xl p-6 flex flex-wrap">
-  <h3 className="text-xl font-bold mb-4 w-full">Flagged Overview</h3>
+     {/* Main Dashboard Container - Flagged Students */}
+     <div className="w-full h-auto bg-[#D9D9D9] rounded-xl p-6 flex flex-wrap">
+  <h3 className="text-xl font-bold mb-2 w-full">Flagged Overview</h3>
 
   {/* Flagged Overview */}
   <div className="flex flex-col items-center w-full md:w-1/2">
@@ -311,7 +311,7 @@ const saveReferredAction = async () => {
             { name: "Manually Flagged", value: data.studentgrades.filter((grade) => grade.flagstatus === 1).length },
             { name: "Auto-Flagged", value: data.studentgrades.filter((grade) => grade.flagstatus === 2).length },
             { name: "Responded", value: data.studentgrades.filter((grade) => grade.flagstatus === 3).length },
-          ]}
+          ].filter((entry) => entry.value > 0)} // Lọc các mục có giá trị > 0
           cx="50%"
           cy="50%"
           innerRadius="50%"
@@ -319,115 +319,7 @@ const saveReferredAction = async () => {
           paddingAngle={3}
           dataKey="value"
           label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-            const RADIAN = Math.PI / 180;
-            const radius = innerRadius + (outerRadius - innerRadius) * 0.5; // Position in the middle of the segment
-            const x = cx + radius * Math.cos(-midAngle * RADIAN);
-            const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-            return (
-              <text
-                x={x}
-                y={y}
-                fill="white"
-                fontSize="12px"
-                textAnchor="middle"
-                dominantBaseline="central"
-              >
-                {`${(percent * 100).toFixed(0)}%`}
-              </text>
-            );
-          }}
-          labelLine={false} // Disable outer labels
-          onMouseEnter={(e) => {
-            const hoveredName = e.name; // Get the segment name
-            document.getElementById("hovered-info").innerHTML = `
-              <span style="color: ${e.fill}; font-weight: bold;">${hoveredName}</span>
-              <span style="color: #666;"> (${((e.percent) * 100).toFixed(2)}%)</span>`;
-          }}
-          onMouseLeave={() => {
-            document.getElementById("hovered-info").innerHTML = ""; // Clear info when leaving the segment
-          }}
-        >
-          <Cell fill="#FFBB28" /> {/* Manually Flagged */}
-          <Cell fill="#FF8042" /> {/* Auto-Flagged */}
-          <Cell fill="#0088FE" /> {/* Responded */}
-        </Pie>
-      </PieChart>
-    </ResponsiveContainer>
-
-    {/* Display info just below the chart */}
-    <div
-      id="hovered-info"
-      className="text-lg font-bold text-gray-300"
-      style={{ marginTop: "-40px", textAlign: "center" }}
-    ></div>
-  </div>
-
-  {/* Flagged Students (Data Summary) */}
-  <div className="flex flex-col w-full md:w-1/2 mt-4 md:mt-0 md:pl-4">
-    <h3 className="text-lg font-semibold mb-2 text-gray-500">Flagged Students</h3>
-    <ul>
-      <li className="flex justify-between mb-2">
-        <div className="flex items-center">
-          <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#FFBB28" }}></div>
-          <span className="text-sm">Manually Flagged</span>
-        </div>
-        <span className="text-sm ml-2">
-          {data.studentgrades.filter((grade) => grade.flagstatus === 1).length}
-        </span>
-      </li>
-      <li className="flex justify-between mb-2">
-        <div className="flex items-center">
-          <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#FF8042" }}></div>
-          <span className="text-sm">Auto-Flagged</span>
-        </div>
-        <span className="text-sm ml-2">
-          {data.studentgrades.filter((grade) => grade.flagstatus === 2).length}
-        </span>
-      </li>
-      <li className="flex justify-between mb-2">
-        <div className="flex items-center">
-          <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#0088FE" }}></div>
-          <span className="text-sm">Responded</span>
-        </div>
-        <span className="text-sm ml-2">
-          {data.studentgrades.filter((grade) => grade.flagstatus === 3).length}
-        </span>
-      </li>
-    </ul>
-  </div>
-</div>
-
-
-<div className="w-full h-auto bg-[#D9D9D9] rounded-xl p-6 flex flex-wrap">
-  <h3 className="text-xl font-bold mb-4 w-full">Case Overview</h3>
-
-  {/* Case Overview */}
-  <div className="flex flex-col items-center w-full md:w-1/2">
-    <ResponsiveContainer width="100%" height={300}>
-      <PieChart>
-        <Pie
-          data={data.casecategory.map((category) => ({
-            name: category.categoryname,
-            value: data.studentcases.filter(
-              (studentcase) => studentcase.categoryid === category.categoryid
-            ).length,
-          }))}
-          cx="50%"
-          cy="50%"
-          innerRadius="50%"
-          outerRadius="80%"
-          paddingAngle={3}
-          dataKey="value"
-          onMouseEnter={(e) => {
-            document.getElementById("case-hovered-info").innerHTML = `
-              <span style="color: ${e.fill}; font-weight: bold;">${e.name}</span>
-              <span style="color: #666;"> (${((e.percent) * 100).toFixed(2)}%)</span>`;
-          }}
-          onMouseLeave={() => {
-            document.getElementById("case-hovered-info").innerHTML = ""; // Clear info when leaving the segment
-          }}
-          label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+            if (percent === 0) return null; // Không hiển thị label nếu giá trị = 0
             const RADIAN = Math.PI / 180;
             const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
             const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -446,44 +338,167 @@ const saveReferredAction = async () => {
               </text>
             );
           }}
-          labelLine={false} // Disable outer labels
+          labelLine={false} // Không hiển thị đường dẫn ra ngoài
+          onMouseEnter={(e) => {
+            const hoveredName = e.name;
+            document.getElementById("hovered-info").innerHTML = `
+              <span style="color: ${e.fill}; font-weight: bold;">${hoveredName}</span>
+              <span style="color: #666;"> (${((e.percent) * 100).toFixed(2)}%)</span>`;
+          }}
+          onMouseLeave={() => {
+            document.getElementById("hovered-info").innerHTML = ""; // Clear info when leaving the segment
+          }}
         >
-          {data.casecategory.map((_, index) => (
-            <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-          ))}
+          <Cell fill="#FFBB28" /> {/* Manually Flagged */}
+          <Cell fill="#FF8042" /> {/* Auto-Flagged */}
+          <Cell fill="#0088FE" /> {/* Responded */}
         </Pie>
       </PieChart>
     </ResponsiveContainer>
 
-    {/* Display info just below the chart */}
+    {/* Fixed height to prevent container movement */}
+    <div
+      id="hovered-info"
+      className="text-lg font-bold text-gray-300"
+      style={{ marginTop: "-40px", textAlign: "center", height: "30px" }}
+    ></div>
+  </div>
+
+  {/* Flagged Students (Data Summary) */}
+  <div className="flex flex-col w-full md:w-1/2 mt-2 md:mt-0 md:pl-4">
+    <h3 className="text-lg font-semibold mb-1 text-gray-500">Flagged Students</h3>
+    <ul>
+      <li className="flex justify-between mb-1">
+        <div className="flex items-center">
+          <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#FFBB28" }}></div>
+          <span className="text-sm">Manually Flagged</span>
+        </div>
+        <span className="text-sm ml-2">
+          {data.studentgrades.filter((grade) => grade.flagstatus === 1).length}
+        </span>
+      </li>
+      <li className="flex justify-between mb-1">
+        <div className="flex items-center">
+          <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#FF8042" }}></div>
+          <span className="text-sm">Auto-Flagged</span>
+        </div>
+        <span className="text-sm ml-2">
+          {data.studentgrades.filter((grade) => grade.flagstatus === 2).length}
+        </span>
+      </li>
+      <li className="flex justify-between mb-1">
+        <div className="flex items-center">
+          <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: "#0088FE" }}></div>
+          <span className="text-sm">Responded</span>
+        </div>
+        <span className="text-sm ml-2">
+          {data.studentgrades.filter((grade) => grade.flagstatus === 3).length}
+        </span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+<div className="w-full h-auto bg-[#D9D9D9] rounded-xl p-6 flex flex-wrap">
+  <h3 className="text-xl font-bold mb-2 w-full">Case Overview</h3>
+
+  {/* Case Overview */}
+  <div className="flex flex-col items-center w-full md:w-1/2">
+    <ResponsiveContainer width="100%" height={300}>
+      <PieChart>
+        <Pie
+          data={data.casecategory
+            .map((category) => ({
+              name: category.categoryname,
+              value: data.studentcases.filter(
+                (studentcase) => studentcase.categoryid === category.categoryid
+              ).length,
+            }))
+            .filter((entry) => entry.value > 0)} // Lọc các mục có giá trị > 0
+          cx="50%"
+          cy="50%"
+          innerRadius="50%"
+          outerRadius="80%"
+          paddingAngle={3}
+          dataKey="value"
+          onMouseEnter={(e) => {
+            document.getElementById("case-hovered-info").innerHTML = `
+              <span style="color: ${e.fill}; font-weight: bold;">${e.name}</span>
+              <span style="color: #666;"> (${((e.percent) * 100).toFixed(2)}%)</span>`;
+          }}
+          onMouseLeave={() => {
+            document.getElementById("case-hovered-info").innerHTML = ""; // Clear info when leaving the segment
+          }}
+          label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+            if (percent === 0) return null; // Không hiển thị % nếu giá trị là 0
+            const RADIAN = Math.PI / 180;
+            const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+            const x = cx + radius * Math.cos(-midAngle * RADIAN);
+            const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+            return (
+              <text
+                x={x}
+                y={y}
+                fill="white"
+                fontSize="12px"
+                textAnchor="middle"
+                dominantBaseline="central"
+              >
+                {`${(percent * 100).toFixed(0)}%`}
+              </text>
+            );
+          }}
+          labelLine={false} // Không hiển thị đường dẫn ra ngoài
+        >
+          {data.casecategory
+            .map((category) => ({
+              name: category.categoryname,
+              value: data.studentcases.filter(
+                (studentcase) => studentcase.categoryid === category.categoryid
+              ).length,
+            }))
+            .filter((entry) => entry.value > 0)
+            .map((_, index) => (
+              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+            ))}
+        </Pie>
+      </PieChart>
+    </ResponsiveContainer>
+
+    {/* Fixed height to prevent container movement */}
     <div
       id="case-hovered-info"
       className="text-lg font-bold text-gray-700"
-      style={{ marginTop: "-20px", textAlign: "center" }}
+      style={{ marginTop: "-20px", textAlign: "center", height: "30px" }}
     ></div>
   </div>
 
   {/* Right Side: Category Data */}
-  <div className="flex flex-col w-full md:w-1/2 mt-4 md:mt-0 md:pl-4">
-    <h3 className="text-lg font-semibold mb-2 text-gray-500">Category</h3>
+  <div className="flex flex-col w-full md:w-1/2 mt-2 md:mt-0 md:pl-4">
+    <h3 className="text-lg font-semibold mb-1 text-gray-500">Category</h3>
     <ul>
       {data.casecategory.map((category, index) => (
-        <li key={index} className="flex justify-between mb-2">
+        <li key={index} className="flex justify-between mb-1">
           <div className="flex items-center">
             <div
               className="w-4 h-4 rounded-full mr-2"
-              style={{ backgroundColor: colors[index % colors.length] }}
+              style={{ backgroundColor: colors[index % colors.length] }} // Giữ nguyên màu gốc
             ></div>
-            <span className="text-sm">{category.categoryname}</span> {/* Reduce font size */}
+            <span className="text-sm">{category.categoryname}</span>
           </div>
           <span className="text-sm ml-2">
-            {data.studentcases.filter((studentcase) => studentcase.categoryid === category.categoryid).length}
+            {data.studentcases.filter(
+              (studentcase) => studentcase.categoryid === category.categoryid
+            ).length}
           </span>
         </li>
       ))}
     </ul>
   </div>
 </div>
+
 
       </div>
 
