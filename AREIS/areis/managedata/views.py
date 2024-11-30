@@ -5,32 +5,58 @@ from django.shortcuts import render
 from .models import Students, Courses, Studentgrades
 from django.contrib import messages
 from tablib import Dataset
-import csv, io
+import csv, io, os
 from django.db import IntegrityError
+import pandas as pd
 
 
 # Create your views here.
 
 @api_view(['POST'])
 def upload_csv(request):
-    if 'csv_file' not in request.FILES:
-        return Response({"error": "CSV file not provided."}, status=status.HTTP_400_BAD_REQUEST)
+    #Check for either 'csv_file' or 'excel_file' is in the request
+    uploaded_file_key = None
 
-    csv_file = request.FILES['csv_file']
+    if 'csv_file' in request.FILES:
+        uploaded_file_key = 'csv_file'
+    elif 'excel_file' in request.FILES:
+        uploaded_file_key = 'excel_file'
+    else:
+        return Response({"error": "No file is provided."}, status=status.HTTP_400_BAD_REQUEST)
+    
 
-    if not csv_file.name.endswith('.csv'):
-        return Response({"error": "Please upload a CSV file only."}, status=status.HTTP_400_BAD_REQUEST)
+    #Get the uploaded file
+    uploaded_file = request.FILES[uploaded_file_key]
 
-    data_set = csv_file.read().decode('UTF-8')
-    io_string = io.StringIO(data_set)
-    next(io_string)  # skip one row to get the headers
+    #Determine the uploaded extension
+    file_extension = os.path.splitext(uploaded_file.name)[-1].lower()
+
+    #Converts Excel to CSV
+    if file_extension in ['.xls', '.xlsx']:
+        try:
+            #Using pandas to convert
+            excel_data = pd.read_excel(uploaded_file, skiprows=1)
+            print("Excel data preview after skipping title row:", excel_data.head())  # Debugging: check data after skipping rows
+            csv_data = excel_data.to_csv(index=False)
+            io_string = io.StringIO(csv_data)
+        except Exception as e:
+            return Response({"error": f"Failed to process Excel file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+    #If extension is csv read striaght away
+    elif file_extension == '.csv':
+        data_set = uploaded_file.read().decode('UTF-8')
+        io_string = io.StringIO(data_set)
+        next(io_string)  # skip one row to get the headers
+
+    #File is not CSV or Excel
+    else:
+        return Response({"error": "Unsupported file format, Please upload either CSV or Excel in xls or xlsx"})
 
     csv_reader = csv.DictReader(io_string)
 
     student_duplicates = set()
     course_duplicates = set()
     grade_duplicates = set()
-
     new_students = set()
     new_courses = set()
     new_grades = set()
@@ -84,15 +110,11 @@ def upload_csv(request):
             Studentgrades.objects.create(
                 studentid=Students.objects.get(studentid=StudentId),
                 courseid=Courses.objects.get(courseid=CourseId),
-                journal1=None,
-                journal2=None,
-                assessment1=None,
-                assessment2=None,
-                assessment3=None,
                 currentscore=None,
                 finalgrade=None,
                 trimester=Trimester,
-                flagstatus=0
+                flagstatus=0,
+                assessments=None
             )
             new_grades.add(f"{StudentId}-{CourseId}")
 
@@ -111,75 +133,106 @@ def upload_csv(request):
 
 @api_view(['POST'])
 def upload_grades(request):
-    if 'csv_file' not in request.FILES:
-        return Response({"error": "CSV file not provided."}, status=status.HTTP_400_BAD_REQUEST)
+    #Check for 'csv_file' or 'excel_file' is in the request
+    uploaded_file_key = None
 
-    csv_file = request.FILES['csv_file']
+    if 'csv_file' in request.FILES:
+        uploaded_file_key = 'csv_file'
 
-    if not csv_file.name.endswith('.csv'):
-        return Response({"error": "Please upload a CSV file only."}, status=status.HTTP_400_BAD_REQUEST)
+    elif 'excel_file' in request.FILES:
+        uploaded_file_key = 'excel_file'
 
-    data_set = csv_file.read().decode('UTF-8')
-    io_string = io.StringIO(data_set)
+    else:
+        return Response({"error": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
 
-    csv_reader = csv.DictReader(io_string)
-    next(csv_reader)
-    next(csv_reader)
+
+    uploaded_file = request.FILES[uploaded_file_key]
+
+    #Check for file extension in uploaded file
+    file_extension = os.path.splitext(uploaded_file.name)[1].lower()
+    print(f"Uploaded file name: {uploaded_file.name}")
+    io_string = None  # Initialize io_string for CSV processing
+    
+    
+   
+
+    # Process Excel file
+    if file_extension in ['.xls', '.xlsx']:
+        try:
+            excel_data = pd.read_excel(uploaded_file,header=0, skiprows=[1, 2])
+            print("Excel data after reading:", excel_data)  # Debugging step
+
+            csv_data = excel_data.to_csv(index=False)
+            io_string = io.StringIO(csv_data)
+            csv_reader = csv.DictReader(io_string)
+            headers = csv_reader.fieldnames  # Extract headers dynamically
+            
+
+        except Exception as e:
+            print(f"Error processing Excel file: {e}")
+            return Response({"error": f"Failed to process Excel file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+     
+    elif file_extension == '.csv':
+        try:
+            data_set = uploaded_file.read().decode('UTF-8')
+            io_string = io.StringIO(data_set)
+            csv_reader = csv.DictReader(io_string)
+            headers = csv_reader.fieldnames  # Extract headers dynamically
+            next(csv_reader)
+            next(csv_reader)
+            
+            
+
+        except Exception as e:
+            print(f"Error processing CSV file: {e}")
+            return Response({"error": f"Failed to process CSV file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
+    else:
+        return Response({"Error": "Uploaded file type is wrong, plese upload only CSV or Excel files "})
+    
+    
+
+    # Identify dynamic columns for journals and assessments
+
+    
+    journal_columns = [col for col in headers if col.startswith("Journal")]
+    assessment_columns = [col for col in headers if col.startswith("Assessment") and col.endswith("Unposted Final Score")]
+    quiz_columns = [col for col in headers if col.startswith("Quiz")]
+    test_columns = [col for col in headers if col.startswith("Test")]
+
     for row in csv_reader:
         
         StudentId = row.get('SIS User ID', '').strip().lower()
-        Journal1 = row.get('Journal 1 (251237)', '').strip()
-        Journal2 = row.get('Journal 2 (251238)', '').strip()
-        Assessment1 = row.get('Assessment 1 Final Score', '').strip()
-        Assessment2 = row.get('Assessment 2 Final Score', '').strip()
-        Assessment3 = row.get('Assessment 3 Final Score', '').strip()
         CurrentScore = row.get('Current Score', '').strip()
         FinalGrade = row.get('Final Score', '').strip()
         Section = row.get('Section', '').strip()
         #Trimester = Section.split(' ')[0] Issue does not match with the other csv file
         CourseId = Section.split(' ')[0]
 
+
         student = Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).first()
         # check if student already exists
-        if Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).exists():
+        if student:
             try:
-                # add the grades
-                if CurrentScore and int(CurrentScore) <= 50 and student.flagstatus == 0:
-                    Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
-                        journal1=float(Journal1) if Journal1 else None,
-                        journal2=float(Journal2) if Journal2 else None,
-                        assessment1=float(Assessment1) if Assessment1 else None,
-                        assessment2=float(Assessment2) if Assessment2 else None,
-                        assessment3=float(Assessment3) if Assessment3 else None,
-                        currentscore=float(CurrentScore) if CurrentScore else None,
-                        finalgrade=float(FinalGrade) if FinalGrade else None,
-                        #trimester=Trimester,
-                        flagstatus=2
-                )
-                    
-                elif CurrentScore and int(CurrentScore) and student.flagstatus == 0:
-                    Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
-                        journal1=float(Journal1) if Journal1 else None,
-                        journal2=float(Journal2) if Journal2 else None,
-                        assessment1=float(Assessment1) if Assessment1 else None,
-                        assessment2=float(Assessment2) if Assessment2 else None,
-                        assessment3=float(Assessment3) if Assessment3 else None,
-                        currentscore=float(CurrentScore) if CurrentScore else None,
-                        finalgrade=float(FinalGrade) if FinalGrade else None,
-                        #trimester=Trimester,
-                        flagstatus=0
-                )
-                    
+                # Dynamically build JSON for journals and assessments
+                assessments = {
+                    col: float(row.get(col, 0)) if row.get(col) else None
+                    for col in journal_columns + assessment_columns + quiz_columns + test_columns
+                }
+
+                if CurrentScore and float(CurrentScore) <= 50 and student.flagstatus == 0:
+                    flag_status = 2
+                elif CurrentScore and float(CurrentScore) > 50 and student.flagstatus == 0:
+                    flag_status = 0
                 else:
-                    Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
-                        journal1=float(Journal1) if Journal1 else None,
-                        journal2=float(Journal2) if Journal2 else None,
-                        assessment1=float(Assessment1) if Assessment1 else None,
-                        assessment2=float(Assessment2) if Assessment2 else None,
-                        assessment3=float(Assessment3) if Assessment3 else None,
-                        currentscore=float(CurrentScore) if CurrentScore else None,
-                        finalgrade=float(FinalGrade) if FinalGrade else None
-                    )
+                    flag_status = student.flagstatus
+
+                Studentgrades.objects.filter(courseid=CourseId, studentid=StudentId).update(
+                    assessments=assessments,  # Store dynamic data
+                    currentscore=float(CurrentScore) if CurrentScore else None,
+                    finalgrade=float(FinalGrade) if FinalGrade else None,
+                    flagstatus=flag_status
+                )
 
                     
             except IntegrityError:

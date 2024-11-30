@@ -1,65 +1,66 @@
-import { FaCog, FaSearch } from "react-icons/fa"; // Importing FaSearch for search icon
-import { MdKeyboardArrowDown } from "react-icons/md"; // Icon for dropdown arrow
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { FaSearch } from "react-icons/fa"; // Importing FaSearch for search icon
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const navigate = useNavigate();
 
   const handleSearch = () => {
     if (query) {
       navigate(`managestudents/search?name=${query}`);
-      setQuery(''); // Clear the search bar after navigating
+      setQuery(""); // Clear the search bar after navigating
     }
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleSearch();
     }
   };
 
+  const handleLogout = () => {
+    // Perform logout logic here
+    navigate("/logout");
+  };
+
   return (
-    <div className="flex justify-between items-center w-full p-4 bg-white shadow-md">
+    <div className="flex items-center w-full p-4 bg-white shadow-md">
       {/* Left Side: Welcome message */}
-      <div>
-        <h1 className="text-2xl font-bold">Welcome Dr Vincent</h1>
+      <div className="flex-shrink-0 mr-4">
+        <h1 className="text-2xl font-bold">Welcome</h1>
         <p className="text-gray-500">Early At-Risk Intervention Strategy, NAIHE</p>
       </div>
 
-      {/* Right Side: Settings and User Profile */}
-      <div className="flex items-center space-x-4">
-        
-        {/* Search Bar */}
-        <div className="flex items-center border rounded-md">
+      {/* Center: Search Bar */}
+      <div className="flex-grow flex justify-center">
+        <div className="flex items-center border-2 border-gray-300 rounded-full bg-gray-100 shadow-md w-full max-w-xl px-4 py-2">
           <input
-              type="text"
-              placeholder="Enter student name"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="p-2 outline-none"
+            type="text"
+            placeholder="Search for a student..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="p-2 outline-none bg-transparent flex-grow text-gray-700 truncate"
           />
           {/* Search Icon */}
-          <button onClick={handleSearch} className="p-2">
+          <button
+            onClick={handleSearch}
+            className="p-2 flex-shrink-0"
+          >
             <FaSearch className="text-gray-500 cursor-pointer" />
           </button>
         </div>
+      </div>
 
-        {/* Settings Icon */}
-        {/* <FaCog className="text-2xl cursor-pointer" /> */}
-
-        {/* User Profile */}
-        {/* <div className="flex items-center space-x-2">
-          <img
-            src="https://via.placeholder.com/40"
-            alt="User Profile"
-            className="w-10 h-10 rounded-full object-cover"
-          /> */}
-          {/* Dropdown Arrow */}
-          {/* <MdKeyboardArrowDown className="text-xl cursor-pointer" />
-        </div> */}
+      {/* Right Side: Logout Button */}
+      <div className="flex items-center ml-4">
+        <button
+          onClick={handleLogout}
+          className="flex items-center border-2 border-gray-300 rounded-full bg-gray-100 shadow-md px-6 py-2 text-gray-700 font-semibold hover:bg-blue-500 hover:text-white transition-all"
+        >
+          Logout
+        </button>
       </div>
     </div>
   );

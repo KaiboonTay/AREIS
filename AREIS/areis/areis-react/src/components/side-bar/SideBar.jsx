@@ -90,6 +90,8 @@ const SideBar = () => {
           <span>Upload Grades</span>
         </NavLink>
 
+        <div className="my-4"></div>
+
         <NavLink
           to="/users/login/"
           className={({ isActive }) =>

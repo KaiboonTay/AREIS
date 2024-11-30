@@ -12,6 +12,19 @@ function StudentProfile() {
     const modalRef = useRef(null); // Create a ref to track the modal element
     const flagColors = ["#d1d5db", "#fb923c", "#0000ff", "#ef4444"];
 
+    const cleanHeader = (header) => {
+        // Remove everything in parentheses and trim
+        let cleanedHeader = header.replace(/\s*\(.*?\)/, "").trim();
+      
+        // If the header starts with "Assessment", truncate after "Assessment X"
+        const assessmentMatch = cleanedHeader.match(/^(Assessment \d+)/);
+        if (assessmentMatch) {
+          cleanedHeader = assessmentMatch[1];
+        }
+      
+        return cleanedHeader;
+      };
+
     useEffect(() => {
         const fetchStudentProfile = async () => {
             try {
@@ -176,84 +189,97 @@ function StudentProfile() {
 
             <div className="overflow-x-auto">
                 <h3 className="text-2xl font-semibold text-gray-800 mb-4">Grades</h3>
-                <table className="min-w-full bg-white rounded-lg shadow-lg">
-                    <thead>
-                        <tr className="bg-gray-200 text-gray-700">
-                            <th className="p-3 text-left">Course ID</th>
-                            <th className="p-3 text-left">Course Description</th>
-                            <th className="p-3 text-left">Journal 1</th>
-                            <th className="p-3 text-left">Journal 2</th>
-                            <th className="p-3 text-left">Assessment 1</th>
-                            <th className="p-3 text-left">Assessment 2</th>
-                            <th className="p-3 text-left">Assessment 3</th>
-                            <th className="p-3 text-left">Current Grade</th>
-                            <th className="p-3 text-left">Final Grade</th>
-                            <th className="p-3 text-left">Flag Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {studentData.studentgrades.map((grade) => {
-                            const course = studentData.courses.find(course => course.courseid === grade.courseid);
-                            return (
+                {studentData.studentgrades.map((grade) => {
+                    const course = studentData.courses.find(course => course.courseid === grade.courseid);
+                    // Calculate dynamic headers for the current course
+                    const dynamicHeaders = studentData.studentgrades.reduce((headers, grade) => {
+                        if (grade.courseid === course.courseid) {
+                        const keys = Object.keys(grade.assessments || {});
+                        keys.forEach((key) => {
+                            if (!headers.includes(key)) headers.push(key);
+                        });
+                        }
+                        return headers;
+                        }, []);
+                    const assessments = grade?.assessments || {};
+                    return (
+                        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+                        <h4>{grade.courseid}: {course.classdescription}</h4>
+                        
+                        <table className="min-w-full bg-white rounded-lg shadow-lg">
+                            <thead>
+                                <tr className="bg-gray-200 text-gray-700">
+                                    {/* Clean and render headers dynamically */}
+                                    {dynamicHeaders.map((header, i) => (
+                                        <th key={i} className="p-3 text-left">{cleanHeader(header)}</th>
+                                    ))}
+                                    <th className="p-3 text-left">Current Grade</th>
+                                    <th className="p-3 text-left">Final Grade</th>
+                                    <th className="p-3 text-left">Flag Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
                                 <tr key={grade.courseid} className="border-t border-gray-200">
-                                    <td className="p-3">{grade.courseid}</td>
-                                    <td className="p-3">{course.classdescription}</td>
-                                    <td className="p-3">{grade.journal1}</td>
-                                    <td className="p-3">{grade.journal2}</td>
-                                    <td className="p-3">{grade.assessment1}</td>
-                                    <td className="p-3">{grade.assessment2}</td>
-                                    <td className="p-3">{grade.assessment3}</td>
+                                    {/* Render dynamic assessment values */}
+                                    {dynamicHeaders.map((header, i) => (
+                                    <td key={i} className="p-3">
+                                        {assessments[header] !== undefined ? assessments[header] : null}
+                                    </td>
+                                    ))}
                                     <td className="p-3">{grade.currentscore}</td>
                                     <td className="p-3">{grade.finalgrade}</td>
                                     <td className="p-3">
                                         <div className="flex justify-center items-center h-full">
                                             {(grade.flagstatus === 0 || grade.flagstatus === 2) ? (
-                                                <button onClick={() => openModal(studentData.student, grade.courseid)} className="flex items-center justify-center">
-                                                    <svg
-                                                        className={`w-8 h-8`}
-                                                        viewBox="0 0 64 64"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        {/* Flagpole */}
-                                                        <line 
-                                                            x1="10" y1="5" 
-                                                            x2="10" y2="60" 
-                                                            stroke="black" 
-                                                            strokeWidth="2" 
-                                                        />
-                                                        {/* Flag */}
-                                                        <polygon 
-                                                            points="10,5 40,15 10,25" 
-                                                            fill={flagColors[grade.flagstatus]} 
-                                                        />
-                                                    </svg>
-                                                </button>) : 
-                                                <svg
-                                                    className={`w-8 h-8`}
-                                                    viewBox="0 0 64 64"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    {/* Flagpole */}
-                                                    <line 
-                                                        x1="10" y1="5" 
-                                                        x2="10" y2="60" 
-                                                        stroke="black" 
-                                                        strokeWidth="2" 
-                                                    />
-                                                    {/* Flag */}
-                                                    <polygon 
-                                                        points="10,5 40,15 10,25" 
-                                                        fill={flagColors[grade.flagstatus]} 
-                                                    />
-                                                </svg> 
-                                            }
+                                            <button onClick={() => openModal(studentData.student, grade.courseid)} className="flex items-center justify-center">
+                                            <svg
+                                                className={`w-8 h-8`}
+                                                viewBox="0 0 64 64"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                {/* Flagpole */}
+                                                <line 
+                                                x1="10" y1="5" 
+                                                x2="10" y2="60" 
+                                                stroke="black" 
+                                                strokeWidth="2" 
+                                                />
+                                                {/* Flag */}
+                                                <polygon 
+                                                points="10,5 40,15 10,25" 
+                                                fill={flagColors[grade.flagstatus]} 
+                                                />
+                                            </svg>
+                                            </button>) : 
+                                            <svg
+                                            className={`w-8 h-8`}
+                                            viewBox="0 0 64 64"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            {/* Flagpole */}
+                                            <line 
+                                            x1="10" y1="5" 
+                                            x2="10" y2="60" 
+                                            stroke="black" 
+                                            strokeWidth="2" 
+                                            />
+                                            {/* Flag */}
+                                            <polygon 
+                                            points="10,5 40,15 10,25" 
+                                            fill={flagColors[grade.flagstatus]} 
+                                            />
+                                        </svg> }
+                                            
                                         </div>
                                     </td>
                                 </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+                                    
+                            </tbody>
+                        </table>
+                        </div>
+                );
+            })}
             </div>
 
             {/* Modal Popup */}
