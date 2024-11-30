@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const AddUser = () => {
     const [formData, setFormData] = useState({
@@ -12,10 +12,8 @@ const AddUser = () => {
         courses: '',
     });
 
-    const [showConfirm, setShowConfirm] = useState(false); // Confirmation popup state
-    const navigate = useNavigate(); // Initialize navigate function
+    const navigate = useNavigate();
 
-    // Handle form input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -24,27 +22,53 @@ const AddUser = () => {
         });
     };
 
-    // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setShowConfirm(true); // Show confirmation popup
+        
+        // Client-side validation
+        if (formData.password !== formData.confirmPassword) {
+            alert('Passwords do not match');
+            return;
+        }
+
+        try {
+            const response = await fetch('/users/api/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: formData.username,
+                    password: formData.password,
+                    confirmPassword: formData.confirmPassword,
+                    email: formData.email,
+                    contactNumber: formData.contactNumber,
+                    role: formData.role,
+                    courses: formData.courses,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(`User successfully added! Welcome, ${data.user.username}`);
+                navigate('/manageuser');
+            } else {
+                alert(`Error: ${data.message || 'Failed to add user'}`);
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('An unexpected error occurred. Please try again later.');
+        }
     };
 
-    // Confirm submission action
-    const confirmSubmit = () => {
-        setShowConfirm(false);
-        alert('User has been successfully added!');
-    };
-
-    // Handle closing form and navigate back to Manage User page
     const handleCloseForm = () => {
-        navigate('/manageuser'); // Redirect to Manage User page
+        navigate('/manageuser');
     };
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center">
             <div className="relative w-full max-w-md bg-white p-8 rounded-lg shadow-lg border border-black">
-                {/* Close Button */}
                 <button
                     onClick={handleCloseForm}
                     className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -110,7 +134,6 @@ const AddUser = () => {
                             value={formData.contactNumber}
                             onChange={handleChange}
                             className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            required
                         />
                     </div>
                     {/* Role */}
@@ -148,30 +171,6 @@ const AddUser = () => {
                         </button>
                     </div>
                 </form>
-
-                {/* Confirmation Popup */}
-                {showConfirm && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                        <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
-                            <p className="mb-4 text-lg font-semibold text-gray-800">Confirm Submission</p>
-                            <p className="text-gray-600 mb-6">Are you sure you want to submit this form?</p>
-                            <div className="flex justify-around">
-                                <button
-                                    onClick={confirmSubmit}
-                                    className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition"
-                                >
-                                    Yes
-                                </button>
-                                <button
-                                    onClick={() => setShowConfirm(false)}
-                                    className="bg-red-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-600 transition"
-                                >
-                                    No
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     );
