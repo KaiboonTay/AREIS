@@ -88,15 +88,15 @@ WSGI_APPLICATION = 'areis.wsgi.application'
 DATABASES = {
     'default': {
         #this is for the sqlite database
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
 
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'areis',
-        'USER': 'areis_admin',
-        'PASSWORD': 'Password123',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'areis',
+        # 'USER': 'areis_admin',
+        # 'PASSWORD': 'Password123',
+        # 'HOST': 'localhost',
+        # 'PORT': '3306',
     }
 }
 
