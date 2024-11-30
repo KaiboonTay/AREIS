@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const AddUser = () => {
     const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const AddUser = () => {
     });
 
     const [showConfirm, setShowConfirm] = useState(false); // Confirmation popup state
+    const navigate = useNavigate(); // Initialize navigate function
 
     // Handle form input changes
     const handleChange = (e) => {
@@ -31,13 +33,24 @@ const AddUser = () => {
     // Confirm submission action
     const confirmSubmit = () => {
         setShowConfirm(false);
-        // Here you would handle the actual submission logic (e.g., send data to a server)
         alert('User has been successfully added!');
+    };
+
+    // Handle closing form and navigate back to Manage User page
+    const handleCloseForm = () => {
+        navigate('/manageuser'); // Redirect to Manage User page
     };
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center">
-            <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg border border-black">
+            <div className="relative w-full max-w-md bg-white p-8 rounded-lg shadow-lg border border-black">
+                {/* Close Button */}
+                <button
+                    onClick={handleCloseForm}
+                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                >
+                    ✖
+                </button>
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Add New User Form</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Username */}

@@ -65,10 +65,19 @@ const Login = () => {
   };
 
   return (
-    <div style={{ backgroundImage: `/static/bg.png` }} className="bg flex justify-center items-center flex-col relative">
-      <div className="mb-48">
-        <img src={`/static/logoLogin.png`} alt="Logo" />
-      </div>
+    <div
+  style={{
+    backgroundImage: 'url(/static/bg.png)', 
+    backgroundSize: 'cover',               
+    backgroundRepeat: 'no-repeat',         
+    backgroundPosition: 'center',          
+  }}
+  className="bg flex justify-center items-center flex-col relative"
+>
+  <div className="mb-48">
+    <img src="/static/logoLogin.png" alt="Logo" />
+  </div>
+
       <div className="absolute top-[50%] flex flex-col justify-center text-center items-center">
         <h2 className="font-bold text-[24px] shadow-slate-500">Sign In</h2>
         <p>Enter your username or UoN email to sign in</p>
