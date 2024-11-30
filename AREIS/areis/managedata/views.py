@@ -64,7 +64,7 @@ def upload_csv(request):
     new_grades = set()
 
     for row in csv_reader:
-        StudentId = row.get('Empl ID', '').strip().lower
+        StudentId = row.get('Empl ID', '').strip().lower()
         Lastname = row.get('Surname', '').strip()
         FirstName = row.get('First Name', '').strip()
         AcadProgDesc = row.get('Academic Program Descr', '').strip()
@@ -127,12 +127,12 @@ def upload_csv(request):
     # Convert sets to lists and filter out any empty strings
     return Response({
         "message": "CSV file successfully uploaded and processed.",
-        "student_duplicates": [s for s in student_duplicates if s],
-        "course_duplicates": [c for c in course_duplicates if c],
-        "grade_duplicates": [g for g in grade_duplicates if g],
-        "new_students": list(new_students),
-        "new_courses": list(new_courses),
-        "new_grades": list(new_grades),
+        "student_duplicates": list(student_duplicates),
+        "course_duplicates": list(course_duplicates), 
+        "grade_duplicates": list(grade_duplicates),
+        "new_students": list(new_students),   
+        "new_courses": list(new_courses),    
+        "new_grades": list(new_grades), 
     }, status=status.HTTP_201_CREATED)
 
 
